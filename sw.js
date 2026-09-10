@@ -2,7 +2,7 @@
 // а свіжа версія тихо підтягується у фоні (stale-while-revalidate) і діє з наступного відкриття.
 // Запити до Apps Script (script.google.com, POST) сюди не потрапляють — вхід і довідники завжди живі.
 // VERSION переписує tools/stamp-sw.mjs перед кожним викладанням: нова версія — старий кеш видаляється.
-const VERSION = 'v-d6042db36d';
+const VERSION = 'v-561b75f167';
 const CACHE = 'nesvich-calc-' + VERSION;
 const SCOPE = new URL(self.registration.scope);
 const PAGE = new URL('index.html', SCOPE).href;

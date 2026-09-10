@@ -76,45 +76,51 @@
   .mark.grain { border-radius: 50%; }
   .mark.tent { border-radius: 2px; }
 
-  /* ---------- вхід: на весь екран, як код-пароль на iPhone / в Telegram ---------- */
-  .login { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; color: #fff;
+  /* ---------- вхід: код-пароль як на iPhone, на світлому тлі з кольорами Apple ----------
+     Клавіші — матове скло над кольоровим тлом; натиснута — темнішає миттєво, відпущена — світлішає плавно. */
+  .login { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; color: var(--ink);
     padding: calc(var(--s5) + env(safe-area-inset-top)) var(--s4) calc(var(--s5) + env(safe-area-inset-bottom));
     background:
-      radial-gradient(70% 55% at 15% 0%, rgba(10, 132, 255, .30), rgba(10, 132, 255, 0) 70%),
-      radial-gradient(60% 50% at 100% 100%, rgba(191, 90, 242, .24), rgba(191, 90, 242, 0) 70%),
-      #0b0b0f; }
-  .login-card { width: 100%; max-width: 340px; animation: rise .6s var(--spring-soft) both; }
-  .brand { text-align: center; font-size: 15px; font-weight: 600; color: rgba(255, 255, 255, .6); }
-  .login-hint { margin: var(--s5) 0 var(--s4); text-align: center; font-size: 24px; font-weight: 700; letter-spacing: -.02em; color: #fff; }
+      radial-gradient(75% 55% at 0% 0%, rgba(0, 122, 255, .26), rgba(0, 122, 255, 0) 70%),
+      radial-gradient(65% 55% at 100% 25%, rgba(175, 82, 222, .22), rgba(175, 82, 222, 0) 70%),
+      radial-gradient(75% 55% at 15% 100%, rgba(255, 149, 0, .20), rgba(255, 149, 0, 0) 70%),
+      radial-gradient(60% 50% at 100% 100%, rgba(255, 45, 85, .16), rgba(255, 45, 85, 0) 70%),
+      var(--paper); }
+  .login-card { width: 100%; max-width: 360px; animation: rise .6s var(--spring-soft) both; }
+  .brand { text-align: center; font-size: 15px; font-weight: 600; color: var(--ink-2); }
+  .login-hint { margin: var(--s5) 0 var(--s4); text-align: center; font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
   .user-list { display: grid; gap: var(--s2); }
   .user-btn { display: flex; align-items: center; gap: var(--s3); width: 100%; min-height: 64px; padding: var(--s2) var(--s4) var(--s2) var(--s3);
-    border: 0; border-radius: 16px; background: rgba(255, 255, 255, .09); color: #fff; font-weight: 600; text-align: left;
-    transition: background-color .2s ease, transform .45s var(--spring); }
-  .user-btn:active { transform: scale(.98); background: rgba(255, 255, 255, .18); }
+    border: .5px solid rgba(255, 255, 255, .75); border-radius: 16px; color: var(--ink); font-weight: 600; text-align: left;
+    background: rgba(255, 255, 255, .62); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .05); transition: background-color .2s ease, transform .45s var(--spring); }
+  .user-btn:active { transform: scale(.98); background: rgba(255, 255, 255, .92); }
   .user-btn .avatar { flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
-    background: rgba(255, 255, 255, .16); font-weight: 700; }
+    background: rgba(118, 118, 128, .14); font-weight: 700; }
   .user-btn > span:nth-child(2) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .user-btn small { margin-left: auto; color: rgba(255, 255, 255, .55); font-weight: 500; }
-  .link { background: none; border: 0; padding: 0; min-height: var(--h); color: rgba(255, 255, 255, .8); font-weight: 600; }
-  .pin-who { display: grid; justify-items: center; gap: var(--s2); margin-top: var(--s2); }
-  .pin-avatar { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; font-size: 26px; font-weight: 600;
-    background: rgba(255, 255, 255, .16); }
-  .pin-who b { font-size: 17px; font-weight: 600; }
-  #login-pin .login-hint { margin: var(--s4) 0; font-size: 17px; font-weight: 500; color: rgba(255, 255, 255, .8); }
-  .pin-dots { display: flex; gap: 22px; justify-content: center; }
-  .pin-dots i { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, .9);
-    transition: background-color .12s ease, transform .4s var(--spring); }
-  .pin-dots i.on { background: #fff; transform: scale(1.1); }
+  .user-btn small { margin-left: auto; color: var(--ink-3); font-weight: 500; }
+  .pin-top { display: grid; justify-items: center; gap: 6px; margin-top: var(--s5); }
+  .pin-top b { font-size: 15px; font-weight: 600; color: var(--ink-2); }
+  .pin-title { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -.01em; }
+  .pin-dots { display: flex; gap: 22px; justify-content: center; margin-top: var(--s3); }
+  .pin-dots i { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid var(--ink); transition: background-color .08s ease; }
+  .pin-dots i.on { background: var(--ink); }
   .pin-dots.shake { animation: shake .45s cubic-bezier(.36, .07, .19, .97); }
   #login-pin.busy .pin-dots i { animation: breathe 1s ease-in-out infinite; }
   #login-pin.busy .keypad { opacity: .55; pointer-events: none; }
-  #pin-error { min-height: 72px; }
-  .keypad { display: grid; grid-template-columns: repeat(3, 76px); justify-content: center; gap: 16px 26px; }
-  .keypad button { width: 76px; height: 76px; border: 0; border-radius: 50%; display: grid; place-items: center;
-    background: rgba(255, 255, 255, .15); color: #fff; font-size: 32px; font-weight: 400; line-height: 1; transition: background-color .3s ease; }
-  .keypad button:active { background: rgba(255, 255, 255, .42); transition: none; }
-  .keypad button.mute { background: transparent; color: rgba(255, 255, 255, .85); font-size: 15px; font-weight: 600; }
-  .keypad button.mute:active { background: rgba(255, 255, 255, .1); }
+  #pin-error { min-height: 64px; }
+  .keypad { display: grid; grid-template-columns: repeat(3, 78px); justify-content: center; gap: 16px 28px; }
+  .keypad button { width: 78px; height: 78px; padding: 0; border: .5px solid rgba(255, 255, 255, .75); border-radius: 50%;
+    display: grid; place-content: center; justify-items: center; color: var(--ink);
+    background: rgba(255, 255, 255, .55); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .05); touch-action: manipulation; -webkit-user-select: none; user-select: none;
+    transition: background-color .35s ease; }
+  .keypad .d { font-size: 36px; font-weight: 300; line-height: 1; }
+  .keypad .l { margin-top: 3px; font-size: 10px; font-weight: 700; letter-spacing: .16em; line-height: 1; color: var(--ink-2); }
+  .keypad button.down, .keypad button:active { background: rgba(118, 118, 128, .3); transition: none; }
+  .keypad button.mute { border: 0; background: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+    font-size: 16px; font-weight: 500; }
+  .keypad button.mute.down, .keypad button.mute:active { background: transparent; opacity: .45; }
   .alert { display: flex; gap: var(--s3); align-items: flex-start; margin-top: var(--s4); padding: var(--s3) var(--s4);
     border-radius: var(--r-s); font-weight: 600; background: var(--fill-2); color: var(--ink); animation: rise .45s var(--spring-soft) both; }
   .alert .sym { flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
@@ -123,13 +129,8 @@
   .alert.stop { background: var(--stop-bg); } .alert.stop .sym { background: var(--stop); }
   .alert.edge { background: var(--edge-bg); } .alert.edge .sym { background: var(--edge-fill); color: var(--edge-glyph); }
   .alert-act { margin-top: var(--s3); }
-  .login .alert { margin-top: var(--s3); background: rgba(255, 255, 255, .09); color: #fff; }
-  .login .alert small { color: rgba(255, 255, 255, .65); }
-  .login .alert.stop { background: rgba(255, 69, 58, .2); }
-  .login .alert.stop .sym { background: #ff453a; }
-  .login .alert.edge { background: rgba(255, 159, 10, .2); }
-  .login .alert .btn { border-color: transparent; background: rgba(255, 255, 255, .16); color: #fff; }
-  .login-status { margin: var(--s3) 0 0; text-align: center; color: rgba(255, 255, 255, .6); font-size: 13px; min-height: 1.4em; }
+  .login .alert { margin-top: var(--s3); }
+  .login-status { margin: var(--s3) 0 0; text-align: center; color: var(--ink-3); font-size: 13px; min-height: 1.4em; }
   @keyframes shake { 10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(4px); } 30%, 50%, 70% { transform: translateX(-8px); } 40%, 60% { transform: translateX(8px); } }
   @keyframes breathe { 50% { opacity: .35; } }
 
@@ -530,10 +531,11 @@
     </div>
 
     <div id="login-pin" hidden>
-      <button type="button" class="link" id="pin-back">‹ Інший користувач</button>
-      <div class="pin-who"><span class="pin-avatar" id="pin-avatar" aria-hidden="true"></span><b id="pin-user"></b></div>
-      <p class="login-hint">Введіть PIN</p>
-      <div class="pin-dots" id="pin-dots"><i></i><i></i><i></i><i></i></div>
+      <div class="pin-top">
+        <b id="pin-user"></b>
+        <p class="pin-title">Введіть PIN</p>
+        <div class="pin-dots" id="pin-dots"><i></i><i></i><i></i><i></i></div>
+      </div>
       <div id="pin-error" aria-live="polite"></div>
       <div class="keypad" id="keypad"></div>
     </div>
@@ -1030,7 +1032,6 @@ function openPin(user) {
   state.pinUser = user;
   state.pin = '';
   $('#pin-user').textContent = user;
-  $('#pin-avatar').textContent = String(user || '').charAt(0).toUpperCase();
   $('#pin-error').innerHTML = '';
   $('#login-users').hidden = true;
   $('#login-pin').hidden = false;
@@ -1039,11 +1040,14 @@ function openPin(user) {
 
 function renderPinDots() {
   $$('#pin-dots i').forEach(function (d, i) { d.classList.toggle('on', i < state.pin.length); });
+  // Як на iPhone: поки цифр немає — «Скасувати», є — «Стерти».
+  const del = $('#pin-del');
+  if (del) del.textContent = state.pin.length ? 'Стерти' : 'Скасувати';
 }
 
 function pinPress(key) {
   if ($('#login-pin').hidden || $('#login-pin').classList.contains('busy')) return;
-  if (key === 'back') { state.pin = state.pin.slice(0, -1); renderPinDots(); return; }
+  if (key === 'back') { if (!state.pin) { $('#pin-back').click(); return; } state.pin = state.pin.slice(0, -1); renderPinDots(); return; }
   if (key === 'clear') { state.pin = ''; renderPinDots(); return; }
   if (!/^\d$/.test(key) || state.pin.length >= 4) return;
   state.pin += key;
@@ -1097,14 +1101,33 @@ function showPinError(e) {
   if (retry) retry.addEventListener('click', function () { $('#pin-error').innerHTML = ''; });
 }
 
+// Клавіатура PIN як на iPhone: цифри з літерами, унизу «Інший» і «Скасувати / Стерти».
+// Цифра спрацьовує одразу на дотик (pointerdown), як на iPhone. «Скасувати / Стерти» і «Інший» — після
+// відпускання пальця (click): вони міняють екран, і дотик не має «проскочити» на те, що зʼявиться під пальцем.
 function buildKeypad() {
-  const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'clear', '0', 'back'];
+  const letters = { 2: 'ABC', 3: 'DEF', 4: 'GHI', 5: 'JKL', 6: 'MNO', 7: 'PQRS', 8: 'TUV', 9: 'WXYZ' };
+  const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'other', '0', 'back'];
   $('#keypad').innerHTML = keys.map(function (k) {
-    if (k === 'clear') return '<button type="button" class="mute" data-key="clear">скинути</button>';
-    if (k === 'back') return '<button type="button" class="mute" data-key="back" aria-label="Стерти">⌫</button>';
-    return '<button type="button" data-key="' + k + '">' + k + '</button>';
+    if (k === 'other') return '<button type="button" class="mute" id="pin-back">Інший</button>';
+    if (k === 'back') return '<button type="button" class="mute" id="pin-del">Скасувати</button>';
+    return '<button type="button" data-key="' + k + '"><span class="d">' + k + '</span>' + (letters[k] ? '<span class="l">' + letters[k] + '</span>' : '') + '</button>';
   }).join('');
-  $$('#keypad button').forEach(function (b) { b.addEventListener('click', function () { pinPress(b.dataset.key); }); });
+  $$('#keypad button').forEach(function (b) {
+    const up = function () { b.classList.remove('down'); };
+    b.addEventListener('pointerdown', function (e) {
+      if (e.button > 0) return;
+      b.classList.add('down');
+      if (b.dataset.key) pinPress(b.dataset.key);
+    });
+    b.addEventListener('pointerup', up);
+    b.addEventListener('pointercancel', up);
+    b.addEventListener('pointerleave', up);
+  });
+  // Цифри з клавіатури компʼютера (Tab + Enter) — click без дотику (detail = 0), щоб дотик не рахувався двічі.
+  $$('#keypad button[data-key]').forEach(function (b) {
+    b.addEventListener('click', function (e) { if (e.detail === 0) pinPress(b.dataset.key); });
+  });
+  $('#pin-del').addEventListener('click', function () { pinPress('back'); });
   document.addEventListener('keydown', function (e) {
     if ($('#screen-login').hidden || $('#login-pin').hidden) return;
     if (/^\d$/.test(e.key)) pinPress(e.key);
