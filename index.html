@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Калькулятор рейсів — Nesvich Logistics</title>
+<meta name="theme-color" content="#16233a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #16233a;
+    --ink-2: #5a6578;
+    --ink-3: #8a93a3;
+    --paper: #eef1f6;
+    --card: #ffffff;
+    --line: #d6dce7;
+    --line-2: #e9edf3;
+    --go: #1c7c4d;   --go-bg: #e2f2e9;
+    --edge: #a3670a; --edge-bg: #fbefd6;
+    --stop: #b3261e; --stop-bg: #fce6e3;
+    --wait: #5a6578; --wait-bg: #e9ecf1;
+    --grain: #b8860b; --grain-soft: #f6ecd0;
+    --tent: #2f5ea8;  --tent-soft: #dde7f5;
+    --accent: var(--grain);
+    --accent-soft: var(--grain-soft);
+    --r: 12px;
+    --r-s: 8px;
+    --focus: 0 0 0 3px rgba(47, 94, 168, .28);
+  }
+  body[data-mode="tent"] { --accent: var(--tent); --accent-soft: var(--tent-soft); }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--ink);
+    background: var(--paper);
+    font-variant-numeric: tabular-nums;
+  }
+  [hidden] { display: none !important; }
+  button, input, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  h1, h2, h3 { margin: 0; font-weight: 700; }
+  :focus-visible { outline: none; box-shadow: var(--focus); }
+
+  /* ---------- login ---------- */
+  .login {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: var(--ink);
+    background-image: radial-gradient(1200px 600px at 20% -10%, rgba(255,255,255,.07), transparent 60%);
+  }
+  .login-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px 26px 22px;
+  }
+  .brand { font-weight: 800; font-size: 20px; letter-spacing: -.01em; }
+  .brand span { display: block; font-weight: 500; color: var(--ink-2); font-size: 14px; margin-top: 2px; }
+  .login-hint { margin: 22px 0 10px; color: var(--ink-2); }
+  .user-list { display: grid; gap: 8px; }
+  .user-btn {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; text-align: left;
+    padding: 12px 14px;
+    border: 1px solid var(--line); border-radius: var(--r-s);
+    background: #fff;
+    font-weight: 600;
+  }
+  .user-btn:hover { border-color: var(--ink); }
+  .user-btn .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--ink); color: #fff; font-weight: 800;
+  }
+  .user-btn small { color: var(--ink-3); font-weight: 500; margin-left: auto; }
+  .link { background: none; border: 0; padding: 0; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; }
+  .pin-dots { display: flex; gap: 14px; justify-content: center; margin: 18px 0 20px; }
+  .pin-dots i {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid var(--ink); background: transparent;
+    transition: background .12s;
+  }
+  .pin-dots i.on { background: var(--ink); }
+  .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .keypad button {
+    height: 52px; border: 1px solid var(--line); border-radius: var(--r-s);
+    background: #fff; font-size: 20px; font-weight: 600;
+  }
+  .keypad button:active { background: var(--paper); }
+  .keypad button.mute { border-color: transparent; background: transparent; color: var(--ink-2); font-size: 15px; }
+  .login-error { min-height: 1.4em; margin: 12px 0 0; color: var(--stop); font-weight: 600; }
+  .login-status { margin: 12px 0 0; color: var(--ink-3); font-size: 13px; min-height: 1.4em; }
+
+  /* ---------- top bar ---------- */
+  .top {
+    position: sticky; top: 0; z-index: 20;
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
+    padding: 10px 20px;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+  }
+  .top::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 3px;
+    background: var(--accent);
+  }
+  .top-brand { font-weight: 800; letter-spacing: -.01em; white-space: nowrap; }
+  .top-brand span { color: var(--ink-3); font-weight: 500; }
+  .mode-switch {
+    display: inline-flex; padding: 3px; border-radius: 999px;
+    background: var(--paper); border: 1px solid var(--line);
+  }
+  .mode-switch button {
+    border: 0; background: transparent; border-radius: 999px;
+    padding: 8px 18px; font-weight: 700; color: var(--ink-2);
+  }
+  .mode-switch button.is-active { background: var(--accent); color: #fff; }
+  .top-user { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
+  .top-user .name { font-weight: 700; }
+  .icon-btn {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 1px solid var(--line); background: #fff; color: var(--ink-2);
+    display: grid; place-items: center; font-size: 16px;
+  }
+  .icon-btn:hover { color: var(--ink); border-color: var(--ink); }
+
+  /* ---------- layout ---------- */
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 22px 20px 60px; display: grid; gap: 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); }
+
+  /* ---------- settings band ---------- */
+  .settings { padding: 16px 20px; }
+  .settings-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .settings-head h2 { font-size: 15px; font-weight: 700; }
+  .settings-head h2 em { font-style: normal; color: var(--accent); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip {
+    padding: 4px 10px; border-radius: 999px;
+    background: var(--paper); color: var(--ink-2); font-size: 13px; font-weight: 600;
+  }
+  .chip b { color: var(--ink); font-weight: 700; }
+  .settings-actions { display: flex; gap: 8px; align-items: center; }
+  .settings-body { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line-2); }
+  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .settings-group h3 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+  .settings-group p.note { margin: 10px 0 0; color: var(--ink-3); font-size: 13px; }
+  .fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+  .settings-foot { display: flex; align-items: center; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  .dirty { color: var(--edge); font-size: 13px; font-weight: 600; }
+
+  /* ---------- fields ---------- */
+  .field label { display: block; font-size: 13px; color: var(--ink-2); margin-bottom: 4px; font-weight: 600; }
+  .field label small { color: var(--ink-3); font-weight: 500; }
+  .field input, .field select, .input {
+    width: 100%; height: 40px;
+    padding: 0 10px;
+    border: 1px solid var(--line); border-radius: var(--r-s);
+    background: #fff;
+  }
+  .field input:disabled, .input:disabled { background: var(--paper); color: var(--ink-3); }
+  .field select { padding-right: 28px; appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%235a6578' stroke-width='1.8'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center; }
+  .field .hint { display: block; margin-top: 4px; font-size: 12px; color: var(--ink-3); }
+  .toggle { display: flex; align-items: center; gap: 10px; height: 40px; }
+  .toggle input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    height: 38px; padding: 0 16px;
+    border-radius: var(--r-s); border: 1px solid var(--line);
+    background: #fff; font-weight: 700;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn:hover { border-color: var(--ink); }
+  .btn.primary { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .btn.primary:hover { background: #22304d; }
+  .btn.primary:disabled { opacity: .6; cursor: default; }
+  .btn.ghost { background: transparent; }
+  .btn.small { height: 32px; padding: 0 12px; font-size: 13px; }
+
+  /* ---------- variants ---------- */
+  .variants { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .variant { padding: 18px 20px 20px; border-top: 4px solid var(--accent); }
+  .variant-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .variant-head h2 { font-size: 20px; font-weight: 800; letter-spacing: -.01em; }
+  .variant-head .sub { color: var(--ink-3); font-size: 13px; }
+  .block { margin-top: 16px; }
+  .block h3 { font-size: 13px; font-weight: 700; color: var(--ink-2); margin-bottom: 8px; }
+  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .row + .row { margin-top: 10px; }
+  .row.two { grid-template-columns: 1fr 1fr; }
+  .row.veh { grid-template-columns: 2fr 1fr; }
+
+  .tolls { border: 1px solid var(--line-2); border-radius: var(--r-s); padding: 10px; background: #fafbfd; }
+  .toll-row { display: grid; grid-template-columns: 1.6fr 1fr 1fr auto auto; gap: 8px; align-items: end; }
+  .toll-row + .toll-row { margin-top: 8px; }
+  .toll-sum { height: 40px; min-width: 76px; display: grid; place-items: center; padding: 0 8px;
+    background: var(--go-bg); color: var(--go); border-radius: var(--r-s); font-weight: 700; font-size: 13px; }
+  .toll-del { width: 40px; height: 40px; border-radius: var(--r-s); border: 1px solid var(--line); background: #fff; color: var(--ink-2); }
+  .toll-add { margin-top: 10px; }
+
+  .ledger { margin-top: 18px; border-top: 1px solid var(--line-2); }
+  .ledger-row { display: grid; grid-template-columns: 1fr auto 1fr auto; gap: 0 16px; padding: 7px 0; border-bottom: 1px solid var(--line-2); font-size: 14px; }
+  .ledger-row span:nth-child(odd) { color: var(--ink-2); }
+  .ledger-row span:nth-child(even) { font-weight: 700; text-align: right; white-space: nowrap; }
+  .ledger-row.total span { font-weight: 800; color: var(--ink); }
+
+  .verdict {
+    margin-top: 16px; padding: 16px 18px;
+    border-radius: var(--r); border-left: 6px solid var(--wait);
+    background: var(--wait-bg);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .verdict .word { font-size: 24px; font-weight: 800; letter-spacing: -.01em; color: var(--wait); }
+  .verdict .profit { text-align: right; }
+  .verdict .profit small { display: block; color: var(--ink-2); font-size: 13px; }
+  .verdict .profit b { font-size: 26px; font-weight: 800; letter-spacing: -.01em; }
+  .verdict.go { border-color: var(--go); background: var(--go-bg); }     .verdict.go .word, .verdict.go .profit b { color: var(--go); }
+  .verdict.edge { border-color: var(--edge); background: var(--edge-bg); } .verdict.edge .word { color: var(--edge); }
+  .verdict.stop { border-color: var(--stop); background: var(--stop-bg); } .verdict.stop .word, .verdict.stop .profit b { color: var(--stop); }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+  .stat { padding: 10px 12px; border: 1px solid var(--line-2); border-radius: var(--r-s); }
+  .stat small { display: block; color: var(--ink-3); font-size: 12px; font-weight: 600; }
+  .stat b { display: block; font-size: 16px; margin-top: 2px; white-space: nowrap; }
+  .stat b.neg { color: var(--stop); }
+  .stat b.pos { color: var(--go); }
+  .note { margin: 10px 0 0; color: var(--ink-3); font-size: 13px; }
+
+  .compare { padding: 16px 20px; font-size: 15px; }
+  .compare b { font-weight: 800; }
+
+  /* ---------- toast / loader ---------- */
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 999px;
+    font-weight: 600; z-index: 50; max-width: calc(100% - 32px);
+  }
+  .toast.err { background: var(--stop); }
+  .loader {
+    position: fixed; inset: 0; z-index: 40; display: grid; place-items: center;
+    background: rgba(238,241,246,.85); color: var(--ink-2); font-weight: 600;
+  }
+  .loader div { display: flex; align-items: center; gap: 12px; }
+  .spinner { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--ink); animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } .pin-dots i { transition: none; } }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 980px) {
+    .variants { grid-template-columns: 1fr; }
+    .settings-grid { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .top { grid-template-columns: 1fr auto; padding: 8px 12px; }
+    .top-brand { display: none; }
+    .mode-switch { justify-self: start; }
+    .wrap { padding: 14px 12px 50px; gap: 12px; }
+    .settings, .variant, .compare { padding: 14px; }
+    .row, .row.veh { grid-template-columns: 1fr 1fr; }
+    .toll-row { grid-template-columns: 1fr 1fr; }
+    .toll-row .field:first-child { grid-column: 1 / -1; }
+    .ledger-row { grid-template-columns: 1fr auto; }
+    .verdict .word { font-size: 20px; }
+    .verdict .profit b { font-size: 22px; }
+  }
+</style>
+</head>
+<body data-mode="grain">
+
+<section id="screen-login" class="login" hidden>
+  <div class="login-card">
+    <div class="brand">Nesvich Logistics<span>Калькулятор рейсів</span></div>
+
+    <div id="login-users">
+      <p class="login-hint">Хто рахує?</p>
+      <div id="user-list" class="user-list"></div>
+    </div>
+
+    <div id="login-pin" hidden>
+      <button type="button" class="link" id="pin-back">← інший користувач</button>
+      <p class="login-hint">PIN для <b id="pin-user"></b></p>
+      <div class="pin-dots" id="pin-dots"><i></i><i></i><i></i><i></i></div>
+      <div class="keypad" id="keypad"></div>
+      <p class="login-error" id="pin-error"></p>
+    </div>
+
+    <p class="login-status" id="login-status"></p>
+  </div>
+</section>
+
+<section id="screen-calc" hidden>
+  <header class="top">
+    <div class="top-brand">Nesvich <span>· Калькулятор рейсів</span></div>
+    <div class="mode-switch" role="tablist" aria-label="Тип авто">
+      <button type="button" role="tab" data-mode="grain" class="is-active">Зерновоз</button>
+      <button type="button" role="tab" data-mode="tent">Тент</button>
+    </div>
+    <div class="top-user">
+      <span class="name" id="user-name"></span>
+      <button type="button" class="icon-btn" id="btn-refresh" title="Оновити довідники з таблиці" aria-label="Оновити довідники">↻</button>
+      <button type="button" class="btn small" id="btn-logout">Вийти</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card settings">
+      <div class="settings-head">
+        <div>
+          <h2>Мої налаштування · <em id="settings-mode-label">зерновоз</em></h2>
+          <div class="chips" id="settings-chips"></div>
+        </div>
+        <div class="settings-actions">
+          <span class="dirty" id="settings-dirty" hidden>не збережено</span>
+          <button type="button" class="btn ghost" id="btn-settings-toggle">Змінити</button>
+        </div>
+      </div>
+      <div class="settings-body" id="settings-body" hidden>
+        <div class="settings-grid">
+          <div class="settings-group">
+            <h3>Витрати</h3>
+            <div class="fields" id="fields-costs"></div>
+            <p class="note" id="season-note"></p>
+          </div>
+          <div class="settings-group">
+            <h3>Пороги рішення</h3>
+            <div class="fields" id="fields-thresholds"></div>
+            <p class="note">Для «послуги» і «повернення» рішення рахується по прибутку на 1 км, для «простою» — по прибутку за 1 день. «На межі» — коли не вистачає до 10 %.</p>
+          </div>
+        </div>
+        <div class="settings-foot">
+          <button type="button" class="btn primary" id="btn-settings-save">Зберегти</button>
+          <button type="button" class="btn ghost" id="btn-settings-reset">Скинути до заводських</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="variants">
+      <section class="card variant" id="variant-a"></section>
+      <section class="card variant" id="variant-b"></section>
+    </div>
+
+    <section class="card compare" id="compare"></section>
+  </main>
+</section>
+
+<div id="toast" class="toast" hidden></div>
+<div id="loader" class="loader" hidden><div><span class="spinner"></span><span id="loader-text">Завантажую…</span></div></div>
+<script>
+/* ============================================================
+   НАЛАШТУВАННЯ ФАЙЛУ — єдине місце, яке треба змінити.
+   Вставте сюди адресу веб-додатка Apps Script (закінчується на /exec).
+   ============================================================ */
+const API_URL = 'https://script.google.com/macros/s/AKfycbyKuVGbFHkKBD1m5RiPj632gOmyv6-38R7SPaHGuG65grPtZgbLIixo1oKnaTPpji2j/exec';
+</script>
+
+<script>
+/* ---------- Розрахунок: чиста логіка без DOM ---------- */
+const Calc = (function () {
+  const MONTHS = ['січень','лютий','березень','квітень','травень','червень','липень','серпень','вересень','жовтень','листопад','грудень'];
+
+  function num(v, fallback) {
+    if (v === null || v === undefined || v === '') return fallback === undefined ? 0 : fallback;
+    const n = Number(String(v).replace(',', '.').replace(/\s/g, ''));
+    return isNaN(n) ? (fallback === undefined ? 0 : fallback) : n;
+  }
+
+  function threshold(s, region, scenario) {
+    if (scenario === 'idle') return { value: num(s.idleMinDay), unit: 'day' };
+    const ua = region === 'ukraine';
+    const value = scenario === 'return'
+      ? (ua ? num(s.uaReturnMinKm) : num(s.abroadReturnMinKm))
+      : (ua ? num(s.uaServiceMinKm) : num(s.abroadServiceMinKm));
+    return { value: value, unit: 'km' };
+  }
+
+  function decide(scenario, metric, thr, freight, totalKm, days) {
+    if (freight <= 0) return { code: 'wait', label: 'Введіть фрахт' };
+    if (scenario !== 'idle' && totalKm <= 0) return { code: 'wait', label: 'Введіть кілометраж' };
+    if (scenario === 'idle' && days <= 0) return { code: 'wait', label: 'Введіть тривалість' };
+    if (thr <= 0) return metric >= 0 ? { code: 'go', label: 'Їдемо' } : { code: 'stop', label: 'Не вигідно' };
+    if (metric >= thr) return { code: 'go', label: 'Їдемо' };
+    if (metric >= thr * 0.9) return { code: 'edge', label: 'На межі' };
+    return { code: 'stop', label: 'Не вигідно' };
+  }
+
+  /**
+   * inp: { region, scenario, quoteMode, freight, pricePerTon, tons, curAmount, currency,
+   *        kmFull, kmEmpty, days, norm, tolls:[{qty, rate}], other }
+   * s:   налаштування режиму
+   * ctx: { mode: 'grain'|'tent', seasonCoef: number }
+   */
+  function compute(inp, s, ctx) {
+    const mode = ctx.mode || 'grain';
+    const isIdle = inp.scenario === 'idle';
+    const days = Math.max(num(inp.days, 1), 0);
+    const kmFull = isIdle ? 0 : Math.max(num(inp.kmFull), 0);
+    const kmEmpty = isIdle ? 0 : Math.max(num(inp.kmEmpty), 0);
+    const totalKm = kmFull + kmEmpty;
+    const tons = Math.max(num(inp.tons, num(s.defaultLoadTons)), 0);
+
+    let freight;
+    if (inp.quoteMode === 'ton_usd') freight = tons * num(inp.pricePerTon) * num(s.usdRate);
+    else if (inp.quoteMode === 'currency') freight = num(inp.curAmount) * (inp.currency === 'EUR' ? num(s.eurRate) : num(s.usdRate));
+    else freight = num(inp.freight);
+    freight = Math.max(freight, 0);
+
+    const normBase = num(inp.norm, num(s.fuelCons));
+    const seasonOn = !!num(s.seasonOn);
+    const coef = seasonOn ? (num(ctx.seasonCoef, 1) || 1) : 1;
+    const norm = normBase * coef;
+
+    const fuel = totalKm / 100 * norm * num(s.fuelPrice);
+    const amort = totalKm * num(s.amortRate);
+    const tolls = (inp.tolls || []).reduce(function (acc, t) {
+      return acc + Math.max(num(t.qty), 0) * Math.max(num(t.rate), 0);
+    }, 0);
+    const other = Math.max(num(inp.other), 0);
+    const fixed = fuel + amort + tolls + other;
+
+    let driver = 0, p = 0, base = 'gross';
+    if (mode === 'tent') {
+      p = Math.min(Math.max(num(s.driverPct), 0), 99) / 100;
+      base = s.driverPctBase || 'gross';
+      const b = base === 'minusTolls' ? freight - tolls : base === 'net' ? freight - fixed : freight;
+      driver = Math.max(b, 0) * p;
+    } else {
+      driver = totalKm * num(s.driverRate);
+    }
+
+    const total = fixed + driver;
+    const profit = freight - total;
+    const profitPerDay = days > 0 ? profit / days : 0;
+    const profitPerKm = totalKm > 0 ? profit / totalKm : 0;
+
+    const thr = threshold(s, inp.region, inp.scenario);
+    const T = isIdle ? thr.value * days : thr.value * totalKm;
+
+    let required;
+    if (mode === 'tent' && p > 0) {
+      if (base === 'net') required = fixed + T / (1 - p);
+      else if (base === 'minusTolls') required = (fixed + T - p * tolls) / (1 - p);
+      else required = (fixed + T) / (1 - p);
+    } else {
+      required = total + T;
+    }
+    const reserve = freight - required;
+    const metric = isIdle ? profitPerDay : profitPerKm;
+    const decision = decide(inp.scenario, metric, thr.value, freight, totalKm, days);
+
+    return {
+      freight: freight, totalKm: totalKm, kmFull: kmFull, kmEmpty: kmEmpty, days: days, tons: tons,
+      normBase: normBase, coef: coef, norm: norm, seasonOn: seasonOn,
+      fuel: fuel, driver: driver, driverPct: p, driverBase: base, amort: amort, tolls: tolls, other: other,
+      total: total, profit: profit, profitPerDay: profitPerDay, profitPerKm: profitPerKm,
+      threshold: thr.value, thresholdUnit: thr.unit, required: required, reserve: reserve,
+      metric: metric, decision: decision
+    };
+  }
+
+  return { num: num, compute: compute, threshold: threshold, MONTHS: MONTHS };
+})();
+if (typeof module !== 'undefined') module.exports = Calc;
+</script>
+
+<script>
+/* ---------- Бекенд (Apps Script) ---------- */
+async function api(action, payload) {
+  if (!API_URL || API_URL.indexOf('ВСТАВТЕ') === 0) {
+    throw new Error('У файлі index.html не вказано API_URL — адресу веб-додатка Apps Script.');
+  }
+  const body = JSON.stringify(Object.assign({ action: action }, payload || {}));
+  let res;
+  try {
+    res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: body });
+  } catch (e) {
+    const err = new Error('Немає зв\u2019язку з сервером'); err.code = 'NETWORK'; throw err;
+  }
+  let data;
+  try { data = await res.json(); } catch (e) {
+    const err = new Error('Сервер відповів не JSON — перевірте, що веб-додаток розгорнуто з доступом «Усі»'); err.code = 'BAD'; throw err;
+  }
+  if (!data || !data.ok) {
+    const err = new Error((data && data.error) || 'Помилка сервера'); err.code = (data && data.code) || 'ERR'; throw err;
+  }
+  return data;
+}
+</script>
+<script>
+/* ---------- Утиліти ---------- */
+const $ = function (sel, root) { return (root || document).querySelector(sel); };
+const $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+const esc = function (s) { return String(s === undefined || s === null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+const fmtMoney = function (v) { return Math.round(Number(v) || 0).toLocaleString('uk-UA'); };
+const fmtNum = function (v, d) { return (Number(v) || 0).toLocaleString('uk-UA', { minimumFractionDigits: d, maximumFractionDigits: d }); };
+const store = {
+  get: function (k, fb) { try { const r = localStorage.getItem(k); return r === null ? fb : JSON.parse(r); } catch (e) { return fb; } },
+  set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+const KEY = {
+  session: 'nl.session',
+  config: function (u) { return 'nl.config:' + u; },
+  draft: function (u, m) { return 'nl.draft:' + u + ':' + m; },
+  mode: function (u) { return 'nl.mode:' + u; }
+};
+const MODE_LABEL = { grain: 'зерновоз', tent: 'тент' };
+const TENT_DELTA = 2.5; // тент бере на стільки л/100 менше за зерновоз, якщо у довіднику не вказано окремо
+
+let toastTimer = null;
+function toast(msg, isErr) {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.toggle('err', !!isErr);
+  el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { el.hidden = true; }, isErr ? 5000 : 2600);
+}
+function loader(on, text) {
+  $('#loader-text').textContent = text || 'Завантажую…';
+  $('#loader').hidden = !on;
+}
+
+/* ---------- Стан ---------- */
+const state = {
+  session: null,     // { token, user, role }
+  config: null,      // з бекенду
+  mode: 'grain',
+  settings: {},      // робоча копія налаштувань { grain:{}, tent:{} }
+  dirty: { grain: false, tent: false },
+  restoring: false,
+  results: { a: null, b: null },
+  pin: ''
+};
+
+/* ============================================================
+   ВХІД
+   ============================================================ */
+function showLogin() {
+  $('#screen-calc').hidden = true;
+  $('#screen-login').hidden = false;
+  $('#login-users').hidden = false;
+  $('#login-pin').hidden = true;
+  $('#login-status').textContent = '';
+  loadUsers();
+}
+
+async function loadUsers() {
+  const list = $('#user-list');
+  list.innerHTML = '';
+  $('#login-status').textContent = 'Завантажую список…';
+  try {
+    const data = await api('users');
+    $('#login-status').textContent = '';
+    renderUsers(data.users || []);
+  } catch (e) {
+    $('#login-status').textContent = e.message;
+    const remembered = store.get(KEY.session);
+    if (remembered && remembered.user) renderUsers([{ name: remembered.user, role: remembered.role }]);
+  }
+}
+
+function renderUsers(users) {
+  const list = $('#user-list');
+  list.innerHTML = users.map(function (u) {
+    const name = typeof u === 'string' ? u : u.name;
+    const role = typeof u === 'string' ? '' : (u.role || '');
+    return '<button type="button" class="user-btn" data-user="' + esc(name) + '">' +
+      '<span class="avatar">' + esc(name.charAt(0).toUpperCase()) + '</span>' +
+      '<span>' + esc(name) + '</span>' + (role ? '<small>' + esc(role) + '</small>' : '') + '</button>';
+  }).join('');
+  $$('.user-btn', list).forEach(function (b) {
+    b.addEventListener('click', function () { openPin(b.dataset.user); });
+  });
+}
+
+function openPin(user) {
+  state.pinUser = user;
+  state.pin = '';
+  $('#pin-user').textContent = user;
+  $('#pin-error').textContent = '';
+  $('#login-users').hidden = true;
+  $('#login-pin').hidden = false;
+  renderPinDots();
+}
+
+function renderPinDots() {
+  $$('#pin-dots i').forEach(function (d, i) { d.classList.toggle('on', i < state.pin.length); });
+}
+
+function pinPress(key) {
+  if ($('#login-pin').hidden) return;
+  if (key === 'back') { state.pin = state.pin.slice(0, -1); renderPinDots(); return; }
+  if (key === 'clear') { state.pin = ''; renderPinDots(); return; }
+  if (!/^\d$/.test(key) || state.pin.length >= 4) return;
+  state.pin += key;
+  renderPinDots();
+  if (state.pin.length === 4) submitPin();
+}
+
+async function submitPin() {
+  const user = state.pinUser, pin = state.pin;
+  $('#pin-error').textContent = '';
+  loader(true, 'Перевіряю PIN…');
+  try {
+    const data = await api('login', { user: user, pin: pin });
+    state.session = { token: data.token, user: data.user, role: data.role };
+    store.set(KEY.session, state.session);
+    loader(false);
+    enter(data);
+  } catch (e) {
+    loader(false);
+    state.pin = '';
+    renderPinDots();
+    $('#pin-error').textContent = e.message;
+  }
+}
+
+function buildKeypad() {
+  const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'clear', '0', 'back'];
+  $('#keypad').innerHTML = keys.map(function (k) {
+    if (k === 'clear') return '<button type="button" class="mute" data-key="clear">скинути</button>';
+    if (k === 'back') return '<button type="button" class="mute" data-key="back" aria-label="Стерти">⌫</button>';
+    return '<button type="button" data-key="' + k + '">' + k + '</button>';
+  }).join('');
+  $$('#keypad button').forEach(function (b) { b.addEventListener('click', function () { pinPress(b.dataset.key); }); });
+  document.addEventListener('keydown', function (e) {
+    if ($('#screen-login').hidden || $('#login-pin').hidden) return;
+    if (/^\d$/.test(e.key)) pinPress(e.key);
+    else if (e.key === 'Backspace') pinPress('back');
+    else if (e.key === 'Escape') $('#pin-back').click();
+  });
+  $('#pin-back').addEventListener('click', function () {
+    $('#login-pin').hidden = true;
+    $('#login-users').hidden = false;
+  });
+}
+
+function logout() {
+  store.del(KEY.session);
+  state.session = null;
+  state.config = null;
+  showLogin();
+}
+
+/* ============================================================
+   ВХІД У КАЛЬКУЛЯТОР
+   ============================================================ */
+function enter(config, fromCache) {
+  state.config = config;
+  store.set(KEY.config(state.session.user), config);
+  state.settings = JSON.parse(JSON.stringify(config.settings || {}));
+  ['grain', 'tent'].forEach(function (m) {
+    if (!state.settings[m]) state.settings[m] = JSON.parse(JSON.stringify((config.defaults || {})[m] || {}));
+  });
+  state.dirty = { grain: false, tent: false };
+  state.mode = store.get(KEY.mode(state.session.user), 'grain');
+
+  $('#screen-login').hidden = true;
+  $('#screen-calc').hidden = false;
+  $('#user-name').textContent = state.session.user;
+
+  applyMode(state.mode, true);
+  if (fromCache) toast('Немає зв\u2019язку — працюю з останніх збережених довідників');
+}
+
+function applyMode(mode, first) {
+  if (!first) saveDraft();
+  state.mode = mode;
+  store.set(KEY.mode(state.session.user), mode);
+  document.body.dataset.mode = mode;
+  $$('.mode-switch button').forEach(function (b) { b.classList.toggle('is-active', b.dataset.mode === mode); });
+  $('#settings-mode-label').textContent = MODE_LABEL[mode];
+  renderSettings();
+  renderVariant('a');
+  renderVariant('b');
+  restoreDraft();
+  recalcAll();
+}
+
+/* ============================================================
+   НАЛАШТУВАННЯ
+   ============================================================ */
+const COST_FIELDS = [
+  { k: 'fuelPrice', l: 'Ціна палива', u: 'грн/л' },
+  { k: 'fuelCons', l: 'Норма, якщо авто не вибрано', u: 'л/100 км' },
+  { k: 'driverRate', l: 'ЗП водія', u: 'грн/км', modes: ['grain'] },
+  { k: 'driverPct', l: 'Водію від фрахту', u: '%', modes: ['tent'] },
+  { k: 'driverPctBase', l: 'Відсоток рахуємо від', type: 'select', modes: ['tent'],
+    opts: [['gross', 'повного фрахту'], ['minusTolls', 'фрахту мінус платні дороги'], ['net', 'фрахту мінус усі витрати']] },
+  { k: 'amortRate', l: 'Амортизація', u: 'грн/км' },
+  { k: 'usdRate', l: 'Курс USD', u: 'грн' },
+  { k: 'eurRate', l: 'Курс EUR', u: 'грн' },
+  { k: 'defaultLoadTons', l: 'Тонаж за замовчуванням', u: 'т' },
+  { k: 'seasonOn', l: 'Сезонний коефіцієнт до норми', type: 'toggle' }
+];
+const THRESHOLD_FIELDS = [
+  { k: 'uaServiceMinKm', l: 'Україна, послуга', u: 'грн/км' },
+  { k: 'abroadServiceMinKm', l: 'Закордон, послуга', u: 'грн/км' },
+  { k: 'uaReturnMinKm', l: 'Україна, повернення', u: 'грн/км' },
+  { k: 'abroadReturnMinKm', l: 'Закордон, повернення', u: 'грн/км' },
+  { k: 'idleMinDay', l: 'Простій, мінімум за день', u: 'грн' }
+];
+
+function fieldHTML(f, s) {
+  const v = s[f.k];
+  if (f.type === 'toggle') {
+    return '<div class="field"><label>' + esc(f.l) + '</label><label class="toggle"><input type="checkbox" data-key="' + f.k + '"' + (Calc.num(v) ? ' checked' : '') + '> <span>увімкнено</span></label></div>';
+  }
+  if (f.type === 'select') {
+    return '<div class="field"><label>' + esc(f.l) + '</label><select data-key="' + f.k + '">' +
+      f.opts.map(function (o) { return '<option value="' + o[0] + '"' + (v === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') +
+      '</select></div>';
+  }
+  return '<div class="field"><label>' + esc(f.l) + (f.u ? ' <small>' + esc(f.u) + '</small>' : '') + '</label>' +
+    '<input type="text" inputmode="decimal" data-key="' + f.k + '" value="' + esc(v === undefined || v === null ? '' : v) + '"></div>';
+}
+
+function renderSettings() {
+  const mode = state.mode, s = state.settings[mode] || {};
+  const visible = function (f) { return !f.modes || f.modes.indexOf(mode) >= 0; };
+  $('#fields-costs').innerHTML = COST_FIELDS.filter(visible).map(function (f) { return fieldHTML(f, s); }).join('');
+  $('#fields-thresholds').innerHTML = THRESHOLD_FIELDS.map(function (f) { return fieldHTML(f, s); }).join('');
+  $$('#settings-body [data-key]').forEach(function (el) {
+    el.addEventListener('input', onSettingChange);
+    el.addEventListener('change', onSettingChange);
+  });
+  renderSeasonNote();
+  renderChips();
+  renderDirty();
+}
+
+function onSettingChange(e) {
+  const el = e.target, k = el.dataset.key, s = state.settings[state.mode];
+  if (el.type === 'checkbox') s[k] = el.checked ? 1 : 0;
+  else if (el.tagName === 'SELECT') s[k] = el.value;
+  else s[k] = el.value;
+  state.dirty[state.mode] = true;
+  if (k === 'fuelCons') {
+    ['a', 'b'].forEach(function (p) {
+      const n = $('#' + p + '-norm');
+      if (n && !$('#' + p + '-vehicle').value && n.dataset.auto !== '') n.value = s.fuelCons;
+    });
+  }
+  if (k === 'defaultLoadTons') {
+    ['a', 'b'].forEach(function (p) {
+      const t = $('#' + p + '-tons');
+      if (t && t.dataset.manual !== '1') t.value = s.defaultLoadTons;
+    });
+  }
+  renderSeasonNote();
+  renderChips();
+  renderDirty();
+  recalcAll();
+}
+
+function seasonCoef() {
+  const m = (state.config && state.config.month) || (new Date().getMonth() + 1);
+  const season = (state.config && state.config.season) || {};
+  return Calc.num(season[m], 1) || 1;
+}
+
+function renderSeasonNote() {
+  const m = (state.config && state.config.month) || (new Date().getMonth() + 1);
+  const s = state.settings[state.mode] || {};
+  $('#season-note').textContent = Calc.num(s.seasonOn)
+    ? 'Зараз ' + Calc.MONTHS[m - 1] + ': норма × ' + fmtNum(seasonCoef(), 3) + '. Коефіцієнти по місяцях — на аркуші «Сезон».'
+    : 'Сезон вимкнено — норма береться як є.';
+}
+
+function renderChips() {
+  const s = state.settings[state.mode] || {};
+  const chips = [
+    ['Паливо', fmtNum(Calc.num(s.fuelPrice), 2) + ' ₴/л'],
+    state.mode === 'tent'
+      ? ['Водію', fmtNum(Calc.num(s.driverPct), 1) + ' % ' + ({ gross: 'від фрахту', minusTolls: 'від фрахту − дороги', net: 'від чистого' }[s.driverPctBase] || 'від фрахту')]
+      : ['ЗП', fmtNum(Calc.num(s.driverRate), 2) + ' ₴/км'],
+    ['Аморт.', fmtNum(Calc.num(s.amortRate), 2) + ' ₴/км'],
+    ['USD', fmtNum(Calc.num(s.usdRate), 2)],
+    ['EUR', fmtNum(Calc.num(s.eurRate), 2)],
+    ['Тонаж', fmtNum(Calc.num(s.defaultLoadTons), 1) + ' т'],
+    ['Пороги', fmtNum(Calc.num(s.uaServiceMinKm), 0) + ' / ' + fmtNum(Calc.num(s.abroadServiceMinKm), 0) + ' ₴/км'],
+    ['Сезон', Calc.num(s.seasonOn) ? '× ' + fmtNum(seasonCoef(), 3) : 'вимк.']
+  ];
+  $('#settings-chips').innerHTML = chips.map(function (c) { return '<span class="chip">' + esc(c[0]) + ' <b>' + esc(c[1]) + '</b></span>'; }).join('');
+}
+
+function renderDirty() {
+  $('#settings-dirty').hidden = !state.dirty[state.mode];
+}
+
+async function saveSettings() {
+  const btn = $('#btn-settings-save');
+  const mode = state.mode;
+  const clean = {};
+  Object.keys(state.settings[mode]).forEach(function (k) {
+    const v = state.settings[mode][k];
+    clean[k] = (k === 'driverPctBase') ? v : Calc.num(v);
+  });
+  btn.disabled = true; btn.textContent = 'Зберігаю…';
+  try {
+    await api('save', { token: state.session.token, mode: mode, settings: clean });
+    state.settings[mode] = clean;
+    state.config.settings = state.config.settings || {};
+    state.config.settings[mode] = JSON.parse(JSON.stringify(clean));
+    store.set(KEY.config(state.session.user), state.config);
+    state.dirty[mode] = false;
+    renderSettings();
+    toast('Збережено');
+  } catch (e) {
+    if (e.code === 'AUTH') { toast('Сесія закінчилась — увійдіть знову', true); logout(); }
+    else toast(e.message, true);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Зберегти';
+  }
+}
+
+function resetSettings() {
+  const d = (state.config.defaults || {})[state.mode];
+  if (!d) { toast('Заводські значення не задані — заповніть рядок «*» на аркуші «Налаштування»', true); return; }
+  state.settings[state.mode] = JSON.parse(JSON.stringify(d));
+  state.dirty[state.mode] = true;
+  renderSettings();
+  recalcAll();
+  toast('Підставив заводські — натисніть «Зберегти», щоб лишити');
+}
+
+/* ============================================================
+   ВАРІАНТИ А / Б
+   ============================================================ */
+function vehicleOptions(selected) {
+  const list = (state.config.vehicles || []).filter(function (v) { return v.active !== false; });
+  return '<option value="">— без авто —</option>' + list.map(function (v) {
+    const label = v.plate + ' · ' + shortModel(v.model) + (v.driver ? ' · ' + shortName(v.driver) : '');
+    return '<option value="' + esc(v.plate) + '"' + (v.plate === selected ? ' selected' : '') + '>' + esc(label) + '</option>';
+  }).join('');
+}
+function shortModel(m) { return String(m || '').replace(/\s*\d{4}\s*р?\.?$/, '').trim(); }
+function shortName(n) {
+  const p = String(n || '').trim().split(/\s+/);
+  return p.length > 1 ? p[0] + ' ' + p[1].charAt(0) + '.' : p[0] || '';
+}
+function vehicleByPlate(plate) {
+  return (state.config.vehicles || []).find(function (v) { return v.plate === plate; }) || null;
+}
+function vehicleNorm(v, mode) {
+  if (!v) return '';
+  if (mode === 'tent') {
+    const t = Calc.num(v.normTent, NaN);
+    if (!isNaN(t) && t > 0) return t;
+    const g = Calc.num(v.normGrain, NaN);
+    return isNaN(g) ? '' : Math.max(g - TENT_DELTA, 0);
+  }
+  const g = Calc.num(v.normGrain, NaN);
+  return isNaN(g) ? '' : g;
+}
+
+function renderVariant(p) {
+  const title = p === 'a' ? 'Варіант А' : 'Варіант Б';
+  const s = state.settings[state.mode] || {};
+  const host = $('#variant-' + p);
+  host.innerHTML =
+    '<div class="variant-head"><h2>' + title + '</h2><button type="button" class="btn small ghost" data-act="reset">Очистити</button></div>' +
+
+    '<div class="block"><h3>Рейс</h3>' +
+      '<div class="row">' +
+        '<div class="field"><label>Регіон</label><select id="' + p + '-region"><option value="ukraine">Україна</option><option value="abroad">Закордон</option></select></div>' +
+        '<div class="field"><label>Сценарій</label><select id="' + p + '-scenario"><option value="service">Надаємо послугу</option><option value="return">Повертаємось назад</option><option value="idle">Простій / очікування</option></select></div>' +
+        '<div class="field"><label>Фрахт задаємо</label><select id="' + p + '-quote"><option value="manual">Сумою в гривні</option><option value="ton_usd">Ціною за тонну, USD</option><option value="currency">Сумою у валюті</option></select></div>' +
+      '</div>' +
+      '<div class="row veh">' +
+        '<div class="field"><label>Авто</label><select id="' + p + '-vehicle">' + vehicleOptions('') + '</select></div>' +
+        '<div class="field"><label>Норма <small>л/100 км</small></label><input type="text" inputmode="decimal" id="' + p + '-norm" value="' + esc(s.fuelCons || '') + '"><span class="hint" id="' + p + '-norm-hint">з налаштувань</span></div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="block"><h3>Гроші і пробіг</h3>' +
+      '<div class="row">' +
+        '<div class="field" data-quote="manual"><label>Фрахт <small>грн</small></label><input type="text" inputmode="decimal" id="' + p + '-freight" placeholder="0"></div>' +
+        '<div class="field" data-quote="ton_usd"><label>Ціна за 1 т <small>USD</small></label><input type="text" inputmode="decimal" id="' + p + '-ppt" placeholder="0"></div>' +
+        '<div class="field" data-quote="ton_usd"><label>Тонаж <small>т</small></label><input type="text" inputmode="decimal" id="' + p + '-tons" value="' + esc(s.defaultLoadTons || '') + '"></div>' +
+        '<div class="field" data-quote="currency"><label>Сума у валюті</label><input type="text" inputmode="decimal" id="' + p + '-cur" placeholder="0"></div>' +
+        '<div class="field" data-quote="currency"><label>Валюта</label><select id="' + p + '-currency"><option value="EUR">EUR</option><option value="USD">USD</option></select></div>' +
+        '<div class="field" data-km><label>Км з вантажем</label><input type="text" inputmode="decimal" id="' + p + '-km-full" placeholder="0"></div>' +
+        '<div class="field" data-km><label>Км порожній</label><input type="text" inputmode="decimal" id="' + p + '-km-empty" placeholder="0"></div>' +
+        '<div class="field"><label>Тривалість <small>днів</small></label><input type="text" inputmode="decimal" id="' + p + '-days" value="1"></div>' +
+        '<div class="field"><label>Інші витрати <small>грн: стоянки, переправи, добові</small></label><input type="text" inputmode="decimal" id="' + p + '-other" placeholder="0"></div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="block"><h3>Платні дороги по країнах</h3>' +
+      '<div class="tolls"><div id="' + p + '-tolls"></div>' +
+      '<button type="button" class="btn small toll-add" data-act="add-toll">+ Додати країну</button></div>' +
+    '</div>' +
+
+    '<div class="ledger">' +
+      '<div class="ledger-row"><span>Фрахт</span><span id="' + p + '-r-freight">0 ₴</span><span>Пробіг</span><span id="' + p + '-r-km">0 км</span></div>' +
+      '<div class="ledger-row"><span>Паливо <small id="' + p + '-r-fuel-note"></small></span><span id="' + p + '-r-fuel">0 ₴</span><span id="' + p + '-r-driver-label">ЗП водія</span><span id="' + p + '-r-driver">0 ₴</span></div>' +
+      '<div class="ledger-row"><span>Амортизація</span><span id="' + p + '-r-amort">0 ₴</span><span>Платні дороги</span><span id="' + p + '-r-tolls">0 ₴</span></div>' +
+      '<div class="ledger-row"><span>Інші витрати</span><span id="' + p + '-r-other">0 ₴</span><span>Усі витрати</span><span id="' + p + '-r-total">0 ₴</span></div>' +
+      '<div class="ledger-row total"><span>Мінімальний фрахт, щоб їхати</span><span id="' + p + '-r-required">0 ₴</span><span></span><span></span></div>' +
+    '</div>' +
+
+    '<div class="verdict wait" id="' + p + '-verdict"><div class="word" id="' + p + '-verdict-word">Введіть фрахт</div>' +
+      '<div class="profit"><small>Чистий прибуток</small><b id="' + p + '-r-profit">0 ₴</b></div></div>' +
+
+    '<div class="stats">' +
+      '<div class="stat"><small>Прибуток за день</small><b id="' + p + '-r-day">0 ₴</b></div>' +
+      '<div class="stat"><small>Прибуток на 1 км</small><b id="' + p + '-r-perkm">0,00 ₴</b></div>' +
+      '<div class="stat"><small>Потрібний поріг</small><b id="' + p + '-r-threshold">—</b></div>' +
+      '<div class="stat"><small>Запас / недобір</small><b id="' + p + '-r-reserve">0 ₴</b></div>' +
+    '</div>' +
+    '<p class="note" id="' + p + '-note"></p>';
+
+  // події
+  $$('input, select', host).forEach(function (el) {
+    const handler = function () { onVariantInput(p, el); };
+    el.addEventListener('input', handler);
+    el.addEventListener('change', handler);
+  });
+  $('[data-act="reset"]', host).addEventListener('click', function () { resetVariant(p, true); });
+  $('[data-act="add-toll"]', host).addEventListener('click', function () { addTollRow(p); recalcVariant(p); });
+  addTollRow(p);
+  syncVariantVisibility(p);
+}
+
+function onVariantInput(p, el) {
+  if (el.id === p + '-vehicle') {
+    const v = vehicleByPlate(el.value);
+    const norm = $('#' + p + '-norm');
+    norm.value = v ? vehicleNorm(v, state.mode) : (state.settings[state.mode].fuelCons || '');
+    norm.dataset.auto = '1';
+  } else if (el.id === p + '-norm') {
+    el.dataset.auto = '';
+  } else if (el.id === p + '-tons') {
+    el.dataset.manual = '1';
+  }
+  syncVariantVisibility(p);
+  recalcVariant(p);
+}
+
+function syncVariantVisibility(p) {
+  const host = $('#variant-' + p);
+  const quote = $('#' + p + '-quote').value;
+  const idle = $('#' + p + '-scenario').value === 'idle';
+  $$('[data-quote]', host).forEach(function (f) { f.hidden = f.dataset.quote !== quote; });
+  $$('[data-km]', host).forEach(function (f) { f.hidden = idle; });
+  const v = vehicleByPlate($('#' + p + '-vehicle').value);
+  const norm = $('#' + p + '-norm');
+  $('#' + p + '-norm-hint').textContent = v
+    ? (norm.dataset.auto === '1' ? 'з довідника: ' + v.plate : 'вручну (довідник: ' + fmtNum(vehicleNorm(v, state.mode), 1) + ')')
+    : (norm.dataset.auto === '' && norm.value !== String(state.settings[state.mode].fuelCons) ? 'вручну' : 'з налаштувань');
+}
+
+/* ---- платні дороги ---- */
+function tollUnit(country) {
+  const t = (state.config.tolls || []).find(function (x) { return x.country === country; });
+  return t && t.unit === 'day' ? 'day' : 'km';
+}
+function tollRate(country) {
+  const t = (state.config.tolls || []).find(function (x) { return x.country === country; });
+  return t ? Calc.num(t.rate) : '';
+}
+function addTollRow(p, data) {
+  const d = data || {};
+  const host = $('#' + p + '-tolls');
+  const row = document.createElement('div');
+  row.className = 'toll-row';
+  const opts = '<option value="">Країна</option>' + (state.config.tolls || []).map(function (t) {
+    return '<option value="' + esc(t.country) + '"' + (t.country === d.country ? ' selected' : '') + '>' + esc(t.country) + '</option>';
+  }).join('');
+  row.innerHTML =
+    '<div class="field"><label>Країна</label><select class="t-country">' + opts + '</select></div>' +
+    '<div class="field"><label class="t-qty-label">Км</label><input type="text" inputmode="decimal" class="t-qty" value="' + esc(d.qty || '') + '" placeholder="Кілометри"></div>' +
+    '<div class="field"><label class="t-rate-label">₴/км</label><input type="text" inputmode="decimal" class="t-rate" value="' + esc(d.rate || '') + '" placeholder="Ставка"></div>' +
+    '<div class="toll-sum">0 ₴</div>' +
+    '<button type="button" class="toll-del" aria-label="Прибрати">×</button>';
+  host.appendChild(row);
+  const sel = $('.t-country', row);
+  if (d.country && !d.rate) $('.t-rate', row).value = tollRate(d.country);
+  applyTollUnit(row, tollUnit(sel.value));
+  sel.addEventListener('change', function () {
+    const r = tollRate(sel.value);
+    if (r !== '') $('.t-rate', row).value = r;
+    applyTollUnit(row, tollUnit(sel.value));
+    recalcVariant(p);
+  });
+  $$('input', row).forEach(function (i) { i.addEventListener('input', function () { recalcVariant(p); }); });
+  $('.toll-del', row).addEventListener('click', function () {
+    row.remove();
+    if (!host.children.length) addTollRow(p);
+    recalcVariant(p);
+  });
+}
+function applyTollUnit(row, unit) {
+  const day = unit === 'day';
+  $('.t-qty-label', row).textContent = day ? 'Дні' : 'Км';
+  $('.t-rate-label', row).textContent = day ? '₴/день' : '₴/км';
+  $('.t-qty', row).placeholder = day ? 'К-сть днів' : 'Кілометри';
+}
+function readTolls(p) {
+  return $$('#' + p + '-tolls .toll-row').map(function (row) {
+    return { country: $('.t-country', row).value, qty: $('.t-qty', row).value, rate: $('.t-rate', row).value };
+  });
+}
+
+/* ---- зчитування і розрахунок ---- */
+function val(id) { const el = $('#' + id); return el ? el.value : ''; }
+function readVariant(p) {
+  return {
+    region: val(p + '-region'), scenario: val(p + '-scenario'), quoteMode: val(p + '-quote'),
+    vehicle: val(p + '-vehicle'), norm: val(p + '-norm'), normAuto: $('#' + p + '-norm').dataset.auto === '1',
+    freight: val(p + '-freight'), pricePerTon: val(p + '-ppt'), tons: val(p + '-tons'),
+    curAmount: val(p + '-cur'), currency: val(p + '-currency'),
+    kmFull: val(p + '-km-full'), kmEmpty: val(p + '-km-empty'), days: val(p + '-days'), other: val(p + '-other'),
+    tolls: readTolls(p)
+  };
+}
+
+function recalcVariant(p) {
+  const inp = readVariant(p);
+  const s = state.settings[state.mode] || {};
+  const r = Calc.compute(inp, s, { mode: state.mode, seasonCoef: seasonCoef() });
+  state.results[p] = r;
+
+  // суми по рядках доріг
+  $$('#' + p + '-tolls .toll-row').forEach(function (row) {
+    const sum = Math.max(Calc.num($('.t-qty', row).value), 0) * Math.max(Calc.num($('.t-rate', row).value), 0);
+    $('.toll-sum', row).textContent = fmtMoney(sum) + ' ₴';
+  });
+
+  const set = function (id, text) { $('#' + p + '-' + id).textContent = text; };
+  set('r-freight', fmtMoney(r.freight) + ' ₴');
+  set('r-km', fmtNum(r.totalKm, 0) + ' км');
+  set('r-fuel', fmtMoney(r.fuel) + ' ₴');
+  set('r-fuel-note', r.totalKm > 0 ? '· ' + fmtNum(r.norm, 1) + ' л/100' + (r.seasonOn && r.coef !== 1 ? ' із сезоном' : '') : '');
+  set('r-driver-label', state.mode === 'tent' ? 'Водію (' + fmtNum(r.driverPct * 100, 1) + ' %)' : 'ЗП водія');
+  set('r-driver', fmtMoney(r.driver) + ' ₴');
+  set('r-amort', fmtMoney(r.amort) + ' ₴');
+  set('r-tolls', fmtMoney(r.tolls) + ' ₴');
+  set('r-other', fmtMoney(r.other) + ' ₴');
+  set('r-total', fmtMoney(r.total) + ' ₴');
+  set('r-required', fmtMoney(r.required) + ' ₴');
+  set('r-profit', fmtMoney(r.profit) + ' ₴');
+  set('r-day', fmtMoney(r.profitPerDay) + ' ₴');
+  set('r-perkm', fmtNum(r.profitPerKm, 2) + ' ₴');
+  set('r-threshold', r.thresholdUnit === 'day' ? fmtMoney(r.threshold) + ' ₴/день' : fmtNum(r.threshold, 2) + ' ₴/км');
+  set('r-reserve', fmtMoney(r.reserve) + ' ₴');
+  $('#' + p + '-r-reserve').className = r.reserve >= 0 ? 'pos' : 'neg';
+  $('#' + p + '-r-day').className = r.profitPerDay >= 0 ? '' : 'neg';
+  $('#' + p + '-r-perkm').className = r.profitPerKm >= 0 ? '' : 'neg';
+
+  const v = $('#' + p + '-verdict');
+  v.className = 'verdict ' + r.decision.code;
+  $('#' + p + '-verdict-word').textContent = r.decision.label;
+
+  const isIdle = inp.scenario === 'idle';
+  $('#' + p + '-note').textContent = isIdle
+    ? 'Для простою дивимось прибуток за 1 день. Зараз: ' + fmtMoney(r.metric) + ' ₴/день'
+    : 'Дивимось прибуток на 1 км. Зараз: ' + fmtNum(r.metric, 2) + ' ₴/км при порозі ' + fmtNum(r.threshold, 2);
+
+  renderCompare();
+  saveDraft();
+}
+
+function recalcAll() { recalcVariant('a'); recalcVariant('b'); }
+
+function renderCompare() {
+  const a = state.results.a, b = state.results.b, el = $('#compare');
+  if (!a || !b || a.decision.code === 'wait' || b.decision.code === 'wait') {
+    el.innerHTML = 'Заповніть обидва варіанти — покажу, який кращий.';
+    return;
+  }
+  if (Math.round(a.profit) === Math.round(b.profit)) {
+    el.innerHTML = 'Обидва варіанти дають однаковий прибуток: <b>' + fmtMoney(a.profit) + ' ₴</b>.';
+    return;
+  }
+  const best = a.profit > b.profit ? a : b, key = a.profit > b.profit ? 'А' : 'Б';
+  el.innerHTML = 'Кращий варіант: <b>' + key + '</b>. Різниця по прибутку <b>' + fmtMoney(Math.abs(a.profit - b.profit)) + ' ₴</b>, ' +
+    'запас до порогу у кращого — <b>' + fmtMoney(best.reserve) + ' ₴</b>' +
+    (best.decision.code !== 'go' ? ', але він ' + (best.decision.code === 'edge' ? 'на межі' : 'не проходить поріг') : '') + '.';
+}
+
+/* ---- чернетки ---- */
+function saveDraft() {
+  if (state.restoring || !state.session) return;
+  store.set(KEY.draft(state.session.user, state.mode), { a: readVariant('a'), b: readVariant('b') });
+}
+function restoreDraft() {
+  const d = store.get(KEY.draft(state.session.user, state.mode));
+  state.restoring = true;
+  try {
+    ['a', 'b'].forEach(function (p) { if (d && d[p]) applyVariant(p, d[p]); });
+  } finally { state.restoring = false; }
+}
+function applyVariant(p, d) {
+  const setv = function (id, v) { const el = $('#' + id); if (el && v !== undefined && v !== null) el.value = v; };
+  setv(p + '-region', d.region); setv(p + '-scenario', d.scenario); setv(p + '-quote', d.quoteMode);
+  setv(p + '-vehicle', d.vehicle);
+  const normEl = $('#' + p + '-norm');
+  const veh = vehicleByPlate(d.vehicle);
+  if (d.normAuto && veh) { normEl.value = vehicleNorm(veh, state.mode); normEl.dataset.auto = '1'; }
+  else if (d.norm !== undefined && d.norm !== '') { normEl.value = d.norm; normEl.dataset.auto = ''; }
+  setv(p + '-freight', d.freight); setv(p + '-ppt', d.pricePerTon);
+  if (d.tons) { setv(p + '-tons', d.tons); }
+  setv(p + '-cur', d.curAmount); setv(p + '-currency', d.currency);
+  setv(p + '-km-full', d.kmFull); setv(p + '-km-empty', d.kmEmpty); setv(p + '-days', d.days); setv(p + '-other', d.other);
+  if (Array.isArray(d.tolls) && d.tolls.length) {
+    $('#' + p + '-tolls').innerHTML = '';
+    d.tolls.forEach(function (t) { addTollRow(p, t); });
+  }
+  syncVariantVisibility(p);
+}
+function resetVariant(p, ask) {
+  if (ask && !confirm('Очистити варіант ' + (p === 'a' ? 'А' : 'Б') + '?')) return;
+  renderVariant(p);
+  recalcVariant(p);
+}
+
+/* ============================================================
+   ОНОВЛЕННЯ ДОВІДНИКІВ, ВИХІД, СТАРТ
+   ============================================================ */
+async function refreshConfig() {
+  loader(true, 'Оновлюю довідники…');
+  try {
+    const data = await api('config', { token: state.session.token });
+    const dirty = state.dirty, mine = state.settings;
+    state.config = data;
+    store.set(KEY.config(state.session.user), data);
+    ['grain', 'tent'].forEach(function (m) { if (!dirty[m]) mine[m] = JSON.parse(JSON.stringify((data.settings || {})[m] || (data.defaults || {})[m] || {})); });
+    renderSettings();
+    ['a', 'b'].forEach(function (p) {
+      const d = readVariant(p);
+      renderVariant(p);
+      applyVariant(p, d);
+    });
+    recalcAll();
+    toast('Довідники оновлено');
+  } catch (e) {
+    if (e.code === 'AUTH') { toast('Сесія закінчилась — увійдіть знову', true); logout(); }
+    else toast(e.message, true);
+  } finally { loader(false); }
+}
+
+async function boot() {
+  buildKeypad();
+  $$('.mode-switch button').forEach(function (b) { b.addEventListener('click', function () { if (b.dataset.mode !== state.mode) applyMode(b.dataset.mode); }); });
+  $('#btn-settings-toggle').addEventListener('click', function () {
+    const body = $('#settings-body');
+    body.hidden = !body.hidden;
+    $('#btn-settings-toggle').textContent = body.hidden ? 'Змінити' : 'Згорнути';
+  });
+  $('#btn-settings-save').addEventListener('click', saveSettings);
+  $('#btn-settings-reset').addEventListener('click', resetSettings);
+  $('#btn-refresh').addEventListener('click', refreshConfig);
+  $('#btn-logout').addEventListener('click', logout);
+  window.addEventListener('beforeunload', function (e) {
+    if (state.dirty.grain || state.dirty.tent) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  const session = store.get(KEY.session);
+  if (session && session.token) {
+    state.session = session;
+    loader(true, 'Завантажую довідники…');
+    try {
+      const data = await api('config', { token: session.token });
+      loader(false);
+      enter(data);
+    } catch (e) {
+      loader(false);
+      const cached = store.get(KEY.config(session.user));
+      if (e.code === 'AUTH') { store.del(KEY.session); state.session = null; showLogin(); }
+      else if (cached) enter(cached, true);
+      else { showLogin(); toast(e.message, true); }
+    }
+  } else {
+    showLogin();
+  }
+}
+document.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>
