@@ -427,6 +427,22 @@
   .calc-hint { display: block; min-height: 18px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
   .calc-hint b { color: var(--ink); }
   @media (prefers-reduced-motion: reduce) { .seg-thumb, .seg-extra { transition: none; } .appear { animation: none; } }
+
+  /* Колонки сітки не ширші за екран: інакше один незгортуваний рядок (підсумок налаштувань)
+     розтягує колонку, а за нею — всю сторінку, і на телефоні обрізається все праворуч. */
+  .wrap, .variants { grid-template-columns: minmax(0, 1fr); }
+  .row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .row.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .row[data-quote="currency"] { grid-template-columns: minmax(0, 1fr) auto; }
+  .toll-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto 44px; }
+  .seg.auto button { padding: 0 10px; }
+  @media (min-width: 900px) {
+    .variants.two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .toll-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto 44px; }
+  }
+  @media (min-width: 1200px) {
+    .toll-row { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr) minmax(76px, auto) 44px; }
+  }
 </style>
 </head>
 <body data-mode="grain">
