@@ -4,489 +4,488 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Калькулятор рейсів — Nesvich Logistics</title>
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#f5f5f7">
 <style>
+  /* ============================================================
+     Калькулятор рейсів — стилі одним шаром (зведено 10.09.2026 із груп 1–3г).
+     Порядок: токени → основа → вхід → шапка → поля й кнопки → перемикач → рейс →
+     результат → порівняння → екрани поверх → фон → широкий екран → рух.
+     Правити тут, а не дописувати перекриття в кінець.
+     ============================================================ */
   :root {
     --ink: #1d1d1f;
-    --ink-2: #6e6e73;
-    --ink-3: #6e6e73;
+    --ink-2: #636366;           /* другорядний текст: ≥ 4,5:1 навіть на тлі вердиктів */
+    --ink-3: #6e6e73;           /* третинний: ≥ 4,5:1 на білому й сірому */
+    --ph: #a1a1a6;              /* підказка в порожньому полі */
     --paper: #f5f5f7;
     --card: #ffffff;
     --line: #d2d2d7;
     --line-2: #e8e8ed;
+    --fill: rgba(118, 118, 128, .12);   /* сіра підкладка перемикачів і тихих кнопок, як в iOS */
+    --fill-2: rgba(118, 118, 128, .07);
 
-    --go: #0f7a46;   --go-bg: #eaf4ee;
-    --edge: #8f6100;  --edge-bg: #f7f1e2;
-    --stop: #b3261e; --stop-bg: #f9ebe9;
-    --wait: #6e6e73; --wait-bg: #f0f0f2;
+    /* Вердикти — системні кольори Apple у доступних відтінках (WCAG AA): текст ≥ 4,5:1 на своєму тлі. */
+    --go: #248a3d;   --go-ink: #1f7a36;  --go-bg: #e7f8eb;   --go-line: #b8e6c4;
+    --edge: #b25000; --edge-bg: #fff2e0; --edge-line: #ffd49e; --edge-fill: #ff9f0a; --edge-glyph: #3d2400;
+    --stop: #d70015; --stop-bg: #ffebea; --stop-line: #ffc3be;
+    --wait: #6e6e73;
 
     --grain: #6b5844; --grain-soft: #f2efea;
     --tent: #3c5a73;  --tent-soft: #ecf0f4;
-    --accent: var(--grain);
-    --accent-soft: var(--grain-soft);
+    --accent: var(--grain); --accent-soft: var(--grain-soft);
+    --blue: #0071e3;
 
-    --r: 18px;
-    --r-s: 12px;
-    --focus: 0 0 0 4px rgba(29,29,31,.18);
+    --r: 20px; --r-m: 16px; --r-s: 12px;
+    --h: 44px;                                   /* одна висота: поля, кнопки, перемикачі */
+    --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; /* одна шкала відступів */
+    --shadow: 0 4px 12px rgba(0, 0, 0, .04), 0 1px 2px rgba(0, 0, 0, .03);
+
+    /* Рух: відскок — перемикачі й натискання; мʼяко — картки. Без linear() — запасні криві. */
+    --spring: cubic-bezier(.34, 1.56, .64, 1);
+    --spring-soft: cubic-bezier(.22, 1, .36, 1);
+    --ease-out: cubic-bezier(.2, .8, .2, 1);
+  }
+  @supports (transition-timing-function: linear(0, 1)) {
+    :root {
+      --spring: linear(0, .013 1.7%, .049 3.3%, .102 5%, .168 6.7%, .326 10%, .655 16.7%, .795 20%, .91 23.3%, .996 26.7%, 1.054 30%, 1.089 33.3%, 1.105 36.7%, 1.102 41.7%, 1.01 61.7%, .991 71.7%, .997 96.7%, 1);
+      --spring-soft: linear(0, .007 1.7%, .026 3.3%, .09 6.7%, .226 11.7%, .526 21.7%, .655 26.7%, .761 31.7%, .844 36.7%, .906 41.7%, .961 48.3%, .998 56.7%, 1.014 68.3%, 1.005 98.3%, 1);
+    }
   }
   body[data-mode="tent"] { --accent: var(--tent); --accent-soft: var(--tent-soft); }
 
+  /* ---------- основа ---------- */
   * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; scroll-padding-top: 132px; }
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, "Segoe UI", system-ui, sans-serif;
-    font-size: 15px; font-weight: 400; line-height: 1.45;
-    letter-spacing: -.005em;
+    font-size: 15px; font-weight: 400; line-height: 1.45; letter-spacing: -.01em;
     color: var(--ink); background: var(--paper);
-    font-variant-numeric: tabular-nums;
+    font-variant-numeric: lining-nums tabular-nums;
+    -webkit-font-smoothing: antialiased;
   }
   [hidden] { display: none !important; }
-  button, input, select { font: inherit; color: inherit; }
-  button { cursor: pointer; }
+  button, input, select { font: inherit; color: inherit; letter-spacing: inherit; }
+  button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
   h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -.02em; }
   a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
   a:hover { color: var(--ink); }
-  :focus-visible { outline: none; box-shadow: var(--focus); }
+  :focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(0, 113, 227, .3); }
   .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
-
-  /* ---------- shapes: mode marks ---------- */
-  .mark { width: 12px; height: 12px; flex: 0 0 12px; background: currentColor; display: inline-block; }
+  .mark { width: 10px; height: 10px; flex: 0 0 10px; background: currentColor; display: inline-block; }
   .mark.grain { border-radius: 50%; }
   .mark.tent { border-radius: 2px; }
 
-  /* ---------- login ---------- */
-  .login {
-    min-height: 100vh; min-height: 100dvh;
-    display: grid; place-items: center; padding: 20px;
-    background: #1d1d1f;
-  }
-  .login-card { width: 100%; max-width: 420px; background: var(--card); border-radius: 22px; padding: 26px 24px 22px; box-shadow: 0 20px 60px rgba(0,0,0,.28); }
+  /* ---------- вхід ---------- */
+  .login { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: var(--s5) var(--s4); background: #1d1d1f; }
+  .login-card { width: 100%; max-width: 420px; background: var(--card); border-radius: 24px; padding: var(--s5);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .28); animation: rise .6s var(--spring-soft) both; }
   .brand { font-weight: 600; font-size: 21px; letter-spacing: -.02em; }
   .brand span { display: block; font-weight: 500; color: var(--ink-2); font-size: 14px; margin-top: 2px; }
-  .login-hint { margin: 20px 0 10px; color: var(--ink-2); font-weight: 600; }
-  .user-list { display: grid; gap: 8px; }
-  .user-btn {
-    display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
-    min-height: 60px; padding: 10px 14px;
-    border: 1px solid var(--line); border-radius: 12px; background: #fff; font-weight: 700;
-  }
-  .user-btn:hover { border-color: var(--ink); }
-  .user-btn .avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
-    background: var(--paper); color: var(--ink); font-weight: 800; }
-  .user-btn > span:nth-child(2) { white-space: nowrap; }
-  .user-btn small { color: var(--ink-3); font-weight: 600; margin-left: auto; }
-  .link { background: none; border: 0; padding: 8px 0; color: var(--ink-2); font-weight: 600;
-    text-decoration: underline; text-underline-offset: 3px; min-height: 44px; }
-  .pin-dots { display: flex; gap: 16px; justify-content: center; margin: 18px 0 20px; }
-  .pin-dots i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--ink); background: transparent; }
-  .pin-dots i.on { background: var(--ink); }
-  .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .keypad button { min-height: 60px; border: 1px solid var(--line); border-radius: 12px; background: #fff;
-    font-size: 22px; font-weight: 700; }
-  .keypad button:active { background: var(--paper); }
-  .keypad button.mute { border-color: transparent; background: transparent; color: var(--ink-2); font-size: 15px; font-weight: 600; }
-
-  .alert { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding: 12px 14px;
-    border-radius: 12px; font-weight: 600; background: var(--wait-bg); color: var(--ink); }
+  .login-hint { margin: var(--s5) 0 var(--s3); color: var(--ink-2); font-weight: 600; }
+  .user-list { display: grid; gap: var(--s2); }
+  .user-btn { display: flex; align-items: center; gap: var(--s3); width: 100%; text-align: left; min-height: 60px;
+    padding: var(--s2) var(--s4) var(--s2) var(--s3); border: 1px solid var(--line); border-radius: var(--r-s); background: #fff; font-weight: 600;
+    transition: border-color .2s ease, background-color .2s ease, transform .45s var(--spring); }
+  .user-btn:active { transform: scale(.98); background: var(--paper); }
+  .user-btn .avatar { flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--paper); color: var(--ink); font-weight: 700; }
+  .user-btn > span:nth-child(2) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .user-btn small { color: var(--ink-3); font-weight: 500; margin-left: auto; }
+  .link { background: none; border: 0; padding: 0; min-height: var(--h); color: var(--ink-2); font-weight: 600;
+    text-decoration: underline; text-underline-offset: 3px; }
+  .pin-dots { display: flex; gap: var(--s4); justify-content: center; margin: var(--s4) 0 var(--s5); }
+  .pin-dots i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--ink);
+    transition: background-color .15s ease, transform .45s var(--spring); }
+  .pin-dots i.on { background: var(--ink); transform: scale(1.15); }
+  .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s2); }
+  .keypad button { height: 60px; border: 1px solid var(--line); border-radius: var(--r-s); background: #fff; font-size: 22px; font-weight: 600;
+    transition: background-color .15s ease, transform .45s var(--spring); }
+  .keypad button:active { background: var(--paper); transform: scale(.95); }
+  .keypad button.mute { border-color: transparent; background: transparent; color: var(--ink-2); font-size: 15px; }
+  .alert { display: flex; gap: var(--s3); align-items: flex-start; margin-top: var(--s4); padding: var(--s3) var(--s4);
+    border-radius: var(--r-s); font-weight: 600; background: var(--fill-2); color: var(--ink); animation: rise .45s var(--spring-soft) both; }
   .alert .sym { flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
     background: var(--ink); color: #fff; font-size: 13px; font-weight: 800; }
   .alert small { display: block; font-weight: 500; color: var(--ink-2); margin-top: 2px; }
   .alert.stop { background: var(--stop-bg); } .alert.stop .sym { background: var(--stop); }
-  .alert.edge { background: var(--edge-bg); } .alert.edge .sym { background: var(--edge); }
-  .alert-act { margin-top: 10px; }
-  .login-status { margin: 12px 0 0; color: var(--ink-3); font-size: 13px; min-height: 1.4em; }
+  .alert.edge { background: var(--edge-bg); } .alert.edge .sym { background: var(--edge-fill); color: var(--edge-glyph); }
+  .alert-act { margin-top: var(--s3); }
+  .login-status { margin: var(--s3) 0 0; color: var(--ink-3); font-size: 13px; min-height: 1.4em; }
 
-  /* ---------- top bar ---------- */
-  .top { position: sticky; top: 0; z-index: 20;
-    display: flex; align-items: center; gap: 12px; padding: 8px 14px;
-    background: rgba(255,255,255,.86); backdrop-filter: saturate(180%) blur(16px);
-    color: var(--ink); border-bottom: 1px solid var(--line); }
-  .mode-switch { display: inline-flex; min-width: 0; gap: 2px; padding: 3px; border-radius: 999px;
-    background: linear-gradient(#ececf0, #e3e3e8); border: 1px solid rgba(0,0,0,.06);
-    box-shadow: inset 0 1px 2px rgba(0,0,0,.07), 0 1px 0 rgba(255,255,255,.7); }
-  .mode-switch button { display: inline-flex; align-items: center; gap: 8px; border: 0; background: transparent;
-    border-radius: 999px; min-height: 40px; padding: 0 15px; font-weight: 500; color: var(--ink-2);
-    transition: background .18s ease, color .18s ease, box-shadow .18s ease; }
-  .mode-switch button:active { transform: scale(.97); }
-  .mode-switch button .mark { color: var(--ink-3); }
-  .mode-switch button.is-active { color: var(--ink); font-weight: 600;
-    background: linear-gradient(#ffffff, #fafafc);
-    box-shadow: 0 1px 3px rgba(0,0,0,.16), 0 0 0 .5px rgba(0,0,0,.04); }
-  .mode-switch button.is-active .mark { color: var(--accent); }
-  .top-right { margin-left: auto; min-width: 0; display: flex; align-items: center; gap: 8px; }
-  @media (max-width: 899px) {
-    .top { gap: 8px; padding: 8px 10px; }
-    .top-user { display: none; }
-    .mode-switch button { padding: 0 12px; }
+  /* ---------- шапка ---------- */
+  .top { position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2);
+    padding: calc(var(--s2) + env(safe-area-inset-top)) var(--s3) var(--s2); }
+  /* Прогресивне скло, як в iOS: біля низу шапки розмиття ледь помітне, до верхнього краю — сильне, межі немає.
+     Пʼять шарів backdrop-filter (1/2/4/8/16 px), кожен видно у своїй смузі (mask-image), поверх — мʼякий тон.
+     Сама шапка без backdrop-filter і прозорості: інакше шари розмивали б лише її, а не сторінку під нею. */
+  .glass { position: absolute; z-index: -1; left: 0; right: 0; top: 0; bottom: -24px; pointer-events: none; }
+  .glass i { position: absolute; inset: 0; }
+  .glass i:nth-child(1) { -webkit-backdrop-filter: blur(1px); backdrop-filter: blur(1px);
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 20%, #000 40%, transparent 60%);
+    mask-image: linear-gradient(to top, transparent 0%, #000 20%, #000 40%, transparent 60%); }
+  .glass i:nth-child(2) { -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+    -webkit-mask-image: linear-gradient(to top, transparent 20%, #000 40%, #000 60%, transparent 80%);
+    mask-image: linear-gradient(to top, transparent 20%, #000 40%, #000 60%, transparent 80%); }
+  .glass i:nth-child(3) { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+    -webkit-mask-image: linear-gradient(to top, transparent 40%, #000 60%, #000 80%, transparent 100%);
+    mask-image: linear-gradient(to top, transparent 40%, #000 60%, #000 80%, transparent 100%); }
+  .glass i:nth-child(4) { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    -webkit-mask-image: linear-gradient(to top, transparent 60%, #000 80%);
+    mask-image: linear-gradient(to top, transparent 60%, #000 80%); }
+  .glass i:nth-child(5) { -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+    -webkit-mask-image: linear-gradient(to top, transparent 80%, #000 100%);
+    mask-image: linear-gradient(to top, transparent 80%, #000 100%); }
+  .glass::after { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(245, 245, 247, .86) 0%, rgba(245, 245, 247, .7) 50%, rgba(245, 245, 247, .34) 78%, rgba(245, 245, 247, 0) 100%); }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass::after { background: linear-gradient(to bottom, rgba(245, 245, 247, .98) 0%, rgba(245, 245, 247, .95) 72%, rgba(245, 245, 247, 0) 100%); }
   }
-  .top-user { font-weight: 600; white-space: nowrap; color: var(--ink-2); }
-  .icon-btn { min-width: 44px; min-height: 44px; border-radius: 50%; border: 1px solid var(--line);
-    background: #fff; color: var(--ink-2); display: grid; place-items: center; font-size: 17px; }
-  .icon-btn:hover { color: var(--ink); border-color: var(--ink-3); }
+  @media (prefers-reduced-transparency: reduce) {
+    .glass i { display: none; }
+    .glass::after { background: linear-gradient(to bottom, var(--paper) 76%, rgba(245, 245, 247, 0) 100%); }
+  }
+  .top-brand { display: none; }
+  .top-right { margin-left: auto; min-width: 0; display: flex; align-items: center; gap: var(--s2); }
+  .top-user { display: none; font-weight: 600; white-space: nowrap; color: var(--ink-2); }
+  .icon-btn { flex: 0 0 var(--h); width: var(--h); height: var(--h); border: 0; border-radius: 50%; background: var(--fill); color: var(--ink);
+    display: grid; place-items: center; transition: background-color .2s ease, transform .45s var(--spring); }
+  .icon-btn svg { width: 19px; height: 19px; }
+  .icon-btn:active { transform: scale(.9); }
+  .vswitch { flex: 1 0 100%; order: 3; min-width: 0; }
+  .vdot { flex: 0 0 18px; width: 18px; height: 18px; border-radius: 50%; display: inline-grid; place-items: center;
+    font-size: 11px; font-weight: 800; font-style: normal; line-height: 1; color: #fff; background: transparent;
+    box-shadow: inset 0 0 0 1.5px #aeaeb2; transition: background-color .3s ease, box-shadow .3s ease, color .3s ease; }
+  .vdot.go { background: var(--go); box-shadow: none; }
+  .vdot.edge { background: var(--edge-fill); color: var(--edge-glyph); box-shadow: none; }
+  .vdot.stop { background: var(--stop); box-shadow: none; }
+  .vsum { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .vswitch:not(.has-b) #vdot-b, .vswitch:not(.has-b) #vsum-b { display: none; }
+  .vswitch:not(.has-b) [data-v="b"] { color: var(--accent); }
 
-  .bar { padding: 10px 14px; font-weight: 700; display: flex; gap: 10px; align-items: center; }
-  .bar.offline { background: var(--edge-bg); color: var(--edge); }
-  .bar .sym { flex: 0 0 20px; width: 20px; height: 20px; border-radius: 50%; background: var(--edge); color: #fff;
+  .bar { display: flex; gap: var(--s3); align-items: center; margin: var(--s2) var(--s3) 0; padding: var(--s3) var(--s4);
+    border-radius: var(--r-s); font-weight: 600; }
+  .bar.offline { background: var(--edge-bg); color: var(--ink); }
+  .bar .sym { flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; background: var(--edge-fill); color: var(--edge-glyph);
     display: grid; place-items: center; font-size: 13px; font-weight: 800; }
   .bar span.small { font-weight: 500; color: var(--ink-2); }
 
-  /* ---------- layout ---------- */
-  .wrap { max-width: 1240px; margin: 0 auto; padding: 14px 14px 40px; display: grid; gap: 12px; }
-  .card { background: var(--card); border: 1px solid var(--line-2); border-radius: var(--r); box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+  /* ---------- розкладка й картки ---------- */
+  .wrap { max-width: 1240px; margin: 0 auto; padding: var(--s4) var(--s3) var(--s5); display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
+  .card { background: var(--card); border: 1px solid var(--line-2); border-radius: var(--r); box-shadow: var(--shadow); }
 
-  /* ---------- settings strip ---------- */
-  .settings { padding: 12px 14px; background: transparent; border: 1px solid var(--line); box-shadow: none; }
-  .settings-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .settings-line .sum { color: var(--ink-2); font-size: 13px; font-weight: 400; }
-  .settings-line .sum b { color: var(--ink); font-weight: 500; white-space: nowrap; }
-  .settings-line .title { font-size: 12px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em; }
-  .settings-line .spacer { margin-left: auto; }
-  .settings-body { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-2); }
-  .settings-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-  .settings-group h3 { font-size: 14px; margin-bottom: 10px; }
-  .settings-group p.note { margin: 10px 0 0; color: var(--ink-3); font-size: 13px; }
-  .fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-  .settings-foot { display: flex; align-items: center; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
-  .dirty { color: var(--edge); font-size: 13px; font-weight: 700; }
+  .settings { padding: var(--s2) var(--s2) var(--s2) var(--s4); }
+  .settings-line { display: flex; align-items: center; gap: var(--s3); min-height: var(--h); }
+  .settings-line .title { display: none; font-size: 12px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; }
+  .settings-line .sum { flex: 1 1 auto; min-width: 0; color: var(--ink-2); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .settings-line .sum b { color: var(--ink); font-weight: 500; }
+  .settings-line .spacer { display: none; }
+  .dirty { color: var(--edge); font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .settings-body { display: grid; grid-template-rows: 0fr; opacity: 0; margin: 0 var(--s2) 0 0; padding-top: 0; border-top: 1px solid transparent;
+    transition: grid-template-rows .4s var(--ease-out), opacity .25s ease, margin .4s var(--ease-out), padding-top .4s var(--ease-out), border-color .4s ease; }
+  .settings-body.open { grid-template-rows: 1fr; opacity: 1; margin: var(--s2) var(--s2) var(--s2) 0; padding-top: var(--s4); border-top-color: var(--line-2); }
+  .settings-inner { overflow: hidden; min-height: 0; }
+  .settings-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s5); }
+  .settings-group h3 { font-size: 15px; margin-bottom: var(--s3); }
+  .settings-group p.note { margin: var(--s3) 0 0; color: var(--ink-3); font-size: 13px; }
+  .fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--s3); }
+  .fields .field { display: flex; flex-direction: column; justify-content: flex-end; }
+  .fields .field > label { white-space: normal; }
+  .settings-foot { display: flex; align-items: center; gap: var(--s2); margin-top: var(--s4); flex-wrap: wrap; }
 
-  /* ---------- fields ---------- */
-  .field label { display: block; font-size: 13px; color: var(--ink-2); margin-bottom: 4px; font-weight: 700; }
-  .field label small { color: var(--ink-3); font-weight: 500; }
-  .field input, .field select, .input {
-    width: 100%; min-height: 48px; padding: 0 12px; font-size: 17px; font-weight: 600;
-    border: 1px solid var(--line); border-radius: var(--r-s); background: #fff;
-  }
-  .field input::placeholder { color: #a1a1a6; font-weight: 400; }
-  .field select { padding-right: 30px; appearance: none; -webkit-appearance: none;
+  /* ---------- поля ---------- */
+  .field { min-width: 0; }
+  .field > label, .lbl { display: block; margin: 0 0 var(--s2); font-size: 13px; line-height: 18px; font-weight: 600; color: var(--ink-2);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .field label small, .lbl small { font-weight: 500; color: var(--ink-3); }
+  .field input, .field select { display: block; width: 100%; height: var(--h); padding: 0 var(--s3); font-size: 17px; font-weight: 600;
+    border: 1px solid var(--line); border-radius: var(--r-s); background: #fff; box-shadow: inset 0 1px 2px rgba(0, 0, 0, .03);
+    transition: border-color .2s ease, box-shadow .2s ease; }
+  .field input::placeholder { color: var(--ph); font-weight: 400; }
+  .field input:focus, .field select:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(0, 113, 227, .18); }
+  .field select { padding-right: 34px; appearance: none; -webkit-appearance: none; text-overflow: ellipsis;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236e6e73' stroke-width='1.8'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 11px center; }
-  .field .hint { display: block; margin-top: 4px; font-size: 12px; color: var(--ink-3); font-weight: 600; }
-  .toggle { display: flex; align-items: center; gap: 10px; min-height: 48px; font-weight: 600; }
-  .toggle input { width: 22px; height: 22px; margin: 0; accent-color: var(--accent); }
+    background-repeat: no-repeat; background-position: right 13px center; }
+  .note { display: block; min-width: 0; font-size: 13px; line-height: 18px; font-weight: 500; color: var(--ink-2); }
+  .note:empty { display: none; }
+  .note b { color: var(--ink); font-weight: 600; }
+  .field > label.toggle { display: flex; align-items: center; gap: var(--s3); height: var(--h); margin: 0; font-size: 15px; font-weight: 600; color: var(--ink); }
+  .toggle input { display: block; flex: 0 0 22px; width: 22px; height: 22px; margin: 0; padding: 0; border: 0; box-shadow: none; accent-color: var(--accent); }
+  .link-inline { border: 0; background: none; padding: 0 2px; margin: 0; font-weight: 600; color: var(--blue); cursor: pointer; }
 
-  .seg { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: var(--r-s); background: var(--paper); }
-  .seg button { flex: 1 1 0; min-height: 40px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent;
-    font-size: 14px; font-weight: 700; color: var(--ink-2); }
-  .seg button[aria-pressed="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.14); }
-  .seg.compact button { font-size: 13px; }
-
-  /* ---------- buttons ---------- */
-  .btn { white-space: nowrap; min-height: 48px; padding: 0 18px; border-radius: var(--r-s); border: 1px solid var(--line);
-    background: #fff; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-  .btn:hover { border-color: var(--ink); }
+  /* ---------- кнопки ---------- */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); height: var(--h); padding: 0 var(--s4);
+    border: 1px solid var(--line); border-radius: var(--r-s); background: #fff; color: var(--ink); font-size: 15px; font-weight: 600; white-space: nowrap;
+    transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .45s var(--spring); }
+  .btn:active { transform: scale(.97); }
   .btn.primary { background: var(--ink); border-color: var(--ink); color: #fff; }
   .btn.primary:disabled { opacity: .55; cursor: default; }
-  .btn.ghost { background: transparent; }
-  .btn.small { min-height: 40px; padding: 0 12px; font-size: 13px; }
+  .btn.ghost { border-color: transparent; background: var(--fill); }
+  .btn.small { padding: 0 var(--s3); font-size: 14px; }
   .btn.wide { width: 100%; }
-  .btn.dashed { border-style: dashed; background: transparent; color: var(--ink-2); }
+  .btn.accent { border-color: transparent; background: var(--accent-soft); color: var(--accent); }
 
-  /* ---------- variant ---------- */
-  .variants { display: grid; grid-template-columns: 1fr; gap: 12px; }
-  .variant { padding: 14px; }
-  .v-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .v-head h2 { font-size: 17px; display: flex; align-items: center; gap: 8px; }
-  .v-key { width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent);
-    display: grid; place-items: center; font-size: 14px; font-weight: 600; }
-  .v-head-actions { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+  /* ---------- перемикач: один компонент для режиму, рейсів А/Б і пігулок у картці ----------
+     Біла підкладка їде за вибраною кнопкою з відскоком (JS рахує ширину й зсув, CSS анімує). */
+  .seg { position: relative; isolation: isolate; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+    min-width: 0; padding: 3px; border-radius: 999px; background: var(--fill); }
+  .seg.fit { display: inline-grid; grid-auto-columns: 1fr; }
+  .seg.auto { display: inline-grid; grid-auto-columns: auto; justify-self: start; }
+  .seg > button { position: relative; min-width: 0; height: calc(var(--h) - 6px); padding: 0 var(--s3); border: 0; border-radius: 999px;
+    background: transparent; color: var(--ink-2); font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: color .2s ease, background-color .2s ease, transform .45s var(--spring); }
+  .seg > button[aria-pressed="true"] { color: var(--ink); }
+  .seg > button:active { transform: scale(.95); }
+  .seg.compact > button { font-size: 14px; padding: 0 var(--s2); }
+  .seg-thumb { position: absolute; z-index: -1; top: 3px; bottom: 3px; left: 0; width: 0; border-radius: 999px; background: #fff;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .12), 0 1px 1px rgba(0, 0, 0, .04), 0 0 0 .5px rgba(0, 0, 0, .04);
+    transition: transform .6s var(--spring), width .6s var(--spring), scale .35s var(--spring-soft); }
+  .seg:has(> button[aria-pressed="true"]:active) > .seg-thumb { scale: .96; }
+  .seg .mark { color: var(--ink-3); transition: color .2s ease; }
+  .seg > button[aria-pressed="true"] .mark { color: var(--accent); }
+  .seg-extra { display: none; font-weight: 500; color: var(--ink-2); }
+  .seg > button[aria-pressed="true"] .seg-extra { display: inline; }
 
-  .fieldset { display: grid; gap: 10px; margin-top: 12px; }
-  .leg { font-size: 12px; font-weight: 800; color: var(--ink-3); text-transform: uppercase; letter-spacing: .05em; margin-top: 4px; }
-  .route { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: end; }
-  .route-dash { padding-bottom: 14px; color: var(--ink-3); font-weight: 700; }
-  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .row.three { grid-template-columns: repeat(3, 1fr); }
-  .km-total { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+  @media (hover: hover) {
+    .btn:hover { border-color: #b9b9c0; }
+    .btn.primary:hover { background: #3a3a3c; border-color: #3a3a3c; }
+    .btn.ghost:hover, .btn.accent:hover, .icon-btn:hover { background: rgba(118, 118, 128, .2); }
+    .btn.accent:hover { color: var(--ink); }
+    .seg > button:not([aria-pressed="true"]):hover { color: var(--ink); background: rgba(118, 118, 128, .1); }
+    .user-btn:hover { border-color: var(--ink-3); }
+  }
 
-  details.more, details.ledger-wrap { border: 1px solid var(--line-2); border-radius: var(--r-s); background: #f5f5f7; }
-  details.more > summary, details.ledger-wrap > summary {
-    list-style: none; cursor: pointer; min-height: 48px; display: flex; align-items: center; gap: 8px;
-    padding: 0 14px; font-weight: 700; color: var(--ink-2); }
+  /* ---------- рейс ---------- */
+  .variants { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s3); }
+  .variant { min-width: 0; padding: var(--s4); display: grid; gap: var(--s4); container-type: inline-size; }
+  .v-head { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s3); min-height: var(--h); }
+  .v-head h2 { font-size: 17px; display: flex; align-items: center; gap: var(--s2); white-space: nowrap; }
+  .v-key { flex: 0 0 28px; width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+    display: grid; place-items: center; font-size: 14px; font-weight: 600; letter-spacing: 0; }
+  .v-head-actions { margin-left: auto; display: flex; gap: var(--s2); min-width: 0; }
+  .group { display: grid; gap: var(--s2); min-width: 0; }
+  .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s3); }
+  .row.car { grid-template-columns: minmax(0, 1fr) 112px; }
+  .row[data-quote="currency"] { grid-template-columns: minmax(0, 1fr) auto; }
+  @container (max-width: 480px) {
+    #variant-b .v-head-actions { flex: 1 0 100%; margin-left: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+    #variant-b .v-head-actions .btn { padding: 0 var(--s2); }
+  }
+
+  details.more, details.ledger-wrap { border-radius: var(--r-m); background: var(--fill-2); }
+  details > summary { list-style: none; }
   details > summary::-webkit-details-marker { display: none; }
-  details.more > summary::after, details.ledger-wrap > summary::after { content: "▾"; margin-left: auto; }
-  details[open].more > summary::after, details[open].ledger-wrap > summary::after { content: "▴"; }
-  .more-body { padding: 4px 14px 14px; display: grid; gap: 10px; }
+  details.more > summary, details.ledger-wrap > summary { display: flex; align-items: center; gap: var(--s2); min-height: var(--h);
+    padding: 0 var(--s4); cursor: pointer; font-weight: 600; color: var(--ink-2); border-radius: var(--r-m); transition: color .2s ease; }
+  details > summary:hover { color: var(--ink); }
+  details > summary .sum-t { flex: 0 0 auto; white-space: nowrap; }
+  details > summary .sum-val { flex: 0 1 auto; min-width: 0; font-weight: 500; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  details > summary::after { content: ""; flex: 0 0 auto; margin-left: auto; width: 7px; height: 7px;
+    border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+    transform: translateY(-2px) rotate(45deg); transition: transform .5s var(--spring); }
+  details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
+  .more-body { padding: 0 var(--s4) var(--s4); display: grid; gap: var(--s3); }
 
-  .tolls { display: grid; gap: 8px; }
-  .toll-row { display: grid; grid-template-columns: 1fr 1fr auto 44px; gap: 8px; align-items: end;
-    padding: 10px; border: 1px solid var(--line-2); border-radius: var(--r-s); background: #fff; }
-  .toll-row .field.country { grid-column: 1 / -1; }
-  .toll-row .field.qty, .toll-row .field.rate { min-width: 0; }
-  .toll-sum { display: block; font-weight: 600; font-size: 15px; min-height: 48px; line-height: 48px; }
-  .toll-del { min-width: 44px; min-height: 44px; border-radius: 50%; border: 1px solid var(--line);
-    background: #fff; color: var(--ink-2); font-size: 17px; }
-  .toll-del:hover { color: var(--stop); border-color: var(--stop); }
-  .tolls-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .tolls-total { margin-left: auto; font-weight: 600; color: var(--ink-2); font-size: 13px; }
+  /* Платні дороги: порожньо — лише рядок із кнопкою; країну вибирають одразу зі списку на кнопці. */
+  .tolls-block { display: grid; gap: var(--s2); }
+  .tolls-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); min-height: var(--h); }
+  .tolls-head .lbl { margin: 0; }
+  .add-toll { position: relative; overflow: hidden; flex: 0 0 auto; }
+  .add-toll select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; font-size: 16px; }
+  .add-toll:focus-within { box-shadow: 0 0 0 4px rgba(0, 113, 227, .3); }
+  .tolls { display: grid; gap: var(--s2); }
+  .tolls:empty { display: none; }
+  .toll-row { display: grid; gap: var(--s2) var(--s3); align-items: end; padding: var(--s3); border-radius: var(--r-m); background: var(--fill-2);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(64px, auto) var(--h);
+    grid-template-areas: "country country country del" "qty rate sum sum"; }
+  .toll-row .country { grid-area: country; }
+  .toll-row .qty { grid-area: qty; }
+  .toll-row .rate { grid-area: rate; }
+  .toll-row .sum { grid-area: sum; text-align: right; }
+  .toll-row .toll-del { grid-area: del; }
+  .toll-sum { display: block; height: var(--h); line-height: var(--h); font-size: 17px; font-weight: 600; }
+  .toll-del { width: var(--h); height: var(--h); padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--ink-3);
+    display: grid; place-items: center; font-size: 22px; line-height: 1; transition: background-color .2s ease, color .2s ease, transform .45s var(--spring); }
+  .toll-del:hover { color: var(--stop); background: var(--stop-bg); }
+  .toll-del:active { transform: scale(.88); }
+  @container (min-width: 560px) {
+    .toll-row { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) minmax(88px, auto) var(--h);
+      grid-template-areas: "country qty rate sum del"; }
+  }
 
-  /* ---------- result ---------- */
-  .result { margin-top: 14px; display: grid; gap: 8px; position: sticky; bottom: 0; z-index: 5;
-    background: var(--card); padding-top: 8px; }
-  .verdict { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: var(--r);
-    border: 1px solid var(--wait); background: var(--wait-bg); }
-  .verdict .badge { flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
-    background: var(--wait); color: #fff; font-size: 20px; font-weight: 800; }
-  .verdict .word { display: block; font-size: 24px; font-weight: 600; letter-spacing: -.02em; color: var(--wait); }
-  .verdict .sub { display: block; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+  /* ---------- результат ---------- */
+  .result { display: grid; gap: var(--s2); }
+  .verdict { display: grid; gap: var(--s3); padding: var(--s4); border-radius: var(--r); border: 1px solid var(--line); background: var(--card);
+    transition: background-color .35s ease, border-color .35s ease, padding .35s var(--ease-out); }
+  .v-row { display: flex; align-items: center; gap: var(--s3); }
+  .v-text { min-width: 0; }
+  .verdict .badge { flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 18px; font-weight: 800; color: #fff; background: var(--wait); transition: background-color .3s ease, border-radius .3s ease, width .3s ease, height .3s ease; }
+  .verdict .word { display: block; font-size: 24px; line-height: 1.15; font-weight: 700; letter-spacing: -.025em; color: var(--ink); }
+  .verdict .sub { display: block; margin-top: 2px; font-size: 14px; font-weight: 500; color: var(--ink-2); }
   .verdict-profit { margin-left: auto; text-align: right; }
-  .verdict-profit small { display: block; font-size: 12px; font-weight: 700; color: var(--ink-2); }
-  .verdict-profit b { font-size: 24px; font-weight: 600; letter-spacing: -.02em; }
-  .verdict.go { border-color: var(--go); background: var(--go-bg); }
-  .verdict.go .badge { background: var(--go); } .verdict.go .word, .verdict.go .verdict-profit b { color: var(--go); }
-  .verdict.edge { border-color: var(--edge); background: var(--edge-bg); }
-  .verdict.edge .badge { background: var(--edge); } .verdict.edge .word { color: var(--edge); }
-  .verdict.stop { border-color: var(--stop); background: var(--stop-bg); }
-  .verdict.stop .badge { background: var(--stop); } .verdict.stop .word, .verdict.stop .verdict-profit b { color: var(--stop); }
-  .verdict.badge-square .badge { border-radius: 8px; }
-
-  .offer { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;
-    padding: 14px 16px; border-radius: var(--r); background: #1d1d1f; color: #fff; }
-  .offer small { display: block; font-size: 12px; font-weight: 500; color: #a1a1a6; }
-  .offer b { font-size: 28px; font-weight: 600; letter-spacing: -.02em; }
-  .offer .res { text-align: right; }
-  .offer .res b { font-size: 18px; }
-  .offer .res b.neg { color: #ffb3ab; }
-
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-  .stat { padding: 8px 10px; border: 1px solid var(--line-2); border-radius: var(--r-s); }
-  .stat small { display: block; color: var(--ink-3); font-size: 11px; font-weight: 700; }
-  .stat b { display: block; font-size: 15px; margin-top: 2px; white-space: nowrap; }
-  .stat b.neg { color: var(--stop); }
-
-  .ledger-row { display: flex; justify-content: space-between; gap: 12px; padding: 8px 14px;
-    border-top: 1px solid var(--line-2); font-size: 14px; }
+  .verdict-profit small { display: block; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+  .verdict-profit b { font-size: 24px; font-weight: 700; letter-spacing: -.025em; }
+  .verdict.go { background: var(--go-bg); border-color: var(--go-line); }
+  .verdict.go .badge { background: var(--go); }
+  .verdict.go .word, .verdict.go .verdict-profit b { color: var(--go); }
+  .verdict.edge { background: var(--edge-bg); border-color: var(--edge-line); }
+  .verdict.edge .badge { background: var(--edge-fill); color: var(--edge-glyph); border-radius: 11px; }
+  .verdict.edge .word { color: var(--edge); }
+  .verdict.stop { background: var(--stop-bg); border-color: var(--stop-line); }
+  .verdict.stop .badge { background: var(--stop); border-radius: 11px; }
+  .verdict.stop .word, .verdict.stop .verdict-profit b { color: var(--stop); }
+  .verdict.wait { background: transparent; border-style: dashed; padding: var(--s3) var(--s4); }
+  .verdict.wait .badge { flex-basis: 28px; width: 28px; height: 28px; background: transparent; box-shadow: inset 0 0 0 1.5px var(--line); }
+  .verdict.wait .word { font-size: 18px; font-weight: 600; color: var(--ink-2); }
+  .verdict.wait .sub { color: var(--ink-3); }
+  .verdict.wait .v-price, .verdict.wait .v-metrics, .verdict.wait .verdict-profit { display: none; }
+  .badge.pop { animation: pop .6s var(--spring); }
+  .v-price { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s3); padding: var(--s3) var(--s4);
+    border-radius: var(--r-s); background: rgba(255, 255, 255, .82); }
+  .v-price small { display: block; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+  .v-price b { font-size: 28px; font-weight: 700; letter-spacing: -.03em; color: var(--ink); }
+  .v-price .res { text-align: right; }
+  .v-price .res b { font-size: 20px; color: var(--go-ink); }
+  .v-price .res b.neg { color: var(--stop); }
+  .v-metrics { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); font-size: 13px; color: var(--ink-2); }
+  .v-metrics b { color: var(--ink); font-weight: 700; }
+  .v-metrics b.neg { color: var(--stop); }
+  @container (min-width: 520px) {
+    .verdict .word, .verdict-profit b { font-size: 28px; }
+    .v-price b { font-size: 34px; }
+  }
+  .ledger-row { display: flex; justify-content: space-between; gap: var(--s3); padding: var(--s2) var(--s4); border-top: 1px solid var(--line-2); font-size: 14px; }
   .ledger-row span:first-child { color: var(--ink-2); }
   .ledger-row span:last-child { font-weight: 700; white-space: nowrap; }
   .ledger-row.total span { font-weight: 800; color: var(--ink); }
-  .ledger-note { padding: 10px 14px; color: var(--ink-3); font-size: 12px; }
+  .ledger-note { margin: 0; padding: var(--s3) var(--s4) var(--s4); color: var(--ink-3); font-size: 13px; }
 
-  /* ---------- compare ---------- */
-  .compare { padding: 14px; }
-  .compare h2 { font-size: 17px; }
-  .compare .lead { margin: 10px 0 0; font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
-  .compare .lead small { display: block; font-size: 13px; font-weight: 600; color: var(--ink-2); letter-spacing: 0; }
-  .cmp-table { margin-top: 12px; }
-  .cmp-row { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; padding: 8px 0;
-    border-top: 1px solid var(--line-2); font-size: 14px; }
-  .cmp-row span:first-child { color: var(--ink-2); }
-  .cmp-row span + span { text-align: right; font-weight: 700; }
-  .cmp-row.head span { color: var(--ink-3); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; border: 0; }
-  .cmp-row .win { color: var(--go); }
-  .cmp-acts { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  /* Місце рейсу Б на широкому екрані, коли Б прибрали: картка-заглушка «+ Порівняти». На телефоні — вкладка в шапці. */
+  .add-b { display: none; }
 
-  /* ---------- overlays ---------- */
-  .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
-    background: var(--ink); color: #fff; padding: 12px 18px; border-radius: 999px; font-weight: 700; z-index: 60;
-    max-width: calc(100% - 28px); }
-  .toast.err { background: var(--stop); }
-  .loader { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center;
-    background: rgba(242,241,236,.9); color: var(--ink-2); font-weight: 700; }
-  .loader div { display: flex; align-items: center; gap: 12px; }
-  .spinner { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--ink);
-    animation: spin .8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
-
-  .sheet { position: fixed; inset: 0; z-index: 55; display: grid; place-items: center; padding: 20px;
-    background: rgba(27,27,24,.55); }
-  .sheet-card { width: 100%; max-width: 420px; background: #fff; border-radius: 18px; padding: 22px; }
-  .sheet-card h2 { font-size: 20px; }
-  .sheet-card p { margin: 8px 0 18px; color: var(--ink-2); }
-
-  /* ---------- ≥ 900px ---------- */
-  @media (min-width: 900px) {
-    .top { padding: 10px 20px; }
-    .wrap { padding: 18px 20px 60px; gap: 16px; }
-    .settings { padding: 12px 18px; }
-    .settings-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
-    .variant, .compare { padding: 18px 20px; }
-    .variants.two { grid-template-columns: 1fr 1fr; }
-    .row.three { grid-template-columns: repeat(3, 1fr); }
-    .toll-row { grid-template-columns: 1.4fr 1fr 1fr; }
-    .toll-row .field.country { grid-column: auto; }
-    .result { position: static; }
-    .verdict .word { font-size: 28px; }
-    .offer b { font-size: 32px; }
-    .stats { grid-template-columns: repeat(3, 1fr); }
-    .stat b { font-size: 16px; }
+  /* Телефон: рейси А і Б — стрічка, видно одну картку; перемикання — зсув стрічки (showVariant). */
+  @media (max-width: 899px) {
+    .variants { display: flex; align-items: flex-start; gap: var(--s3); overflow-x: hidden; overflow-x: clip;
+      margin: 0 calc(-1 * var(--s3)); padding: 0 var(--s3); }
+    .variants > .variant { flex: 0 0 100%; }
+    .variants.two > .variant:not(.is-active) { display: none; }
+    .variants.sliding > .variant:not([hidden]) { display: grid; }
   }
 
-  /* ---------- правки Антона 10.09: ширше, пігулки по центру, дороги в рядок, фон ---------- */
-  .settings { background: rgba(255,255,255,.92); }
-  .toll-del { width: 44px; height: 44px; padding: 0; justify-self: end; align-self: end; }
-  .bg-scene { display: none; }
+  /* ---------- порівняння ---------- */
+  .compare { padding: var(--s4); display: grid; gap: var(--s4); container-type: inline-size; }
+  .cmp-main { display: grid; gap: var(--s3); align-content: start; min-width: 0; }
+  .compare h2 { font-size: 17px; }
+  .cmp-lead { margin: 0; font-size: 22px; line-height: 1.2; font-weight: 700; letter-spacing: -.025em; }
+  .cmp-lead .win { color: var(--go); }
+  .cmp-sub { margin: 0; font-size: 14px; color: var(--ink-2); }
+  .cmp-bars { display: grid; gap: var(--s2); }
+  .cmp-bar { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: var(--s3); }
+  .cmp-bar .track { height: 10px; border-radius: 999px; background: var(--fill); overflow: hidden; }
+  .cmp-bar .track i { display: block; height: 100%; width: 0; border-radius: inherit; background: #aeaeb2; transition: width .7s var(--spring-soft), background-color .3s ease; }
+  .cmp-bar.win .track i { background: var(--go); }
+  .cmp-bar.neg .track i { background: var(--stop); }
+  .cmp-bar b { min-width: 96px; text-align: right; font-size: 15px; font-weight: 700; }
+  .cmp-bar.win b { color: var(--go-ink); }
+  .cmp-table { display: grid; min-width: 0; }
+  .cmp-row { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr); gap: var(--s2); align-items: center;
+    min-height: 40px; border-top: 1px solid var(--line-2); font-size: 14px; }
+  .cmp-row > span { text-align: right; font-weight: 600; white-space: nowrap; }
+  .cmp-row > span:first-child { text-align: left; color: var(--ink-2); font-weight: 500; }
+  .cmp-row .d { display: none; }
+  .cmp-row.head { min-height: 32px; border-top: 0; }
+  .cmp-row.head > span { font-size: 12px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em; }
+  .cmp-row .pill { display: inline-block; padding: 2px var(--s2); margin-right: calc(-1 * var(--s2)); border-radius: 999px; background: var(--go-bg); color: var(--go-ink); }
+  .cmp-row .d.up { color: var(--go-ink); }
+  .cmp-row .d.down { color: var(--stop); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; }
+  .chip .vdot { flex-basis: 16px; width: 16px; height: 16px; font-size: 10px; }
+  .cmp-acts { display: flex; gap: var(--s2); flex-wrap: wrap; }
+  @container (min-width: 480px) {
+    .cmp-row { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); }
+    .cmp-row .d { display: block; }
+  }
+  @media (min-width: 1000px) {
+    .compare { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--s5); align-items: start; }
+  }
+
+  /* ---------- поверх сторінки ---------- */
+  .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 60; max-width: calc(100% - 32px);
+    transform: translateX(-50%); padding: var(--s3) var(--s5); border-radius: 999px; background: rgba(29, 29, 31, .92); color: #fff;
+    font-weight: 600; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, .18); animation: toast-in .55s var(--spring) both; }
+  .toast.err { background: var(--stop); }
+  .toast.act { cursor: pointer; }
+  .loader { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: rgba(245, 245, 247, .88); color: var(--ink-2); font-weight: 600; }
+  .loader div { display: flex; align-items: center; gap: var(--s3); }
+  .spinner { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--ink); animation: spin .8s linear infinite; }
+  .sheet { position: fixed; inset: 0; z-index: 55; display: grid; place-items: center; padding: var(--s5); background: rgba(29, 29, 31, .45); }
+  .sheet-card { width: 100%; max-width: 420px; background: #fff; border-radius: 28px; padding: var(--s5);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, .12), 0 2px 8px rgba(0, 0, 0, .06); animation: rise .5s var(--spring-soft) both; }
+  .sheet-card h2 { font-size: 20px; }
+  .sheet-card p { margin: var(--s2) 0 var(--s5); color: var(--ink-2); }
+
+  /* ---------- фон широкого екрана: від 1200 px, під картками ----------
+     data-bg="scene" — намальована сцена; data-bg="photo" — фото bg.webp (ставить tools/bg-photo.mjs).
+     Картинку браузер тягне лише на широкому екрані й лише в режимі фото. */
+  .bg-scene, .bg-photo { display: none; }
+
+  /* ---------- широкий екран ---------- */
   @media (min-width: 900px) {
-    .wrap { max-width: 1480px; }
-    .top { display: grid; grid-template-columns: 1fr auto 1fr; }
-    .top .mode-switch { grid-column: 2; }
-    .top .top-right { grid-column: 3; justify-self: end; margin-left: 0; }
-    .toll-row { grid-template-columns: 1fr 1fr auto 44px; }
-    .toll-row .field.country { grid-column: 1 / -1; }
-    #screen-calc { position: relative; z-index: 0; }
-    .bg-scene { display: block; position: fixed; left: 0; right: 0; bottom: 0; height: 62vh; z-index: -1; pointer-events: none; }
-    .bg-scene svg { display: block; width: 100%; height: 100%; }
+    html { scroll-padding-top: 96px; }
+    .top { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); padding: var(--s3) var(--s5); }
+    .top-brand { display: block; min-width: 0; font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .top-brand span { font-weight: 500; color: var(--ink-3); margin-left: var(--s2); }
+    .top .mode-switch { justify-self: center; }
+    .top-right { justify-self: end; margin-left: 0; }
+    .top-user { display: block; }
+    .vswitch { display: none; }
+    .bar { margin: var(--s2) auto 0; max-width: calc(1480px - 2 * var(--s5)); }
+    .wrap { max-width: 1480px; padding: var(--s4) var(--s5) 48px; gap: var(--s4); }
+    .settings { padding: var(--s2) var(--s2) var(--s2) var(--s5); }
+    .settings-line .title { display: block; }
+    .settings-body.open { margin-right: var(--s4); margin-bottom: var(--s4); }
+    .settings-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .variants { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s4); align-items: start; }
+    .variant, .compare { padding: var(--s5); }
+    .add-b { display: grid; justify-items: center; align-content: center; gap: var(--s2); min-height: 280px; padding: var(--s5);
+      border: 1.5px dashed var(--line); border-radius: var(--r); background: var(--card); color: var(--ink-2); text-align: center; font-weight: 600;
+      transition: border-color .25s ease, color .25s ease, transform .5s var(--spring); }
+    .add-b:hover { border-color: var(--accent); color: var(--ink); }
+    .add-b:active { transform: scale(.99); }
+    .add-b .plus { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; margin-bottom: var(--s2);
+      font-size: 28px; font-weight: 400; line-height: 1; background: var(--accent-soft); color: var(--accent); transition: transform .6s var(--spring); }
+    .add-b:hover .plus { transform: rotate(90deg); }
+    .add-b .t { font-size: 17px; color: var(--ink); }
+    .add-b .s { max-width: 300px; font-size: 13px; font-weight: 500; color: var(--ink-3); }
   }
   @media (min-width: 1200px) {
-    .toll-row { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr) minmax(76px, auto) 44px; }
-    .toll-row .field.country { grid-column: auto; }
+    #screen-calc { position: relative; z-index: 0; }
+    body[data-bg="scene"] .bg-scene { display: block; position: fixed; left: 0; right: 0; bottom: 0; height: 64vh; z-index: -1; pointer-events: none; }
+    .bg-scene svg { display: block; width: 100%; height: 100%; }
+    body[data-bg="photo"] .bg-photo { display: block; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background: linear-gradient(to bottom, rgba(245, 245, 247, .94) 0, rgba(245, 245, 247, .5) 120px, rgba(245, 245, 247, .12) 45%, rgba(245, 245, 247, .08) 100%),
+        url("bg.webp") center 70% / cover no-repeat; }
   }
   .bg-scene .tr-grain { display: none; }
   body[data-mode="grain"] .bg-scene .tr-grain { display: inline; }
   body[data-mode="grain"] .bg-scene .tr-tent { display: none; }
 
-  /* ---------- полірка 10.09: перемикач із пружинкою, налаштування в рядок, рейси А/Б свайпом, компактний результат ---------- */
-  .mode-switch { position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; gap: 0; isolation: isolate; }
-  .mode-switch::before, .vtabs::before { content: ""; position: absolute; z-index: -1; top: 3px; bottom: 3px; left: 3px;
-    width: calc(50% - 3px); border-radius: 999px; background: linear-gradient(#ffffff, #fafafc);
-    box-shadow: 0 1px 3px rgba(0,0,0,.16), 0 0 0 .5px rgba(0,0,0,.04);
-    transition: transform .5s cubic-bezier(.34, 1.56, .64, 1);
-    transition: transform .6s linear(0, .402 7.4%, .711 15.3%, .929 23.7%, 1.008 28.2%, 1.067 33%, 1.099 38.2%, 1.105 43.1%, 1.084 50%, 1.018 65.5%, .994 74.2%, 1.001 100%); }
-  body[data-mode="tent"] .mode-switch::before, .vswitch.on-b .vtabs::before { transform: translateX(100%); }
-  .mode-switch button { justify-content: center; }
-  .mode-switch button.is-active { background: transparent; box-shadow: none; }
-
-  .settings-line { flex-wrap: nowrap; }
-  .settings-line .sum { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .settings-line .spacer { display: none; }
-  .settings-body { display: grid; grid-template-rows: 0fr; opacity: 0; margin-top: 0; padding-top: 0; border-top-color: transparent;
-    transition: grid-template-rows .34s cubic-bezier(.2, .8, .2, 1), opacity .22s ease, margin-top .34s ease, padding-top .34s ease, border-color .34s ease; }
-  .settings-body.open { grid-template-rows: 1fr; opacity: 1; margin-top: 14px; padding-top: 14px; border-top-color: var(--line-2); }
-  .settings-inner { overflow: hidden; min-height: 0; }
-
-  /* Рейси А/Б на телефоні — скляна нижня панель із двома вкладками (схема Codex + пружинка).
-     Поки рейсу Б немає, друга вкладка — «+ Порівняти»: створює Б копією А. */
-  .vswitch { display: none; }
-  .vdot { display: inline-block; flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--wait); }
-  .vdot.go { background: var(--go); } .vdot.edge { background: var(--edge); } .vdot.stop { background: var(--stop); }
-  @media (max-width: 899px) {
-    .mode-switch button { padding: 0 10px; }
-    .settings-line .title { display: none; }
-    #btn-add-b { display: none; }
-    .variants { overflow-x: clip; }
-    .vswitch { display: block; position: sticky; bottom: 0; z-index: 8; margin: 0 -14px -40px;
-      padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
-      background: rgba(250,250,252,.72); -webkit-backdrop-filter: saturate(180%) blur(22px); backdrop-filter: saturate(180%) blur(22px);
-      border-top: .5px solid rgba(0,0,0,.1); }
-    .vtabs { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 3px; border-radius: 999px;
-      background: rgba(118,118,128,.14); isolation: isolate; }
-    .vtabs button { min-width: 0; min-height: 42px; padding: 0 8px; border: 0; background: transparent; border-radius: 999px;
-      font-size: 14px; font-weight: 600; color: var(--ink-2); display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .vtabs button[aria-pressed="true"] { color: var(--ink); }
-    .vtabs .vsum { font-weight: 700; white-space: nowrap; }
-    .vswitch:not(.has-b) #vdot-b, .vswitch:not(.has-b) #vsum-b { display: none; }
-    .vswitch:not(.has-b) [data-v="b"] { color: var(--accent); }
-    .result { bottom: calc(66px + env(safe-area-inset-bottom)); }
-    .variants.two .variant:not(.is-active) { display: none; }
-    .variant.slide-l { animation: slide-l .28s cubic-bezier(.2, .8, .2, 1); }
-    .variant.slide-r { animation: slide-r .28s cubic-bezier(.2, .8, .2, 1); }
-  }
-  @keyframes slide-l { from { transform: translateX(22px); opacity: .5; } to { transform: none; opacity: 1; } }
-  @keyframes slide-r { from { transform: translateX(-22px); opacity: .5; } to { transform: none; opacity: 1; } }
-  @media (prefers-reduced-motion: reduce) { .vtabs::before { transition: none; } }
-
-  .verdict { display: grid; gap: 10px; align-items: stretch; padding: 12px 14px; }
-  .verdict .v-row { display: flex; align-items: center; gap: 12px; }
-  .verdict .v-text { min-width: 0; }
-  .verdict .badge { flex: 0 0 34px; width: 34px; height: 34px; font-size: 17px; }
-  .verdict .word { font-size: 22px; }
-  .verdict-profit b { font-size: 22px; }
-  .v-price { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 10px 12px;
-    border-radius: 12px; background: rgba(255,255,255,.78); }
-  .v-price small { display: block; font-size: 12px; font-weight: 600; color: var(--ink-2); }
-  .v-price b { font-size: 24px; font-weight: 700; letter-spacing: -.02em; color: var(--ink); }
-  .v-price .res { text-align: right; }
-  .v-price .res b { font-size: 17px; color: var(--go); }
-  .v-price .res b.neg { color: var(--stop); }
-  .v-metrics { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: 13px; color: var(--ink-2); }
-  .v-metrics b { color: var(--ink); font-weight: 700; }
-  .v-metrics b.neg { color: var(--stop); }
-  .verdict.wait { padding: 10px 14px; }
-  .verdict.wait .v-price, .verdict.wait .v-metrics, .verdict.wait .verdict-profit { display: none; }
-  .verdict.wait .badge { flex-basis: 28px; width: 28px; height: 28px; font-size: 14px; }
-  .verdict.wait .word { font-size: 18px; }
-  details.ledger-wrap { margin-top: 8px; }
-  @media (min-width: 900px) {
-    .verdict .word { font-size: 26px; }
-    .v-price b { font-size: 30px; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .mode-switch::before, .vswitch::before, .settings-body { transition: none; }
-    .variant.slide-l, .variant.slide-r { animation: none; }
-  }
-
-  /* ---------- полірка 2: скло шапки, легке «Чекаю дані», пігулки з пружинкою скрізь, курс і сума на місці ---------- */
-  .top { background: rgba(250,250,252,.64); -webkit-backdrop-filter: saturate(180%) blur(22px); backdrop-filter: saturate(180%) blur(22px);
-    border-bottom: .5px solid rgba(0,0,0,.1); }
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .top { background: rgba(250,250,252,.96); } }
-  .verdict.wait { background: transparent; border: 1px dashed var(--line); }
-  .verdict.wait .badge { background: transparent; color: var(--ink-3); border: 1.5px solid var(--line); }
-  .verdict.wait .word { color: var(--ink-2); font-weight: 600; }
-  .verdict.wait .sub { font-weight: 500; color: var(--ink-3); }
-
-  .seg { position: relative; isolation: isolate; }
-  .seg-thumb { position: absolute; z-index: -1; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 8px; background: #fff;
-    box-shadow: 0 1px 2px rgba(0,0,0,.14);
-    transition: transform .55s cubic-bezier(.34, 1.56, .64, 1), width .55s cubic-bezier(.34, 1.56, .64, 1);
-    transition: transform .6s linear(0, .402 7.4%, .711 15.3%, .929 23.7%, 1.008 28.2%, 1.067 33%, 1.099 38.2%, 1.105 43.1%, 1.084 50%, 1.018 65.5%, .994 74.2%, 1.001 100%), width .6s linear(0, .402 7.4%, .711 15.3%, .929 23.7%, 1.008 28.2%, 1.067 33%, 1.099 38.2%, 1.105 43.1%, 1.084 50%, 1.018 65.5%, .994 74.2%, 1.001 100%); }
-  .seg button { position: relative; }
-  .seg button[aria-pressed="true"] { background: transparent; box-shadow: none; }
-  .seg.auto button { flex: 0 0 auto; padding: 0 12px; }
-  .seg-extra { display: inline-block; max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap; vertical-align: bottom;
-    transition: max-width .5s cubic-bezier(.34, 1.56, .64, 1), opacity .25s ease; }
-  .seg button[aria-pressed="true"] .seg-extra { max-width: 90px; opacity: 1; }
-  .appear { animation: appear .28s cubic-bezier(.2, .8, .2, 1); }
+  /* ---------- рух ---------- */
+  .appear { animation: appear .45s var(--spring-soft); }
   @keyframes appear { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
-  .calc-hint { display: block; min-height: 18px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
-  .calc-hint b { color: var(--ink); }
-  @media (prefers-reduced-motion: reduce) { .seg-thumb, .seg-extra { transition: none; } .appear { animation: none; } }
-
-  /* Колонки сітки не ширші за екран: інакше один незгортуваний рядок (підсумок налаштувань)
-     розтягує колонку, а за нею — всю сторінку, і на телефоні обрізається все праворуч. */
-  .wrap, .variants { grid-template-columns: minmax(0, 1fr); }
-  .row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .row.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .row[data-quote="currency"] { grid-template-columns: minmax(0, 1fr) auto; }
-  .toll-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto 44px; }
-  .seg.auto button { padding: 0 10px; }
-  @media (min-width: 900px) {
-    .variants.two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-    .toll-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto 44px; }
+  @keyframes pop { from { transform: scale(.55); } to { transform: none; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
+  @keyframes toast-in { from { opacity: 0; transform: translate(-50%, 18px) scale(.96); } to { opacity: 1; transform: translate(-50%, 0); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important; scroll-behavior: auto !important; }
   }
-  @media (min-width: 1200px) {
-    .toll-row { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr) minmax(76px, auto) 44px; }
-  }
-
-  /* ---------- полірка 3: статус рейсу вгорі в шапці, картка результату без прилипання ---------- */
-  @media (max-width: 899px) {
-    .top { flex-wrap: wrap; row-gap: 8px; }
-    .vswitch { position: static; flex: 1 0 100%; order: 3; margin: 0; padding: 0; background: none;
-      -webkit-backdrop-filter: none; backdrop-filter: none; border: 0; }
-    .vtabs button { min-height: 38px; }
-    .result { position: static; }
-    #variant-b .v-head-actions { flex: 1 0 100%; margin-left: 0; display: grid; grid-auto-flow: column;
-      grid-auto-columns: minmax(0, 1fr); gap: 6px; }
-    #variant-b .v-head-actions .btn { padding: 0 6px; font-size: 12px; }
-  }
-  .vdot { width: 18px; height: 18px; flex-basis: 18px; display: inline-grid; place-items: center;
-    color: #fff; font-size: 11px; font-weight: 800; font-style: normal; }
-  .seg-extra { display: none; max-width: none; opacity: 1; transition: none; }
-  .seg button[aria-pressed="true"] .seg-extra { display: inline; }
-
-  /* ---------- токени Apple: скло шапки, мʼяка глибина карток, фокус ---------- */
-  :root { --r: 20px; }
-  body { letter-spacing: -.01em; font-variant-numeric: lining-nums tabular-nums; }
-  .card, .settings { box-shadow: 0 4px 12px rgba(0,0,0,.04); }
-  .top { background: #fafafc; }
-  @supports ((backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px))) {
-    .top { background: rgba(250,250,252,.8); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
-  }
-  .sheet-card { border-radius: 28px; box-shadow: 0 16px 48px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.06); }
-  .field input, .field select { box-shadow: inset 0 1px 2px rgba(0,0,0,.03); }
-  .field input:focus, .field select:focus { outline: none; border-color: #0071e3; box-shadow: 0 0 0 4px rgba(0,113,227,.18); }
 </style>
 </head>
-<body data-mode="grain">
+<body data-mode="grain" data-bg="scene">
 
 <section id="screen-login" class="login" hidden>
   <div class="login-card">
@@ -511,38 +510,47 @@
 </section>
 
 <section id="screen-calc" hidden>
+<div class="bg-photo" aria-hidden="true"></div>
 <div class="bg-scene" aria-hidden="true">
 <svg viewBox="0 0 1600 600" preserveAspectRatio="xMidYMax slice" focusable="false">
   <defs>
-    <linearGradient id="bgSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f5f5f7"/><stop offset="1" stop-color="#e8eef4"/></linearGradient>
-    <linearGradient id="bgMist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f7fa" stop-opacity="0"/><stop offset="1" stop-color="#f4f7fa" stop-opacity=".92"/></linearGradient>
-    <pattern id="bgPinesFar" x="0" y="430" width="38" height="50" patternUnits="userSpaceOnUse"><path d="M8 50 15 16 22 50Z M24 50 30 26 36 50Z M0 50 4 32 8 50Z" fill="#c9d5df"/></pattern>
-    <pattern id="bgPinesNear" x="17" y="448" width="46" height="60" patternUnits="userSpaceOnUse"><path d="M10 60 19 14 28 60Z M29 60 37 28 45 60Z M0 60 5 36 10 60Z" fill="#b3c3d0"/></pattern>
+    <linearGradient id="bgSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f5f5f7"/><stop offset=".42" stop-color="#e5edf6"/><stop offset=".8" stop-color="#f7ecd9"/></linearGradient>
+    <radialGradient id="bgSun" cx="1210" cy="372" r="360" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffd48f" stop-opacity=".72"/><stop offset=".45" stop-color="#ffe4bb" stop-opacity=".34"/><stop offset="1" stop-color="#ffe4bb" stop-opacity="0"/></radialGradient>
+    <linearGradient id="bgFar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c6d4e3"/><stop offset="1" stop-color="#e2e9f1"/></linearGradient>
+    <linearGradient id="bgMid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9bccf"/><stop offset="1" stop-color="#cdd8e3"/></linearGradient>
+    <linearGradient id="bgMist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f1ea" stop-opacity="0"/><stop offset="1" stop-color="#f4f1ea" stop-opacity=".85"/></linearGradient>
+    <linearGradient id="bgMeadow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dde6cc"/><stop offset="1" stop-color="#c9d6b1"/></linearGradient>
+    <linearGradient id="bgWheat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0e1ba"/><stop offset="1" stop-color="#ddc488"/></linearGradient>
+    <pattern id="bgRows" width="44" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(-5)"><path d="M0 5.5H44" stroke="#cfb577" stroke-width="1.5" opacity=".55"/></pattern>
+    <pattern id="bgPines" x="0" y="424" width="34" height="46" patternUnits="userSpaceOnUse"><path d="M7 46 13 13 19 46Z M21 46 26 25 31 46Z" fill="#98aec0"/></pattern>
   </defs>
   <rect width="1600" height="600" fill="url(#bgSky)"/>
-  <path d="M0 322 120 244 212 296 334 184 452 280 566 226 694 300 824 206 952 288 1082 218 1212 298 1334 238 1462 290 1600 228V600H0Z" fill="#e1e8ef"/>
-  <rect y="240" width="1600" height="170" fill="url(#bgMist)"/>
-  <path d="M0 398 152 330 272 380 402 318 544 388 702 338 862 398 1012 348 1162 404 1322 358 1472 408 1600 368V600H0Z" fill="#d6e0e8"/>
-  <rect y="350" width="1600" height="130" fill="url(#bgMist)"/>
-  <rect y="430" width="1600" height="50" fill="url(#bgPinesFar)"/>
-  <rect y="448" width="1600" height="60" fill="url(#bgPinesNear)"/>
-  <rect y="506" width="1600" height="94" fill="#dfe5ea"/>
-  <rect y="532" width="1600" height="54" fill="#cdd5dc"/>
-  <path d="M0 559H1600" stroke="#f3f5f7" stroke-width="3" stroke-dasharray="46 34"/>
+  <rect width="1600" height="600" fill="url(#bgSun)"/>
+  <path d="M0 318 110 238 196 290 318 176 440 272 560 214 690 296 818 196 950 282 1086 206 1216 292 1340 228 1470 284 1600 222V600H0Z" fill="url(#bgFar)"/>
+  <rect y="236" width="1600" height="170" fill="url(#bgMist)"/>
+  <path d="M0 392 148 326 268 374 400 314 540 382 700 332 860 390 1010 342 1160 398 1320 350 1470 400 1600 362V600H0Z" fill="url(#bgMid)"/>
+  <rect y="344" width="1600" height="110" fill="url(#bgMist)"/>
+  <path d="M0 452C220 426 420 438 620 446S1040 428 1240 438 1500 452 1600 446V600H0Z" fill="url(#bgMeadow)"/>
+  <g fill="url(#bgPines)"><rect x="34" y="424" width="238" height="46"/><rect x="612" y="424" width="170" height="46"/><rect x="1392" y="424" width="208" height="46"/></g>
+  <path d="M0 470C260 448 520 460 760 468S1260 452 1600 472V600H0Z" fill="url(#bgWheat)"/>
+  <path d="M0 470C260 448 520 460 760 468S1260 452 1600 472V600H0Z" fill="url(#bgRows)"/>
+  <rect y="506" width="1600" height="94" fill="#dde3e8"/>
+  <rect y="532" width="1600" height="54" fill="#c7cfd7"/>
+  <path d="M0 559H1600" stroke="#f4f6f8" stroke-width="3" stroke-dasharray="46 34"/>
   <g transform="translate(1128 401)">
-    <ellipse cx="226" cy="170" rx="236" ry="7" fill="#1d1d1f" opacity=".12"/>
+    <ellipse cx="226" cy="170" rx="236" ry="7" fill="#1d1d1f" opacity=".14"/>
     <g class="tr-tent">
       <rect x="0" y="10" width="330" height="118" rx="6" fill="#fbfcfd" stroke="#d3dbe2" stroke-width="1.5"/>
       <path d="M30 15V123M60 15V123M90 15V123M120 15V123M150 15V123M180 15V123M210 15V123M240 15V123M270 15V123M300 15V123" stroke="#e7ecf0" stroke-width="2"/>
       <rect x="0" y="118" width="330" height="10" fill="#edf1f4"/>
-      <text x="165" y="80" text-anchor="middle" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="8" fill="#c9d3dc">NESVICH</text>
+      <text x="165" y="80" text-anchor="middle" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="8" fill="#c3cdd6">NESVICH</text>
     </g>
     <g class="tr-grain">
-      <path d="M20 26Q165 2 314 26Z" fill="#e8dcc0"/>
+      <path d="M20 26Q165 2 314 26Z" fill="#e6d3a4"/>
       <rect x="0" y="22" width="334" height="8" rx="2" fill="#dfe5ea"/>
       <rect x="4" y="28" width="326" height="100" rx="4" fill="#eef1f4" stroke="#cfd8df" stroke-width="1.5"/>
       <path d="M40 31V125M76 31V125M112 31V125M148 31V125M184 31V125M220 31V125M256 31V125M292 31V125" stroke="#dde3e8" stroke-width="3"/>
-      <text x="167" y="86" text-anchor="middle" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="8" fill="#c3cdd6">NESVICH</text>
+      <text x="167" y="86" text-anchor="middle" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="8" fill="#bfc9d3">NESVICH</text>
     </g>
     <rect x="6" y="128" width="324" height="8" fill="#5b646c"/>
     <rect x="286" y="136" width="6" height="22" fill="#6b747c"/>
@@ -554,7 +562,7 @@
     <path d="M360 92H414V138H360Z" fill="none" stroke="#e2e8ec" stroke-width="1.5"/>
     <rect x="440" y="58" width="6" height="18" rx="2" fill="#5b646c"/>
     <rect x="443" y="100" width="7" height="36" fill="#e4e9ed"/>
-    <rect x="441" y="112" width="9" height="8" rx="2" fill="#f6dfa8"/>
+    <rect x="441" y="112" width="9" height="8" rx="2" fill="#f6d596"/>
     <rect x="348" y="126" width="46" height="18" rx="4" fill="#c9d1d8"/>
     <rect x="404" y="138" width="48" height="12" rx="3" fill="#5b646c"/>
     <g fill="#2f363c"><circle cx="44" cy="148" r="21"/><circle cx="92" cy="148" r="21"/><circle cx="140" cy="148" r="21"/><circle cx="320" cy="148" r="21"/><circle cx="420" cy="148" r="21"/></g>
@@ -564,19 +572,23 @@
 </svg>
 </div>
   <header class="top">
-    <div class="mode-switch" role="tablist" aria-label="Тип авто">
-      <button type="button" role="tab" data-mode="grain" class="is-active"><i class="mark grain"></i>Зерновоз</button>
-      <button type="button" role="tab" data-mode="tent"><i class="mark tent"></i>Тент</button>
+    <div class="glass" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="top-brand">Nesvich Logistics<span>Калькулятор рейсів</span></div>
+    <div class="seg fit mode-switch" role="group" aria-label="Тип авто">
+      <span class="seg-thumb"></span>
+      <button type="button" data-mode="grain" aria-pressed="true"><i class="mark grain"></i>Зерновоз</button>
+      <button type="button" data-mode="tent" aria-pressed="false"><i class="mark tent"></i>Тент</button>
     </div>
     <div class="top-right">
       <span class="top-user" id="user-name"></span>
-      <button type="button" class="icon-btn" id="btn-refresh" title="Оновити довідники" aria-label="Оновити довідники">↻</button>
-      <button type="button" class="icon-btn" id="btn-logout" title="Вийти" aria-label="Вийти">⏻</button>
+      <button type="button" class="icon-btn" id="btn-refresh" title="Оновити довідники" aria-label="Оновити довідники"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4.5v4h-4"/></svg></button>
+      <button type="button" class="icon-btn" id="btn-logout" title="Вийти" aria-label="Вийти"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3.5v8"/><path d="M7 6.5a7.5 7.5 0 1 0 10 0"/></svg></button>
     </div>
     <nav class="vswitch" id="vswitch" aria-label="Рейси">
-      <div class="vtabs" role="tablist">
-        <button type="button" role="tab" data-v="a" aria-pressed="true"><i class="vdot" id="vdot-a"></i><span>А</span><b class="vsum" id="vsum-a"></b></button>
-        <button type="button" role="tab" data-v="b" aria-pressed="false"><i class="vdot" id="vdot-b"></i><span id="vlabel-b">+ Порівняти</span><b class="vsum" id="vsum-b"></b></button>
+      <div class="seg" id="vtabs" role="group" aria-label="Рейс А чи Б">
+        <span class="seg-thumb"></span>
+        <button type="button" data-v="a" aria-pressed="true"><i class="vdot" id="vdot-a"></i><span>А</span><b class="vsum" id="vsum-a"></b></button>
+        <button type="button" data-v="b" aria-pressed="false"><i class="vdot" id="vdot-b"></i><span id="vlabel-b">+ Порівняти</span><b class="vsum" id="vsum-b"></b></button>
       </div>
     </nav>
   </header>
@@ -618,9 +630,13 @@
     <div class="variants" id="variants">
       <section class="card variant is-active" id="variant-a"></section>
       <section class="card variant" id="variant-b" hidden></section>
+      <button type="button" class="add-b" id="btn-add-b" hidden>
+        <span class="plus" aria-hidden="true">+</span>
+        <span class="t">Порівняти з іншим рейсом</span>
+        <span class="s">Рейс Б стане копією А — змініть ставку, тип рейсу чи кілометри</span>
+      </button>
     </div>
 
-    <button type="button" class="btn dashed wide" id="btn-add-b">+ Порівняти з іншим рейсом</button>
     <section class="card compare" id="compare" hidden></section>
   </main>
 </section>
@@ -876,6 +892,10 @@ async function apiCall(action, payload) {
 /* ---------- Утиліти ---------- */
 const $ = function (sel, root) { return (root || document).querySelector(sel); };
 const $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+const isPhone = function () { return !window.matchMedia('(min-width: 900px)').matches; };
+const reduceMotion = function () { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; };
+// Крива руху з CSS-змінної (пружинка на linear(), де браузер уміє) — одна для CSS і JS.
+const ease = function (name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || 'ease-out'; };
 const esc = function (s) { return String(s === undefined || s === null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
 const fmtMoney = function (v) { return Math.round(Number(v) || 0).toLocaleString('uk-UA').replace(/\u00a0/g, ' '); };
 const fmtNum = function (v, d) { return (Number(v) || 0).toLocaleString('uk-UA', { minimumFractionDigits: d, maximumFractionDigits: d }).replace(/\u00a0/g, ' '); };
@@ -892,17 +912,20 @@ const KEY = {
 };
 const MODE_LABEL = { grain: 'зерновоз', tent: 'тент' };
 const TENT_DELTA = 2.5;
-const VERDICT_SYM = { wait: '…', go: '✓', edge: '!', stop: '✕' };
+const VERDICT_SYM = { wait: '', go: '✓', edge: '!', stop: '✕' };
 const VERDICT_WORD = { wait: 'Чекаю дані', go: 'Їдемо', edge: 'На межі', stop: 'Не вигідно' };
 
 let toastTimer = null;
-function toast(msg, isErr) {
+// onTap — тост стає кнопкою (напр. «оновити»), висить довше.
+function toast(msg, isErr, onTap) {
   const el = $('#toast');
   el.textContent = msg;
   el.classList.toggle('err', !!isErr);
+  el.classList.toggle('act', !!onTap);
+  el.onclick = onTap ? function () { el.hidden = true; onTap(); } : null;
   el.hidden = false;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(function () { el.hidden = true; }, isErr ? 5000 : 2600);
+  toastTimer = setTimeout(function () { el.hidden = true; }, onTap ? 9000 : isErr ? 5000 : 2600);
 }
 function loader(on, text) {
   $('#loader-text').textContent = text || 'Завантажую…';
@@ -920,7 +943,8 @@ const state = {
   session: null, config: null, mode: 'grain',
   settings: {}, dirty: { grain: false, tent: false },
   restoring: false, frozen: false,
-  results: { a: null, b: null }, showB: false, activeV: 'a', pendingConfig: null, settingsTimer: null, pin: ''
+  results: { a: null, b: null }, codes: { a: 'wait', b: 'wait' }, showB: false, activeV: 'a', sliding: false,
+  pendingConfig: null, settingsTimer: null, pin: ''
 };
 
 /* ============================================================
@@ -1098,13 +1122,12 @@ function applyMode(mode, first) {
   state.mode = mode;
   if (state.session) store.set(KEY.mode(state.session.user), mode);
   document.body.dataset.mode = mode;
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff');
-  $$('.mode-switch button').forEach(function (b) { b.classList.toggle('is-active', b.dataset.mode === mode); });
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f5f5f7');
+  pressSeg($('.mode-switch'), 'data-mode', mode);
   renderSettings();
   renderVariant('a');
   renderVariant('b');
   restoreDraft();
-  if (!state.showB && window.matchMedia('(min-width: 900px)').matches) toggleB(true);
   recalcAll();
 }
 
@@ -1256,7 +1279,7 @@ function resetSettings() {
    ============================================================ */
 function vehicleOptions(selected) {
   const list = (state.config.vehicles || []).filter(function (v) { return v.active !== false; });
-  return '<option value="">— без авто, норма з налаштувань —</option>' + list.map(function (v) {
+  return '<option value="">Без авто — норма з налаштувань</option>' + list.map(function (v) {
     const label = v.plate + ' · ' + shortModel(v.model) + (v.driver ? ' · ' + shortName(v.driver) : '');
     return '<option value="' + esc(v.plate) + '"' + (v.plate === selected ? ' selected' : '') + '>' + esc(label) + '</option>';
   }).join('');
@@ -1290,8 +1313,9 @@ function segHTML(id, value, opts, cls) {
     '</div><input type="hidden" id="' + id + '" value="' + esc(value) + '">';
 }
 
-// Підкладка пігулки їде за вибраною кнопкою з пружинкою; перше розміщення — без анімації.
+// Підкладка перемикача їде за вибраною кнопкою з відскоком; перше розміщення — без анімації.
 function moveThumb(seg) {
+  if (!seg) return;
   const t = seg.querySelector('.seg-thumb'), b = seg.querySelector('button[aria-pressed="true"]');
   if (!t || !b || !b.offsetWidth) return;
   const first = !t.style.width;
@@ -1302,11 +1326,18 @@ function moveThumb(seg) {
 }
 // Кнопка міняє розмір (показали рейс, розкрився курс, повернули телефон) — підкладка доганяє.
 function watchSeg(seg) {
+  if (!seg) return;
   moveThumb(seg);
   if (window.ResizeObserver) {
     const ro = new ResizeObserver(function () { moveThumb(seg); });
     $$('button', seg).forEach(function (b) { ro.observe(b); });
   }
+}
+// Позначити вибрану кнопку будь-якого перемикача за атрибутом (data-val, data-mode, data-v) і підвезти підкладку.
+function pressSeg(seg, attr, value) {
+  if (!seg) return;
+  $$('button', seg).forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute(attr) === value ? 'true' : 'false'); });
+  moveThumb(seg);
 }
 
 function renderVariant(p) {
@@ -1316,22 +1347,22 @@ function renderVariant(p) {
   host.innerHTML =
     '<div class="v-head"><h2><span class="v-key">' + key + '</span>Рейс ' + key + '</h2>' +
       '<div class="v-head-actions">' +
-        (p === 'b' ? '<button type="button" class="btn small ghost" data-act="copy-a">← Копіювати А</button>' : '') +
+        (p === 'b' ? '<button type="button" class="btn small ghost" data-act="copy-a">← Копія А</button>' : '') +
         '<button type="button" class="btn small ghost" data-act="reset">Очистити</button>' +
         (p === 'b' ? '<button type="button" class="btn small ghost" data-act="close-b">Прибрати</button>' : '') +
       '</div></div>' +
 
-    '<div class="fieldset">' +
-      '<div class="field"><label>Куди їдемо</label>' +
-        segHTML(p + '-region', 'ukraine', [['ukraine', 'Україна'], ['abroad', 'Закордон']]) + '</div>' +
+    '<div class="field"><label>Куди їдемо</label>' +
+      segHTML(p + '-region', 'ukraine', [['ukraine', 'Україна'], ['abroad', 'Закордон']]) + '</div>' +
 
-      '<div class="field"><label>Тип рейсу</label>' +
-        segHTML(p + '-scenario', 'service', [['service', 'З вантажем'], ['return', 'Догруз назад'], ['idle', 'Простій']]) +
-        '<span class="hint" id="' + p + '-scenario-hint"></span></div>' +
+    '<div class="group"><div class="field"><label>Тип рейсу</label>' +
+      segHTML(p + '-scenario', 'service', [['service', 'З вантажем'], ['return', 'Догруз назад'], ['idle', 'Простій']]) + '</div>' +
+      '<span class="note" id="' + p + '-scenario-hint"></span></div>' +
 
-      '<div class="field"><label>Як задана ставка</label>' +
-        segHTML(p + '-quote', 'manual', [['manual', '₴ за рейс'], ['ton_usd', '$ за тонну'], ['currency', 'Сумою у валюті']]) + '</div>' +
+    '<div class="field"><label>Як задана ставка</label>' +
+      segHTML(p + '-quote', 'manual', [['manual', '₴ за рейс'], ['ton_usd', '$ за тонну'], ['currency', 'У валюті']]) + '</div>' +
 
+    '<div class="group">' +
       '<div class="field" data-quote="manual"><label for="' + p + '-freight">Скільки платять <small>₴ за рейс</small></label>' +
         '<input type="text" inputmode="decimal" id="' + p + '-freight" placeholder="0"></div>' +
       '<div class="row" data-quote="ton_usd">' +
@@ -1342,38 +1373,46 @@ function renderVariant(p) {
         '<div class="field"><label for="' + p + '-cur">Сума у валюті</label><input type="text" inputmode="decimal" id="' + p + '-cur" placeholder="0"></div>' +
         '<div class="field"><label>Валюта</label>' + segHTML(p + '-currency', 'EUR', [['EUR', 'EUR', 'EUR'], ['USD', 'USD', 'USD']], 'auto') + '</div>' +
       '</div>' +
-      '<span class="calc-hint" id="' + p + '-freight-hint"></span>' +
+      '<span class="note" id="' + p + '-freight-hint"></span>' +
+    '</div>' +
 
-      '<div class="row" data-km>' +
+    '<div class="group" data-km>' +
+      '<div class="row">' +
         '<div class="field"><label for="' + p + '-km-full">Км з вантажем</label><input type="text" inputmode="decimal" id="' + p + '-km-full" placeholder="0"></div>' +
         '<div class="field"><label for="' + p + '-km-empty">Км порожнім</label><input type="text" inputmode="decimal" id="' + p + '-km-empty" placeholder="0"></div>' +
       '</div>' +
-      '<div class="km-total" id="' + p + '-km-total" data-km></div>' +
-
-      '<div class="field" id="' + p + '-tolls-wrap"><label>Платні дороги <small>ставка підставиться з довідника</small></label>' +
-        '<div class="tolls" id="' + p + '-tolls"></div>' +
-        '<div class="tolls-foot" style="margin-top:8px">' +
-          '<button type="button" class="btn small dashed" data-act="add-toll">+ Додати країну</button>' +
-          '<span class="tolls-total num" id="' + p + '-tolls-total"></span>' +
-        '</div>' +
-      '</div>' +
-
-      '<details class="more" id="' + p + '-more"><summary>Ще: дні, авто, норма, інші витрати</summary>' +
-        '<div class="more-body">' +
-          '<div class="row">' +
-            '<div class="field"><label for="' + p + '-days">Скільки днів</label><input type="text" inputmode="decimal" id="' + p + '-days" value="1"></div>' +
-            '<div class="field"><label for="' + p + '-other">Інші витрати <small>₴</small></label><input type="text" inputmode="decimal" id="' + p + '-other" placeholder="0"></div>' +
-          '</div>' +
-          '<div class="field"><label for="' + p + '-vehicle">Авто <small>підставляє норму палива</small></label><select id="' + p + '-vehicle">' + vehicleOptions('') + '</select></div>' +
-          '<div class="field"><label for="' + p + '-norm">Норма палива <small>л/100 км</small></label><input type="text" inputmode="decimal" id="' + p + '-norm" value="' + esc(s.fuelCons || '') + '"><span class="hint" id="' + p + '-norm-hint">з налаштувань</span></div>' +
-        '</div>' +
-      '</details>' +
+      '<span class="note" id="' + p + '-km-total"></span>' +
     '</div>' +
+
+    // Авто й дні — одразу на виду (від них залежать паливо і «за день»); норма видна рядком нижче.
+    '<div class="group">' +
+      '<div class="row car">' +
+        '<div class="field"><label for="' + p + '-vehicle">Авто</label><select id="' + p + '-vehicle">' + vehicleOptions('') + '</select></div>' +
+        '<div class="field"><label for="' + p + '-days">Скільки днів</label><input type="text" inputmode="decimal" id="' + p + '-days" value="1"></div>' +
+      '</div>' +
+      '<span class="note"><span id="' + p + '-norm-hint"></span> <button type="button" class="link-inline" data-act="edit-norm">змінити</button></span>' +
+    '</div>' +
+
+    // Платні дороги: порожньо — лише кнопка; країну вибирають зі списку прямо на ній.
+    '<div class="tolls-block">' +
+      '<div class="tolls-head">' +
+        '<span class="lbl">Платні дороги <small class="num" id="' + p + '-tolls-total"></small></span>' +
+        '<label class="btn small accent add-toll">+ Додати країну<select data-act="add-toll" aria-label="Додати країну з платними дорогами">' + tollOptions('Оберіть країну') + '</select></label>' +
+      '</div>' +
+      '<div class="tolls" id="' + p + '-tolls"></div>' +
+    '</div>' +
+
+    '<details class="more" id="' + p + '-more"><summary><span class="sum-t">Ще: норма, інші витрати</span><span class="sum-val" id="' + p + '-more-sum"></span></summary>' +
+      '<div class="more-body"><div class="row">' +
+        '<div class="field"><label for="' + p + '-norm">Норма палива <small>л/100</small></label><input type="text" inputmode="decimal" id="' + p + '-norm" value="' + esc(s.fuelCons || '') + '"></div>' +
+        '<div class="field"><label for="' + p + '-other">Інші витрати <small>₴</small></label><input type="text" inputmode="decimal" id="' + p + '-other" placeholder="0"></div>' +
+      '</div></div>' +
+    '</details>' +
 
     '<div class="result">' +
       '<div class="verdict wait" id="' + p + '-verdict">' +
         '<div class="v-row">' +
-          '<span class="badge" id="' + p + '-badge">…</span>' +
+          '<span class="badge" id="' + p + '-badge"></span>' +
           '<div class="v-text"><b class="word" id="' + p + '-word">Чекаю дані</b><span class="sub" id="' + p + '-sub">Введіть ставку і кілометри</span></div>' +
           '<div class="verdict-profit"><small>Чистими</small><b class="num" id="' + p + '-r-profit">—</b></div>' +
         '</div>' +
@@ -1401,7 +1440,7 @@ function renderVariant(p) {
     '</details>';
 
   $$('input, select', host).forEach(function (el) {
-    if (el.type === 'hidden') return;
+    if (el.type === 'hidden' || el.dataset.act) return;
     const handler = function () { onVariantInput(p, el); };
     el.addEventListener('input', handler);
     el.addEventListener('change', handler);
@@ -1416,21 +1455,34 @@ function renderVariant(p) {
   });
   $$('[data-seg]', host).forEach(watchSeg);
   $('[data-act="reset"]', host).addEventListener('click', function () { resetVariant(p, true); });
-  $('[data-act="add-toll"]', host).addEventListener('click', function () { addTollRow(p); recalcVariant(p); });
+  const addSel = $('[data-act="add-toll"]', host);
+  addSel.addEventListener('change', function () {
+    const country = addSel.value;
+    addSel.value = '';
+    if (!country) return;
+    const row = addTollRow(p, { country: country }, true);
+    recalcVariant(p);
+    $('.t-qty', row).focus({ preventScroll: true });
+  });
+  $('[data-act="edit-norm"]', host).addEventListener('click', function () {
+    openDetails($('#' + p + '-more'), true);
+    const n = $('#' + p + '-norm');
+    n.focus({ preventScroll: true });
+    n.select();
+  });
+  smoothDetails($('#' + p + '-more'));
+  smoothDetails($('#' + p + '-ledger'));
   const copyA = $('[data-act="copy-a"]', host);
   if (copyA) copyA.addEventListener('click', copyAtoB);
   const closeB = $('[data-act="close-b"]', host);
   if (closeB) closeB.addEventListener('click', function () { toggleB(false); });
-  addTollRow(p);
   syncVariantVisibility(p);
 }
 
 function setSeg(id, value) {
   const el = $('#' + id);
   if (el) el.value = value;
-  const seg = document.querySelector('[data-seg="' + id + '"]');
-  if (seg) $$('button', seg).forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.val === value ? 'true' : 'false'); });
-  if (seg) moveThumb(seg);
+  pressSeg(document.querySelector('[data-seg="' + id + '"]'), 'data-val', value);
 }
 
 function onVariantInput(p, el) {
@@ -1459,8 +1511,6 @@ function syncVariantVisibility(p) {
     else if (!show) f.hidden = true;
   });
   $$('[data-km]', host).forEach(function (f) { f.hidden = idle; });
-  // У простої вердикт залежить від кількості днів, а поле днів сховане в «Ще» — відкриваємо.
-  if (idle) { const more = $('#' + p + '-more'); if (more) more.open = true; }
 
   const s = state.settings[state.mode] || {};
   $('#' + p + '-scenario-hint').textContent = idle
@@ -1471,15 +1521,21 @@ function syncVariantVisibility(p) {
 
   // Курси — прямо в пігулках валют; перераховану суму пише recalcVariant.
   $$('.seg-extra', host).forEach(function (e) {
-    e.textContent = '\u00a0·\u00a0' + fmtNum(Calc.num(e.dataset.extra === 'USD' ? s.usdRate : s.eurRate), 2);
+    e.textContent = ' · ' + fmtNum(Calc.num(e.dataset.extra === 'USD' ? s.usdRate : s.eurRate), 2);
   });
   $$('[data-seg]', host).forEach(moveThumb);
+  renderNormHint(p);
+}
 
+// Норма видна одразу під авто: скільки і звідки. Поле для ручної правки — у «Ще».
+function renderNormHint(p) {
+  const s = state.settings[state.mode] || {};
   const v = vehicleByPlate($('#' + p + '-vehicle').value);
   const norm = $('#' + p + '-norm');
-  $('#' + p + '-norm-hint').textContent = v
-    ? (norm.dataset.auto === '1' ? 'з довідника: ' + v.plate : 'вручну (у довіднику ' + fmtNum(vehicleNorm(v, state.mode), 1) + ')')
-    : (norm.dataset.auto === '' && norm.value !== String(state.settings[state.mode].fuelCons) ? 'вручну' : 'з налаштувань');
+  const src = v
+    ? (norm.dataset.auto === '1' ? 'з довідника' : 'вручну, у довіднику ' + fmtNum(vehicleNorm(v, state.mode), 1))
+    : (norm.dataset.auto === '' && norm.value !== String(s.fuelCons) ? 'вручну' : 'з налаштувань');
+  $('#' + p + '-norm-hint').innerHTML = 'Норма <b class="num">' + esc(fmtNum(Calc.num(norm.value), 1)) + ' л/100 км</b> · ' + esc(src);
 }
 
 /* ---- платні дороги ---- */
@@ -1491,19 +1547,22 @@ function tollRate(country) {
   const t = (state.config.tolls || []).find(function (x) { return x.country === country; });
   return t ? Calc.num(t.rate) : '';
 }
-function addTollRow(p, data) {
+function tollOptions(placeholder, selected) {
+  return '<option value="">' + esc(placeholder) + '</option>' + (state.config.tolls || []).map(function (t) {
+    return '<option value="' + esc(t.country) + '"' + (t.country === selected ? ' selected' : '') + '>' + esc(t.country) + '</option>';
+  }).join('');
+}
+// Рядок країни; animate — зʼявляється з пружинкою (додали кнопкою). Повертає сам рядок.
+function addTollRow(p, data, animate) {
   const d = data || {};
   const host = $('#' + p + '-tolls');
   const row = document.createElement('div');
   row.className = 'toll-row';
-  const opts = '<option value="">Країна</option>' + (state.config.tolls || []).map(function (t) {
-    return '<option value="' + esc(t.country) + '"' + (t.country === d.country ? ' selected' : '') + '>' + esc(t.country) + '</option>';
-  }).join('');
   row.innerHTML =
-    '<div class="field country"><label>Країна</label><select class="t-country">' + opts + '</select></div>' +
+    '<div class="field country"><label>Країна</label><select class="t-country">' + tollOptions('Країна', d.country) + '</select></div>' +
     '<div class="field qty"><label class="t-qty-label">Км</label><input type="text" inputmode="decimal" class="t-qty" value="' + esc(d.qty || '') + '" placeholder="0"></div>' +
     '<div class="field rate"><label class="t-rate-label">₴/км</label><input type="text" inputmode="decimal" class="t-rate" value="' + esc(d.rate || '') + '" placeholder="0"></div>' +
-    '<div class="field" style="text-align:right"><label>Разом</label><span class="toll-sum num">0 ₴</span></div>' +
+    '<div class="field sum"><label>Разом</label><span class="toll-sum num">0 ₴</span></div>' +
     '<button type="button" class="toll-del" aria-label="Прибрати країну">×</button>';
   host.appendChild(row);
   const sel = $('.t-country', row);
@@ -1516,11 +1575,19 @@ function addTollRow(p, data) {
     recalcVariant(p);
   });
   $$('input', row).forEach(function (i) { i.addEventListener('input', function () { recalcVariant(p); }); });
-  $('.toll-del', row).addEventListener('click', function () {
-    row.remove();
-    if (!host.children.length) addTollRow(p);
-    recalcVariant(p);
-  });
+  $('.toll-del', row).addEventListener('click', function () { removeTollRow(p, row); });
+  if (animate && !reduceMotion() && row.animate) {
+    row.animate([{ opacity: 0, transform: 'translateY(-8px) scale(.98)' }, { opacity: 1, transform: 'none' }], { duration: 480, easing: ease('--spring-soft') });
+  }
+  return row;
+}
+// Прибрати країну: рядок згортається; прибрали останню — лишається тільки кнопка «+ Додати країну».
+function removeTollRow(p, row) {
+  const done = function () { row.remove(); recalcVariant(p); };
+  if (reduceMotion() || !row.animate) { done(); return; }
+  row.style.overflow = 'hidden';
+  afterAnim(row.animate([{ height: row.offsetHeight + 'px', opacity: 1 }, { height: '0px', opacity: 0, paddingTop: '0px', paddingBottom: '0px' }],
+    { duration: 240, easing: 'cubic-bezier(.4, 0, .2, 1)', fill: 'forwards' }), 400, done);
 }
 function applyTollUnit(row, unit) {
   const day = unit === 'day';
@@ -1563,7 +1630,9 @@ function recalcVariant(p) {
   const waiting = r.decision.code === 'wait';
 
   set('km-total', r.totalKm > 0 ? 'Разом ' + fmtNum(r.totalKm, 0) + ' км' : '');
-  set('tolls-total', r.tolls > 0 ? 'Дороги разом ' + fmtMoney(r.tolls) + ' ₴' : '');
+  set('tolls-total', r.tolls > 0 ? '· ' + fmtMoney(r.tolls) + ' ₴' : '');
+  set('more-sum', r.other > 0 ? 'інші ' + fmtMoney(r.other) + ' ₴' : '');
+  renderNormHint(p);
   // Ставка у валюті чи за тонну — одразу видно, скільки це гривень і з чого.
   const fh = $('#' + p + '-freight-hint');
   if (fh) fh.innerHTML = inp.quoteMode === 'ton_usd' && r.freight > 0
@@ -1596,8 +1665,14 @@ function recalcVariant(p) {
 
   const code = r.decision.code;
   const v = $('#' + p + '-verdict');
-  v.className = 'verdict ' + code + (code === 'edge' || code === 'stop' ? ' badge-square' : '');
-  $('#' + p + '-badge').textContent = VERDICT_SYM[code];
+  v.className = 'verdict ' + code;
+  const badge = $('#' + p + '-badge');
+  badge.textContent = VERDICT_SYM[code];
+  // Вердикт змінився — значок коротко «підстрибує».
+  if (state.codes[p] !== code) {
+    state.codes[p] = code;
+    if (code !== 'wait') { badge.classList.remove('pop'); void badge.offsetWidth; badge.classList.add('pop'); }
+  }
   $('#' + p + '-word').textContent = VERDICT_WORD[code];
   const dot = $('#vdot-' + p);
   if (dot) { dot.className = 'vdot ' + code; dot.textContent = VERDICT_SYM[code]; }
@@ -1632,6 +1707,7 @@ function toggleB(on) {
   if (!on) showVariant('a');
   if (on) recalcVariant('b');
   renderCompare();
+  moveThumb($('#vtabs'));
 }
 
 // Додати рейс Б: порожній Б стає копією А (частіше порівнюють той самий рейс з іншою ціною),
@@ -1644,37 +1720,52 @@ function addB() {
     recalcVariant('b');
     toast('Рейс Б — копія А: змініть ставку, тип або кілометри');
   }
+  if (!isPhone() && !reduceMotion() && $('#variant-b').animate) {
+    $('#variant-b').animate([{ opacity: 0, transform: 'scale(.98)' }, { opacity: 1, transform: 'none' }], { duration: 520, easing: ease('--spring-soft') });
+  }
   showVariant('b');
 }
 
-// Телефон: видно один рейс; А і Б перемикаються вкладками панелі або свайпом.
+// Телефон: видно один рейс; А і Б перемикаються вкладками в шапці або свайпом.
+// Картки стоять стрічкою (А ліворуч, Б праворуч) і їдуть разом — лише transform із мʼякою пружинкою, без прозорості.
 function showVariant(p) {
+  if (state.sliding) return;
   const prev = state.activeV || 'a';
   state.activeV = p;
-  ['a', 'b'].forEach(function (k) { $('#variant-' + k).classList.toggle('is-active', k === p); });
   $('#vswitch').classList.toggle('on-b', p === 'b');
-  $$('#vswitch button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.v === p ? 'true' : 'false'); });
-  if (prev !== p) {
-    const el = $('#variant-' + p);
-    el.classList.remove('slide-l', 'slide-r');
-    void el.offsetWidth;
-    el.classList.add(p === 'b' ? 'slide-l' : 'slide-r');
-  }
+  pressSeg($('#vtabs'), 'data-v', p);
+  const host = $('#variants');
+  const cards = [$('#variant-a'), $('#variant-b')];
+  const settle = function () { cards.forEach(function (c, i) { c.classList.toggle('is-active', (i ? 'b' : 'a') === p); }); };
+  if (prev === p || !state.showB || !isPhone() || reduceMotion() || !cards[0].animate) { settle(); return; }
+  const shift = 'translateX(calc(-100% - ' + getComputedStyle(host).columnGap + '))';
+  const from = p === 'b' ? 'translateX(0px)' : shift, to = p === 'b' ? shift : 'translateX(0px)';
+  state.sliding = true;
+  host.classList.add('sliding');
+  const runs = cards.map(function (c) {
+    return c.animate([{ transform: from }, { transform: to }], { duration: 560, easing: ease('--spring-soft'), fill: 'forwards' });
+  });
+  afterAnim(runs[0], 900, function () {
+    host.classList.remove('sliding');
+    settle();
+    runs.forEach(function (a) { a.cancel(); });
+    state.sliding = false;
+  });
 }
 
-// Свайп вліво-вправо по рейсу на телефоні — лише коли є рейс Б. Не з полів вводу і не від країв
+// Свайп вліво-вправо по рейсу на телефоні — лише коли є рейс Б. Не з полів і перемикачів і не від країв
 // екрана (там системний жест «назад»); рух має бути помітно горизонтальним і швидким.
 function bindSwipe() {
   const host = $('#variants');
   let s = null;
   host.addEventListener('touchstart', function (e) {
     const t = e.touches[0];
-    const onField = e.target.closest && e.target.closest('input, select, textarea');
-    s = e.touches.length === 1 && !onField && t.clientX > 24 && t.clientX < innerWidth - 24
+    const onControl = e.target.closest && e.target.closest('input, select, textarea, .seg');
+    s = e.touches.length === 1 && !onControl && t.clientX > 24 && t.clientX < innerWidth - 24
       ? { x: t.clientX, y: t.clientY, at: Date.now() } : null;
   }, { passive: true });
   host.addEventListener('touchend', function (e) {
-    if (!s || !state.showB || window.matchMedia('(min-width: 900px)').matches) { s = null; return; }
+    if (!s || !state.showB || !isPhone()) { s = null; return; }
     const t = e.changedTouches[0], dx = t.clientX - s.x, dy = t.clientY - s.y, quick = Date.now() - s.at < 600;
     s = null;
     if (!quick || Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 2) return;
@@ -1694,8 +1785,42 @@ function setSettingsOpen(open) {
     body.classList.add('open');
   } else {
     body.classList.remove('open');
-    state.settingsTimer = setTimeout(function () { if (!body.classList.contains('open')) body.hidden = true; }, 360);
+    state.settingsTimer = setTimeout(function () { if (!body.classList.contains('open')) body.hidden = true; }, 420);
   }
+}
+
+// «Ще» і «Звідки ці числа» розгортаються плавно: висоту веде Web Animations, стан тримає сам <details>.
+function smoothDetails(d) {
+  if (!d) return;
+  d.querySelector('summary').addEventListener('click', function (e) {
+    e.preventDefault();
+    openDetails(d, !d.open);
+  });
+}
+function openDetails(d, open) {
+  if (!d || d.open === open || d.dataset.anim) return;
+  if (reduceMotion() || !d.animate) { d.open = open; return; }
+  const from = d.offsetHeight;
+  if (open) d.open = true;
+  const to = open ? d.offsetHeight : d.querySelector('summary').offsetHeight;
+  d.dataset.anim = '1';
+  d.style.overflow = 'hidden';
+  const run = d.animate({ height: [from + 'px', to + 'px'] }, { duration: open ? 420 : 300, easing: 'cubic-bezier(.2, .8, .2, 1)', fill: 'forwards' });
+  afterAnim(run, open ? 700 : 550, function () {
+    if (!open) d.open = false;
+    run.cancel();
+    d.style.overflow = '';
+    delete d.dataset.anim;
+  });
+}
+
+// Кінець анімації — із запасом за часом: у фоновій вкладці чи при енергозбереженні кадри можуть стояти,
+// а стан інтерфейсу мусить дійти до кінця все одно. fn виконується рівно раз.
+function afterAnim(anim, ms, fn) {
+  let done = false;
+  const once = function () { if (!done) { done = true; fn(); } };
+  anim.finished.then(once, once);
+  setTimeout(once, ms);
 }
 
 function copyAtoB() {
@@ -1706,39 +1831,83 @@ function copyAtoB() {
   toast('Рейс А скопійовано в Б — міняйте те, що відрізняється');
 }
 
+// Порівняння: хто вигідніший і на скільки, смужки «чистими», таблиця з різницею Б − А.
+// Каркас малюється раз на стан, далі міняються лише числа — смужки плавно доростають.
 function renderCompare() {
   const el = $('#compare');
   if (!state.showB) { el.hidden = true; return; }
   el.hidden = false;
   const a = state.results.a, b = state.results.b;
-  if (!a || !b || a.decision.code === 'wait' || b.decision.code === 'wait') {
-    el.innerHTML = '<h2>Який рейс кращий</h2><p class="lead"><small>Заповніть обидва рейси — покажу різницю.</small></p>' +
-      '<div class="cmp-acts"><button type="button" class="btn small" id="cmp-copy">Скопіювати А в Б</button></div>';
+  const ready = !!(a && b && a.decision.code !== 'wait' && b.decision.code !== 'wait');
+  if (el.dataset.state !== (ready ? 'ready' : 'wait')) {
+    el.dataset.state = ready ? 'ready' : 'wait';
+    el.innerHTML = '<div class="cmp-main"><h2>Який рейс кращий</h2>' +
+      (ready
+        ? '<p class="cmp-lead" id="cmp-lead"></p><p class="cmp-sub" id="cmp-sub"></p>' +
+          '<div class="cmp-bars">' +
+            '<div class="cmp-bar" id="cmp-bar-a"><span class="v-key">А</span><span class="track"><i></i></span><b class="num"></b></div>' +
+            '<div class="cmp-bar" id="cmp-bar-b"><span class="v-key">Б</span><span class="track"><i></i></span><b class="num"></b></div>' +
+          '</div>'
+        : '<p class="cmp-sub">Заповніть обидва рейси — покажу, який вигідніший і на скільки.</p>') +
+      '<div class="cmp-acts"><button type="button" class="btn small ghost" id="cmp-copy">Скопіювати А в Б</button></div></div>' +
+      (ready ? '<div class="cmp-table" id="cmp-table"></div>' : '');
     $('#cmp-copy').addEventListener('click', copyAtoB);
-    return;
   }
-  const diff = a.profit - b.profit;
-  const better = diff === 0 ? null : (diff > 0 ? 'А' : 'Б');
-  const row = function (label, av, bv, winA) {
-    return '<div class="cmp-row"><span>' + label + '</span>' +
-      '<span class="num' + (winA === true ? ' win' : '') + '">' + av + '</span>' +
-      '<span class="num' + (winA === false ? ' win' : '') + '">' + bv + '</span></div>';
-  };
-  el.innerHTML = '<h2>Який рейс кращий</h2>' +
-    '<p class="lead">' + (better ? 'Рейс ' + better + ' кращий на ' + fmtMoney(Math.abs(diff)) + ' ₴' : 'Однаково: ' + fmtMoney(a.profit) + ' ₴') +
-      '<small>' + (better ? 'Рейс ' + better + ': ' : '') + (better === 'Б' ? b : a).decision.label +
-      ', ' + ((better === 'Б' ? b : a).reserve >= 0 ? 'запас ' : 'недобір ') + fmtMoney(Math.abs((better === 'Б' ? b : a).reserve)) + ' ₴ до мінімуму</small></p>' +
-    '<div class="cmp-table">' +
-      '<div class="cmp-row head"><span></span><span>Рейс А</span><span>Рейс Б</span></div>' +
-      row('Вердикт', a.decision.label, b.decision.label, a.decision.code === b.decision.code ? null : (a.profit > b.profit)) +
-      row('Чистими', fmtMoney(a.profit) + ' ₴', fmtMoney(b.profit) + ' ₴', a.profit === b.profit ? null : a.profit > b.profit) +
-      row('На 1 км', fmtNum(a.profitPerKm, 2) + ' ₴', fmtNum(b.profitPerKm, 2) + ' ₴', a.profitPerKm === b.profitPerKm ? null : a.profitPerKm > b.profitPerKm) +
-      row('За день', fmtMoney(a.profitPerDay) + ' ₴', fmtMoney(b.profitPerDay) + ' ₴', a.profitPerDay === b.profitPerDay ? null : a.profitPerDay > b.profitPerDay) +
-      row('Не дешевше', fmtMoney(a.required) + ' ₴', fmtMoney(b.required) + ' ₴', null) +
-      row('Пробіг', fmtNum(a.totalKm, 0) + ' км', fmtNum(b.totalKm, 0) + ' км', null) +
-    '</div>' +
-    '<div class="cmp-acts"><button type="button" class="btn small" id="cmp-copy">Скопіювати А в Б</button></div>';
-  $('#cmp-copy').addEventListener('click', copyAtoB);
+  if (!ready) return;
+
+  const diff = b.profit - a.profit;
+  const better = Math.abs(diff) < 0.5 ? '' : (diff > 0 ? 'Б' : 'А');
+  $('#cmp-lead').innerHTML = better
+    ? '<span class="win">Рейс ' + better + '</span> вигідніший на <span class="num">' + fmtMoney(Math.abs(diff)) + ' ₴</span>'
+    : 'Рейси однакові: по <span class="num">' + fmtMoney(a.profit) + ' ₴</span> чистими';
+  $('#cmp-sub').textContent = compareNuance(a, b, better);
+
+  const max = Math.max(Math.abs(a.profit), Math.abs(b.profit)) || 1;
+  [['a', a, better === 'А'], ['b', b, better === 'Б']].forEach(function (x) {
+    const bar = $('#cmp-bar-' + x[0]);
+    bar.className = 'cmp-bar' + (x[2] ? ' win' : '') + (x[1].profit < 0 ? ' neg' : '');
+    $('i', bar).style.width = Math.max(Math.abs(x[1].profit) / max * 100, 2) + '%';
+    $('b', bar).textContent = fmtMoney(x[1].profit) + ' ₴';
+  });
+
+  const money = function (v) { return fmtMoney(v) + ' ₴'; };
+  const perKm = function (v) { return fmtNum(v, 2) + ' ₴'; };
+  const km = function (v) { return fmtNum(v, 0) + ' км'; };
+  const days = function (v) { return fmtNum(v, Number.isInteger(v) ? 0 : 1); };
+  const signed = function (v, f) { return Math.abs(v) < 0.005 ? '0' : (v > 0 ? '+' : '−') + f(Math.abs(v)); };
+  const both = a.totalKm > 0 && b.totalKm > 0;
+  // [назва, А, Б, різниця Б − А, переможець: 1 — А, 2 — Б, 0 — без переможця]
+  const rows = [
+    ['Вердикт', chip(a.decision.code), chip(b.decision.code), '', 0],
+    ['Чистими', money(a.profit), money(b.profit), signed(diff, money), cmp(a.profit, b.profit)],
+    ['На 1 км', a.totalKm ? perKm(a.profitPerKm) : '—', b.totalKm ? perKm(b.profitPerKm) : '—',
+      both ? signed(b.profitPerKm - a.profitPerKm, perKm) : '', both ? cmp(a.profitPerKm, b.profitPerKm) : 0],
+    ['За день', money(a.profitPerDay), money(b.profitPerDay), signed(b.profitPerDay - a.profitPerDay, money), cmp(a.profitPerDay, b.profitPerDay)],
+    ['Не дешевше', money(a.required), money(b.required), signed(b.required - a.required, money), 0],
+    ['Пробіг', km(a.totalKm), km(b.totalKm), signed(b.totalKm - a.totalKm, km), 0],
+    ['Днів', days(a.days), days(b.days), '', 0]
+  ];
+  $('#cmp-table').innerHTML =
+    '<div class="cmp-row head"><span></span><span>Рейс А</span><span>Рейс Б</span><span class="d">Б − А</span></div>' +
+    rows.map(function (r) {
+      const cell = function (v, win) { return '<span class="num">' + (win ? '<b class="pill">' + v + '</b>' : v) + '</span>'; };
+      const dir = r[4] === 2 ? ' up' : r[4] === 1 ? ' down' : '';
+      return '<div class="cmp-row"><span>' + r[0] + '</span>' + cell(r[1], r[4] === 1) + cell(r[2], r[4] === 2) +
+        '<span class="d num' + dir + '">' + r[3] + '</span></div>';
+    }).join('');
+}
+function cmp(x, y) { return Math.abs(x - y) < 0.005 ? 0 : (x > y ? 1 : 2); }
+function chip(code) { return '<span class="chip"><i class="vdot ' + code + '">' + VERDICT_SYM[code] + '</i>' + VERDICT_WORD[code] + '</span>'; }
+// Буває, що «чистими» кращий один рейс, а за день чи на 1 км — інший: про це кажемо одним рядком.
+function compareNuance(a, b, better) {
+  const day = cmp(a.profitPerDay, b.profitPerDay);
+  const km = a.totalKm > 0 && b.totalKm > 0 ? cmp(a.profitPerKm, b.profitPerKm) : 0;
+  const who = function (w) { return w === 1 ? 'А' : 'Б'; };
+  if (better && (!day || who(day) === better) && (!km || who(km) === better)) return 'Він же кращий і за день' + (km ? ', і на 1 км.' : '.');
+  const parts = [];
+  if (day) parts.push('за день — ' + who(day) + ' (+' + fmtMoney(Math.abs(b.profitPerDay - a.profitPerDay)) + ' ₴)');
+  if (km) parts.push('на 1 км — ' + who(km) + ' (+' + fmtNum(Math.abs(b.profitPerKm - a.profitPerKm), 2) + ' ₴)');
+  return parts.length ? 'Кращий ' + parts.join(', ') + '.' : '';
 }
 
 /* ---- чернетки ---- */
@@ -1746,13 +1915,16 @@ function saveDraft() {
   if (state.restoring || state.frozen || !state.session) return;
   store.set(KEY.draft(state.session.user, state.mode), { a: readVariant('a'), b: state.showB ? readVariant('b') : null });
 }
+// Рейс Б — як лишили в чернетці цього режиму: прибрали — лишається прибраним.
+// Чернетки ще немає: на широкому екрані Б одразу стоїть поруч, на телефоні — вкладка «+ Порівняти».
 function restoreDraft() {
-  if (state.frozen || !state.session) return;
-  const d = store.get(KEY.draft(state.session.user, state.mode));
+  if (!state.session) return;
+  const d = state.frozen ? null : store.get(KEY.draft(state.session.user, state.mode));
   state.restoring = true;
   try {
     if (d && d.a) applyVariant('a', d.a);
-    if (d && d.b) { toggleB(true); applyVariant('b', d.b); }
+    toggleB(d ? !!d.b : !isPhone());
+    if (d && d.b) applyVariant('b', d.b);
   } finally { state.restoring = false; }
 }
 function applyVariant(p, d) {
@@ -1771,9 +1943,10 @@ function applyVariant(p, d) {
   setv(p + '-cur', d.curAmount);
   setv(p + '-km-full', d.kmFull); setv(p + '-km-empty', d.kmEmpty);
   setv(p + '-days', d.days); setv(p + '-other', d.other);
-  if (Array.isArray(d.tolls) && d.tolls.length) {
+  // Країни — рівно ті, що в даних; порожніх рядків зі старих чернеток не повертаємо.
+  if (Array.isArray(d.tolls)) {
     $('#' + p + '-tolls').innerHTML = '';
-    d.tolls.forEach(function (t) { addTollRow(p, t); });
+    d.tolls.forEach(function (t) { if (t && (t.country || Calc.num(t.qty) || Calc.num(t.rate))) addTollRow(p, t); });
   }
   syncVariantVisibility(p);
 }
@@ -1830,6 +2003,10 @@ async function refreshConfig(silent) {
 async function boot() {
   buildKeypad();
   $$('.mode-switch button').forEach(function (b) { b.addEventListener('click', function () { if (b.dataset.mode !== state.mode) applyMode(b.dataset.mode); }); });
+  watchSeg($('.mode-switch'));
+  watchSeg($('#vtabs'));
+  // Шрифт дозавантажився — ширина кнопок змінилась, підкладки перемикачів доганяють.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { $$('.seg').forEach(moveThumb); });
   $('#btn-settings-toggle').addEventListener('click', function () {
     setSettingsOpen(!$('#settings-body').classList.contains('open'));
   });
@@ -1842,7 +2019,7 @@ async function boot() {
     b.addEventListener('click', function () {
       const v = b.dataset.v;
       if (v === 'b' && !state.showB) addB();
-      else if (state.activeV === v) $('#' + v + '-verdict').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      else if (state.activeV === v) $('#' + v + '-verdict').scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
       else showVariant(v);
     });
   });
@@ -1891,6 +2068,16 @@ async function boot() {
   }
 }
 document.addEventListener('DOMContentLoaded', boot);
+
+// Сторінка й картинки — з кешу пристрою (sw.js): відкривається миттєво, свіжа версія підтягується у фоні.
+// Нова версія стала на місце, поки сторінка відкрита, — пропонуємо оновити одним дотиком.
+if (!DEMO && 'serviceWorker' in navigator && window.isSecureContext) {
+  const hadSW = !!navigator.serviceWorker.controller;
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  navigator.serviceWorker.addEventListener('controllerchange', function () {
+    if (hadSW) toast('Є нова версія калькулятора — торкніться, щоб оновити', false, function () { location.reload(); });
+  });
+}
 </script>
 
 <script>
