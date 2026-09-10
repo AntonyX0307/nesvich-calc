@@ -311,6 +311,167 @@
     .stats { grid-template-columns: repeat(3, 1fr); }
     .stat b { font-size: 16px; }
   }
+
+  /* ---------- правки Антона 10.09: ширше, пігулки по центру, дороги в рядок, фон ---------- */
+  .settings { background: rgba(255,255,255,.92); }
+  .toll-del { width: 44px; height: 44px; padding: 0; justify-self: end; align-self: end; }
+  .bg-scene { display: none; }
+  @media (min-width: 900px) {
+    .wrap { max-width: 1480px; }
+    .top { display: grid; grid-template-columns: 1fr auto 1fr; }
+    .top .mode-switch { grid-column: 2; }
+    .top .top-right { grid-column: 3; justify-self: end; margin-left: 0; }
+    .toll-row { grid-template-columns: 1fr 1fr auto 44px; }
+    .toll-row .field.country { grid-column: 1 / -1; }
+    #screen-calc { position: relative; z-index: 0; }
+    .bg-scene { display: block; position: fixed; left: 0; right: 0; bottom: 0; height: 62vh; z-index: -1; pointer-events: none; }
+    .bg-scene svg { display: block; width: 100%; height: 100%; }
+  }
+  @media (min-width: 1200px) {
+    .toll-row { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr) minmax(76px, auto) 44px; }
+    .toll-row .field.country { grid-column: auto; }
+  }
+  .bg-scene .tr-grain { display: none; }
+  body[data-mode="grain"] .bg-scene .tr-grain { display: inline; }
+  body[data-mode="grain"] .bg-scene .tr-tent { display: none; }
+
+  /* ---------- полірка 10.09: перемикач із пружинкою, налаштування в рядок, рейси А/Б свайпом, компактний результат ---------- */
+  .mode-switch { position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; gap: 0; isolation: isolate; }
+  .mode-switch::before, .vtabs::before { content: ""; position: absolute; z-index: -1; top: 3px; bottom: 3px; left: 3px;
+    width: calc(50% - 3px); border-radius: 999px; background: linear-gradient(#ffffff, #fafafc);
+    box-shadow: 0 1px 3px rgba(0,0,0,.16), 0 0 0 .5px rgba(0,0,0,.04);
+    transition: transform .5s cubic-bezier(.34, 1.56, .64, 1);
+    transition: transform .6s linear(0, .402 7.4%, .711 15.3%, .929 23.7%, 1.008 28.2%, 1.067 33%, 1.099 38.2%, 1.105 43.1%, 1.084 50%, 1.018 65.5%, .994 74.2%, 1.001 100%); }
+  body[data-mode="tent"] .mode-switch::before, .vswitch.on-b .vtabs::before { transform: translateX(100%); }
+  .mode-switch button { justify-content: center; }
+  .mode-switch button.is-active { background: transparent; box-shadow: none; }
+
+  .settings-line { flex-wrap: nowrap; }
+  .settings-line .sum { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .settings-line .spacer { display: none; }
+  .settings-body { display: grid; grid-template-rows: 0fr; opacity: 0; margin-top: 0; padding-top: 0; border-top-color: transparent;
+    transition: grid-template-rows .34s cubic-bezier(.2, .8, .2, 1), opacity .22s ease, margin-top .34s ease, padding-top .34s ease, border-color .34s ease; }
+  .settings-body.open { grid-template-rows: 1fr; opacity: 1; margin-top: 14px; padding-top: 14px; border-top-color: var(--line-2); }
+  .settings-inner { overflow: hidden; min-height: 0; }
+
+  /* Рейси А/Б на телефоні — скляна нижня панель із двома вкладками (схема Codex + пружинка).
+     Поки рейсу Б немає, друга вкладка — «+ Порівняти»: створює Б копією А. */
+  .vswitch { display: none; }
+  .vdot { display: inline-block; flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--wait); }
+  .vdot.go { background: var(--go); } .vdot.edge { background: var(--edge); } .vdot.stop { background: var(--stop); }
+  @media (max-width: 899px) {
+    .mode-switch button { padding: 0 10px; }
+    .settings-line .title { display: none; }
+    #btn-add-b { display: none; }
+    .variants { overflow-x: clip; }
+    .vswitch { display: block; position: sticky; bottom: 0; z-index: 8; margin: 0 -14px -40px;
+      padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
+      background: rgba(250,250,252,.72); -webkit-backdrop-filter: saturate(180%) blur(22px); backdrop-filter: saturate(180%) blur(22px);
+      border-top: .5px solid rgba(0,0,0,.1); }
+    .vtabs { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 3px; border-radius: 999px;
+      background: rgba(118,118,128,.14); isolation: isolate; }
+    .vtabs button { min-width: 0; min-height: 42px; padding: 0 8px; border: 0; background: transparent; border-radius: 999px;
+      font-size: 14px; font-weight: 600; color: var(--ink-2); display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .vtabs button[aria-pressed="true"] { color: var(--ink); }
+    .vtabs .vsum { font-weight: 700; white-space: nowrap; }
+    .vswitch:not(.has-b) #vdot-b, .vswitch:not(.has-b) #vsum-b { display: none; }
+    .vswitch:not(.has-b) [data-v="b"] { color: var(--accent); }
+    .result { bottom: calc(66px + env(safe-area-inset-bottom)); }
+    .variants.two .variant:not(.is-active) { display: none; }
+    .variant.slide-l { animation: slide-l .28s cubic-bezier(.2, .8, .2, 1); }
+    .variant.slide-r { animation: slide-r .28s cubic-bezier(.2, .8, .2, 1); }
+  }
+  @keyframes slide-l { from { transform: translateX(22px); opacity: .5; } to { transform: none; opacity: 1; } }
+  @keyframes slide-r { from { transform: translateX(-22px); opacity: .5; } to { transform: none; opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .vtabs::before { transition: none; } }
+
+  .verdict { display: grid; gap: 10px; align-items: stretch; padding: 12px 14px; }
+  .verdict .v-row { display: flex; align-items: center; gap: 12px; }
+  .verdict .v-text { min-width: 0; }
+  .verdict .badge { flex: 0 0 34px; width: 34px; height: 34px; font-size: 17px; }
+  .verdict .word { font-size: 22px; }
+  .verdict-profit b { font-size: 22px; }
+  .v-price { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 10px 12px;
+    border-radius: 12px; background: rgba(255,255,255,.78); }
+  .v-price small { display: block; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+  .v-price b { font-size: 24px; font-weight: 700; letter-spacing: -.02em; color: var(--ink); }
+  .v-price .res { text-align: right; }
+  .v-price .res b { font-size: 17px; color: var(--go); }
+  .v-price .res b.neg { color: var(--stop); }
+  .v-metrics { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: 13px; color: var(--ink-2); }
+  .v-metrics b { color: var(--ink); font-weight: 700; }
+  .v-metrics b.neg { color: var(--stop); }
+  .verdict.wait { padding: 10px 14px; }
+  .verdict.wait .v-price, .verdict.wait .v-metrics, .verdict.wait .verdict-profit { display: none; }
+  .verdict.wait .badge { flex-basis: 28px; width: 28px; height: 28px; font-size: 14px; }
+  .verdict.wait .word { font-size: 18px; }
+  details.ledger-wrap { margin-top: 8px; }
+  @media (min-width: 900px) {
+    .verdict .word { font-size: 26px; }
+    .v-price b { font-size: 30px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mode-switch::before, .vswitch::before, .settings-body { transition: none; }
+    .variant.slide-l, .variant.slide-r { animation: none; }
+  }
+
+  /* ---------- полірка 2: скло шапки, легке «Чекаю дані», пігулки з пружинкою скрізь, курс і сума на місці ---------- */
+  .top { background: rgba(250,250,252,.64); -webkit-backdrop-filter: saturate(180%) blur(22px); backdrop-filter: saturate(180%) blur(22px);
+    border-bottom: .5px solid rgba(0,0,0,.1); }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .top { background: rgba(250,250,252,.96); } }
+  .verdict.wait { background: transparent; border: 1px dashed var(--line); }
+  .verdict.wait .badge { background: transparent; color: var(--ink-3); border: 1.5px solid var(--line); }
+  .verdict.wait .word { color: var(--ink-2); font-weight: 600; }
+  .verdict.wait .sub { font-weight: 500; color: var(--ink-3); }
+
+  .seg { position: relative; isolation: isolate; }
+  .seg-thumb { position: absolute; z-index: -1; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 8px; background: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,.14);
+    transition: transform .55s cubic-bezier(.34, 1.56, .64, 1), width .55s cubic-bezier(.34, 1.56, .64, 1);
+    transition: transform .6s linear(0, .402 7.4%, .711 15.3%, .929 23.7%, 1.008 28.2%, 1.067 33%, 1.099 38.2%, 1.105 43.1%, 1.084 50%, 1.018 65.5%, .994 74.2%, 1.001 100%), width .6s linear(0, .402 7.4%, .711 15.3%, .929 23.7%, 1.008 28.2%, 1.067 33%, 1.099 38.2%, 1.105 43.1%, 1.084 50%, 1.018 65.5%, .994 74.2%, 1.001 100%); }
+  .seg button { position: relative; }
+  .seg button[aria-pressed="true"] { background: transparent; box-shadow: none; }
+  .seg.auto button { flex: 0 0 auto; padding: 0 12px; }
+  .seg-extra { display: inline-block; max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap; vertical-align: bottom;
+    transition: max-width .5s cubic-bezier(.34, 1.56, .64, 1), opacity .25s ease; }
+  .seg button[aria-pressed="true"] .seg-extra { max-width: 90px; opacity: 1; }
+  .appear { animation: appear .28s cubic-bezier(.2, .8, .2, 1); }
+  @keyframes appear { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  .calc-hint { display: block; min-height: 18px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+  .calc-hint b { color: var(--ink); }
+  @media (prefers-reduced-motion: reduce) { .seg-thumb, .seg-extra { transition: none; } .appear { animation: none; } }
+
+  /* Колонки сітки не ширші за екран: інакше один незгортуваний рядок (підсумок налаштувань)
+     розтягує колонку, а за нею — всю сторінку, і на телефоні обрізається все праворуч. */
+  .wrap, .variants { grid-template-columns: minmax(0, 1fr); }
+  .row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .row.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .row[data-quote="currency"] { grid-template-columns: minmax(0, 1fr) auto; }
+  .toll-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto 44px; }
+  .seg.auto button { padding: 0 10px; }
+  @media (min-width: 900px) {
+    .variants.two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .toll-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto 44px; }
+  }
+  @media (min-width: 1200px) {
+    .toll-row { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr) minmax(76px, auto) 44px; }
+  }
+
+  /* ---------- полірка 3: статус рейсу вгорі в шапці, картка результату без прилипання ---------- */
+  @media (max-width: 899px) {
+    .top { flex-wrap: wrap; row-gap: 8px; }
+    .vswitch { position: static; flex: 1 0 100%; order: 3; margin: 0; padding: 0; background: none;
+      -webkit-backdrop-filter: none; backdrop-filter: none; border: 0; }
+    .vtabs button { min-height: 38px; }
+    .result { position: static; }
+    #variant-b .v-head-actions { flex: 1 0 100%; margin-left: 0; display: grid; grid-auto-flow: column;
+      grid-auto-columns: minmax(0, 1fr); gap: 6px; }
+    #variant-b .v-head-actions .btn { padding: 0 6px; font-size: 12px; }
+  }
+  .vdot { width: 18px; height: 18px; flex-basis: 18px; display: inline-grid; place-items: center;
+    color: #fff; font-size: 11px; font-weight: 800; font-style: normal; }
+  .seg-extra { display: none; max-width: none; opacity: 1; transition: none; }
+  .seg button[aria-pressed="true"] .seg-extra { display: inline; }
 </style>
 </head>
 <body data-mode="grain">
@@ -338,6 +499,58 @@
 </section>
 
 <section id="screen-calc" hidden>
+<div class="bg-scene" aria-hidden="true">
+<svg viewBox="0 0 1600 600" preserveAspectRatio="xMidYMax slice" focusable="false">
+  <defs>
+    <linearGradient id="bgSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f5f5f7"/><stop offset="1" stop-color="#e8eef4"/></linearGradient>
+    <linearGradient id="bgMist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f7fa" stop-opacity="0"/><stop offset="1" stop-color="#f4f7fa" stop-opacity=".92"/></linearGradient>
+    <pattern id="bgPinesFar" x="0" y="430" width="38" height="50" patternUnits="userSpaceOnUse"><path d="M8 50 15 16 22 50Z M24 50 30 26 36 50Z M0 50 4 32 8 50Z" fill="#c9d5df"/></pattern>
+    <pattern id="bgPinesNear" x="17" y="448" width="46" height="60" patternUnits="userSpaceOnUse"><path d="M10 60 19 14 28 60Z M29 60 37 28 45 60Z M0 60 5 36 10 60Z" fill="#b3c3d0"/></pattern>
+  </defs>
+  <rect width="1600" height="600" fill="url(#bgSky)"/>
+  <path d="M0 322 120 244 212 296 334 184 452 280 566 226 694 300 824 206 952 288 1082 218 1212 298 1334 238 1462 290 1600 228V600H0Z" fill="#e1e8ef"/>
+  <rect y="240" width="1600" height="170" fill="url(#bgMist)"/>
+  <path d="M0 398 152 330 272 380 402 318 544 388 702 338 862 398 1012 348 1162 404 1322 358 1472 408 1600 368V600H0Z" fill="#d6e0e8"/>
+  <rect y="350" width="1600" height="130" fill="url(#bgMist)"/>
+  <rect y="430" width="1600" height="50" fill="url(#bgPinesFar)"/>
+  <rect y="448" width="1600" height="60" fill="url(#bgPinesNear)"/>
+  <rect y="506" width="1600" height="94" fill="#dfe5ea"/>
+  <rect y="532" width="1600" height="54" fill="#cdd5dc"/>
+  <path d="M0 559H1600" stroke="#f3f5f7" stroke-width="3" stroke-dasharray="46 34"/>
+  <g transform="translate(1128 401)">
+    <ellipse cx="226" cy="170" rx="236" ry="7" fill="#1d1d1f" opacity=".12"/>
+    <g class="tr-tent">
+      <rect x="0" y="10" width="330" height="118" rx="6" fill="#fbfcfd" stroke="#d3dbe2" stroke-width="1.5"/>
+      <path d="M30 15V123M60 15V123M90 15V123M120 15V123M150 15V123M180 15V123M210 15V123M240 15V123M270 15V123M300 15V123" stroke="#e7ecf0" stroke-width="2"/>
+      <rect x="0" y="118" width="330" height="10" fill="#edf1f4"/>
+      <text x="165" y="80" text-anchor="middle" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="8" fill="#c9d3dc">NESVICH</text>
+    </g>
+    <g class="tr-grain">
+      <path d="M20 26Q165 2 314 26Z" fill="#e8dcc0"/>
+      <rect x="0" y="22" width="334" height="8" rx="2" fill="#dfe5ea"/>
+      <rect x="4" y="28" width="326" height="100" rx="4" fill="#eef1f4" stroke="#cfd8df" stroke-width="1.5"/>
+      <path d="M40 31V125M76 31V125M112 31V125M148 31V125M184 31V125M220 31V125M256 31V125M292 31V125" stroke="#dde3e8" stroke-width="3"/>
+      <text x="167" y="86" text-anchor="middle" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="8" fill="#c3cdd6">NESVICH</text>
+    </g>
+    <rect x="6" y="128" width="324" height="8" fill="#5b646c"/>
+    <rect x="286" y="136" width="6" height="22" fill="#6b747c"/>
+    <rect x="300" y="136" width="152" height="10" fill="#4e575f"/>
+    <path d="M344 36Q372 10 414 20L420 36Z" fill="#eef2f5" stroke="#d3dbe2" stroke-width="1.5"/>
+    <path d="M344 150V52Q344 36 358 36H414Q428 36 434 48L446 88Q450 98 450 110V150Z" fill="#ffffff" stroke="#d3dbe2" stroke-width="1.5"/>
+    <path d="M418 48H432L444 88H424Z" fill="#46545f"/>
+    <rect x="366" y="50" width="44" height="34" rx="4" fill="#46545f"/>
+    <path d="M360 92H414V138H360Z" fill="none" stroke="#e2e8ec" stroke-width="1.5"/>
+    <rect x="440" y="58" width="6" height="18" rx="2" fill="#5b646c"/>
+    <rect x="443" y="100" width="7" height="36" fill="#e4e9ed"/>
+    <rect x="441" y="112" width="9" height="8" rx="2" fill="#f6dfa8"/>
+    <rect x="348" y="126" width="46" height="18" rx="4" fill="#c9d1d8"/>
+    <rect x="404" y="138" width="48" height="12" rx="3" fill="#5b646c"/>
+    <g fill="#2f363c"><circle cx="44" cy="148" r="21"/><circle cx="92" cy="148" r="21"/><circle cx="140" cy="148" r="21"/><circle cx="320" cy="148" r="21"/><circle cx="420" cy="148" r="21"/></g>
+    <g fill="#cfd6dc"><circle cx="44" cy="148" r="10"/><circle cx="92" cy="148" r="10"/><circle cx="140" cy="148" r="10"/><circle cx="320" cy="148" r="10"/><circle cx="420" cy="148" r="10"/></g>
+    <g fill="#7d8891"><circle cx="44" cy="148" r="4"/><circle cx="92" cy="148" r="4"/><circle cx="140" cy="148" r="4"/><circle cx="320" cy="148" r="4"/><circle cx="420" cy="148" r="4"/></g>
+  </g>
+</svg>
+</div>
   <header class="top">
     <div class="mode-switch" role="tablist" aria-label="Тип авто">
       <button type="button" role="tab" data-mode="grain" class="is-active"><i class="mark grain"></i>Зерновоз</button>
@@ -348,6 +561,12 @@
       <button type="button" class="icon-btn" id="btn-refresh" title="Оновити довідники" aria-label="Оновити довідники">↻</button>
       <button type="button" class="icon-btn" id="btn-logout" title="Вийти" aria-label="Вийти">⏻</button>
     </div>
+    <nav class="vswitch" id="vswitch" aria-label="Рейси">
+      <div class="vtabs" role="tablist">
+        <button type="button" role="tab" data-v="a" aria-pressed="true"><i class="vdot" id="vdot-a"></i><span>А</span><b class="vsum" id="vsum-a"></b></button>
+        <button type="button" role="tab" data-v="b" aria-pressed="false"><i class="vdot" id="vdot-b"></i><span id="vlabel-b">+ Порівняти</span><b class="vsum" id="vsum-b"></b></button>
+      </div>
+    </nav>
   </header>
 
   <div class="bar offline" id="offline-bar" hidden>
@@ -362,9 +581,9 @@
         <span class="sum" id="settings-sum"></span>
         <span class="spacer"></span>
         <span class="dirty" id="settings-dirty" hidden>не збережено</span>
-        <button type="button" class="btn small ghost" id="btn-settings-toggle">Змінити</button>
+        <button type="button" class="btn small ghost" id="btn-settings-toggle" aria-expanded="false" aria-controls="settings-body">Змінити</button>
       </div>
-      <div class="settings-body" id="settings-body" hidden>
+      <div class="settings-body" id="settings-body" hidden><div class="settings-inner">
         <div class="settings-grid">
           <div class="settings-group">
             <h3>Витрати</h3>
@@ -381,11 +600,11 @@
           <button type="button" class="btn primary" id="btn-settings-save">Зберегти</button>
           <button type="button" class="btn ghost" id="btn-settings-reset">Скинути до заводських</button>
         </div>
-      </div>
+      </div></div>
     </section>
 
     <div class="variants" id="variants">
-      <section class="card variant" id="variant-a"></section>
+      <section class="card variant is-active" id="variant-a"></section>
       <section class="card variant" id="variant-b" hidden></section>
     </div>
 
@@ -689,7 +908,7 @@ const state = {
   session: null, config: null, mode: 'grain',
   settings: {}, dirty: { grain: false, tent: false },
   restoring: false, frozen: false,
-  results: { a: null, b: null }, showB: false, pin: ''
+  results: { a: null, b: null }, showB: false, activeV: 'a', pendingConfig: null, settingsTimer: null, pin: ''
 };
 
 /* ============================================================
@@ -709,12 +928,17 @@ function showLogin() {
 
 async function loadUsers() {
   const list = $('#user-list');
-  list.innerHTML = '';
-  $('#login-status').textContent = 'Завантажую список…';
+  // Список людей показуємо одразу з пристрою, свіжий підтягуємо у фоні.
+  const known = store.get('nl.users', null);
+  const hasKnown = Array.isArray(known) && known.length > 0;
+  if (hasKnown) renderUsers(known); else list.innerHTML = '';
+  $('#login-status').textContent = hasKnown ? '' : 'Завантажую список…';
   try {
     const data = await apiCall('users');
     $('#login-status').textContent = '';
-    renderUsers(data.users || []);
+    const users = data.users || [];
+    if (JSON.stringify(users) !== JSON.stringify(known)) renderUsers(users);
+    store.set('nl.users', users);
   } catch (e) {
     $('#login-status').textContent = '';
     const remembered = store.get(KEY.session);
@@ -722,7 +946,7 @@ async function loadUsers() {
       'Не можу завантажити список. Перевірте інтернет і спробуйте ще раз.', 'Спробувати ще раз', 'btn-retry-users');
     const btn = $('#btn-retry-users');
     if (btn) btn.addEventListener('click', loadUsers);
-    if (remembered && remembered.user) renderUsers([{ name: remembered.user, role: remembered.role }]);
+    if (!hasKnown && remembered && remembered.user) renderUsers([{ name: remembered.user, role: remembered.role }]);
   }
 }
 
@@ -1045,12 +1269,32 @@ function vehicleNorm(v, mode) {
   return isNaN(g) ? '' : g;
 }
 
-function segHTML(id, value, opts) {
-  return '<div class="seg' + (opts.length > 2 ? ' compact' : '') + '" role="group" data-seg="' + id + '">' +
+function segHTML(id, value, opts, cls) {
+  return '<div class="seg' + (opts.length > 2 ? ' compact' : '') + (cls ? ' ' + cls : '') + '" role="group" data-seg="' + id + '"><span class="seg-thumb"></span>' +
     opts.map(function (o) {
-      return '<button type="button" data-val="' + esc(o[0]) + '" aria-pressed="' + (o[0] === value ? 'true' : 'false') + '">' + esc(o[1]) + '</button>';
+      return '<button type="button" data-val="' + esc(o[0]) + '" aria-pressed="' + (o[0] === value ? 'true' : 'false') + '">' + esc(o[1]) +
+        (o[2] ? '<span class="seg-extra" data-extra="' + esc(o[2]) + '"></span>' : '') + '</button>';
     }).join('') +
     '</div><input type="hidden" id="' + id + '" value="' + esc(value) + '">';
+}
+
+// Підкладка пігулки їде за вибраною кнопкою з пружинкою; перше розміщення — без анімації.
+function moveThumb(seg) {
+  const t = seg.querySelector('.seg-thumb'), b = seg.querySelector('button[aria-pressed="true"]');
+  if (!t || !b || !b.offsetWidth) return;
+  const first = !t.style.width;
+  if (first) t.style.transition = 'none';
+  t.style.width = b.offsetWidth + 'px';
+  t.style.transform = 'translateX(' + b.offsetLeft + 'px)';
+  if (first) { void t.offsetWidth; t.style.transition = ''; }
+}
+// Кнопка міняє розмір (показали рейс, розкрився курс, повернули телефон) — підкладка доганяє.
+function watchSeg(seg) {
+  moveThumb(seg);
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(function () { moveThumb(seg); });
+    $$('button', seg).forEach(function (b) { ro.observe(b); });
+  }
 }
 
 function renderVariant(p) {
@@ -1084,9 +1328,9 @@ function renderVariant(p) {
       '</div>' +
       '<div class="row" data-quote="currency">' +
         '<div class="field"><label for="' + p + '-cur">Сума у валюті</label><input type="text" inputmode="decimal" id="' + p + '-cur" placeholder="0"></div>' +
-        '<div class="field"><label>Валюта</label>' + segHTML(p + '-currency', 'EUR', [['EUR', 'EUR'], ['USD', 'USD']]) + '</div>' +
+        '<div class="field"><label>Валюта</label>' + segHTML(p + '-currency', 'EUR', [['EUR', 'EUR', 'EUR'], ['USD', 'USD', 'USD']], 'auto') + '</div>' +
       '</div>' +
-      '<span class="hint" id="' + p + '-freight-hint"></span>' +
+      '<span class="calc-hint" id="' + p + '-freight-hint"></span>' +
 
       '<div class="row" data-km>' +
         '<div class="field"><label for="' + p + '-km-full">Км з вантажем</label><input type="text" inputmode="decimal" id="' + p + '-km-full" placeholder="0"></div>' +
@@ -1116,19 +1360,22 @@ function renderVariant(p) {
 
     '<div class="result">' +
       '<div class="verdict wait" id="' + p + '-verdict">' +
-        '<span class="badge" id="' + p + '-badge">…</span>' +
-        '<div><b class="word" id="' + p + '-word">Чекаю дані</b><span class="sub" id="' + p + '-sub">Введіть ставку і кілометри</span></div>' +
-        '<div class="verdict-profit"><small>Чистими</small><b class="num" id="' + p + '-r-profit">—</b></div>' +
+        '<div class="v-row">' +
+          '<span class="badge" id="' + p + '-badge">…</span>' +
+          '<div class="v-text"><b class="word" id="' + p + '-word">Чекаю дані</b><span class="sub" id="' + p + '-sub">Введіть ставку і кілометри</span></div>' +
+          '<div class="verdict-profit"><small>Чистими</small><b class="num" id="' + p + '-r-profit">—</b></div>' +
+        '</div>' +
+        '<div class="v-price">' +
+          '<div><small>Наша ціна: не дешевше</small><b class="num" id="' + p + '-r-required">—</b></div>' +
+          '<div class="res"><small id="' + p + '-res-label">Запас</small><b class="num" id="' + p + '-r-reserve">—</b></div>' +
+        '</div>' +
+        '<div class="v-metrics">' +
+          '<span><b class="num" id="' + p + '-r-perkm">—</b> на 1 км</span>' +
+          '<span><b class="num" id="' + p + '-r-day">—</b> за день</span>' +
+          '<span><span id="' + p + '-thr-label">мін. на 1 км</span> <b class="num" id="' + p + '-r-threshold">—</b></span>' +
+        '</div>' +
       '</div>' +
-      '<div class="offer">' +
-        '<div><small>Наша ціна: не дешевше</small><b class="num" id="' + p + '-r-required">—</b></div>' +
-        '<div class="res"><small id="' + p + '-res-label">Запас</small><b class="num" id="' + p + '-r-reserve">—</b></div>' +
-      '</div>' +
-      '<div class="stats">' +
-        '<div class="stat"><small>Заробіток на 1 км</small><b class="num" id="' + p + '-r-perkm">—</b></div>' +
-        '<div class="stat"><small>Прибуток за день</small><b class="num" id="' + p + '-r-day">—</b></div>' +
-        '<div class="stat"><small id="' + p + '-thr-label">Мінімум на 1 км</small><b class="num" id="' + p + '-r-threshold">—</b></div>' +
-      '</div>' +
+    '</div>' +
       '<details class="ledger-wrap" id="' + p + '-ledger"><summary>Звідки ці числа</summary>' +
         '<div class="ledger-row"><span>Ставка замовника</span><span class="num" id="' + p + '-r-freight">0 ₴</span></div>' +
         '<div class="ledger-row"><span>Пробіг разом</span><span class="num" id="' + p + '-r-km">0 км</span></div>' +
@@ -1139,8 +1386,7 @@ function renderVariant(p) {
         '<div class="ledger-row"><span>Інші витрати</span><span class="num" id="' + p + '-r-other">0 ₴</span></div>' +
         '<div class="ledger-row total"><span>Усі витрати</span><span class="num" id="' + p + '-r-total">0 ₴</span></div>' +
         '<p class="ledger-note" id="' + p + '-note"></p>' +
-      '</details>' +
-    '</div>';
+    '</details>';
 
   $$('input, select', host).forEach(function (el) {
     if (el.type === 'hidden') return;
@@ -1156,6 +1402,7 @@ function renderVariant(p) {
       onVariantInput(p, $('#' + seg.dataset.seg));
     });
   });
+  $$('[data-seg]', host).forEach(watchSeg);
   $('[data-act="reset"]', host).addEventListener('click', function () { resetVariant(p, true); });
   $('[data-act="add-toll"]', host).addEventListener('click', function () { addTollRow(p); recalcVariant(p); });
   const copyA = $('[data-act="copy-a"]', host);
@@ -1171,6 +1418,7 @@ function setSeg(id, value) {
   if (el) el.value = value;
   const seg = document.querySelector('[data-seg="' + id + '"]');
   if (seg) $$('button', seg).forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.val === value ? 'true' : 'false'); });
+  if (seg) moveThumb(seg);
 }
 
 function onVariantInput(p, el) {
@@ -1193,7 +1441,11 @@ function syncVariantVisibility(p) {
   const host = $('#variant-' + p);
   const quote = $('#' + p + '-quote').value;
   const idle = $('#' + p + '-scenario').value === 'idle';
-  $$('[data-quote]', host).forEach(function (f) { f.hidden = f.dataset.quote !== quote; });
+  $$('[data-quote]', host).forEach(function (f) {
+    const show = f.dataset.quote === quote;
+    if (show && f.hidden) { f.hidden = false; f.classList.remove('appear'); void f.offsetWidth; f.classList.add('appear'); }
+    else if (!show) f.hidden = true;
+  });
   $$('[data-km]', host).forEach(function (f) { f.hidden = idle; });
   // У простої вердикт залежить від кількості днів, а поле днів сховане в «Ще» — відкриваємо.
   if (idle) { const more = $('#' + p + '-more'); if (more) more.open = true; }
@@ -1205,10 +1457,11 @@ function syncVariantVisibility(p) {
       ? 'Вантаж у бік дому — мінімум нижчий (' + fmtNum(Calc.num(s.uaReturnMinKm), 0) + ' ₴/км по Україні).'
       : 'Основний рейс — мінімум ' + fmtNum(Calc.num(s.uaServiceMinKm), 0) + ' ₴/км по Україні.');
 
-  const hint = $('#' + p + '-freight-hint');
-  if (quote === 'ton_usd') hint.textContent = 'Тонни × ціна × курс USD ' + fmtNum(Calc.num(s.usdRate), 2);
-  else if (quote === 'currency') hint.textContent = 'Курс EUR ' + fmtNum(Calc.num(s.eurRate), 2) + ' · USD ' + fmtNum(Calc.num(s.usdRate), 2);
-  else hint.textContent = '';
+  // Курси — прямо в пігулках валют; перераховану суму пише recalcVariant.
+  $$('.seg-extra', host).forEach(function (e) {
+    e.textContent = '\u00a0·\u00a0' + fmtNum(Calc.num(e.dataset.extra === 'USD' ? s.usdRate : s.eurRate), 2);
+  });
+  $$('[data-seg]', host).forEach(moveThumb);
 
   const v = vehicleByPlate($('#' + p + '-vehicle').value);
   const norm = $('#' + p + '-norm');
@@ -1299,6 +1552,13 @@ function recalcVariant(p) {
 
   set('km-total', r.totalKm > 0 ? 'Разом ' + fmtNum(r.totalKm, 0) + ' км' : '');
   set('tolls-total', r.tolls > 0 ? 'Дороги разом ' + fmtMoney(r.tolls) + ' ₴' : '');
+  // Ставка у валюті чи за тонну — одразу видно, скільки це гривень і з чого.
+  const fh = $('#' + p + '-freight-hint');
+  if (fh) fh.innerHTML = inp.quoteMode === 'ton_usd' && r.freight > 0
+    ? '= <b>' + fmtMoney(r.freight) + ' ₴</b> · ' + fmtNum(r.tons, 1) + ' т × $' + fmtNum(Calc.num(inp.pricePerTon), 2) + ' × ' + fmtNum(Calc.num(s.usdRate), 2)
+    : inp.quoteMode === 'currency' && r.freight > 0
+      ? '= <b>' + fmtMoney(r.freight) + ' ₴</b> · ' + fmtNum(Calc.num(inp.curAmount), 0) + (inp.currency === 'USD' ? ' $' : ' €') + ' × ' + fmtNum(Calc.num(inp.currency === 'USD' ? s.usdRate : s.eurRate), 2)
+      : '';
   set('r-freight', fmtMoney(r.freight) + ' ₴');
   set('r-km', fmtNum(r.totalKm, 0) + ' км');
   set('r-fuel', fmtMoney(r.fuel) + ' ₴');
@@ -1313,7 +1573,7 @@ function recalcVariant(p) {
   set('r-profit', waiting ? '—' : fmtMoney(r.profit) + ' ₴');
   set('r-day', waiting ? '—' : fmtMoney(r.profitPerDay) + ' ₴');
   set('r-perkm', waiting ? '—' : fmtNum(r.profitPerKm, 2) + ' ₴');
-  set('thr-label', isIdle ? 'Мінімум за день' : 'Мінімум на 1 км');
+  set('thr-label', isIdle ? 'мін. за день' : 'мін. на 1 км');
   set('r-threshold', r.thresholdUnit === 'day' ? fmtMoney(r.threshold) + ' ₴' : fmtNum(r.threshold, 2) + ' ₴');
   set('res-label', r.reserve >= 0 ? 'Запас' : 'Недобір');
   set('r-reserve', waiting ? '—' : fmtMoney(Math.abs(r.reserve)) + ' ₴');
@@ -1327,13 +1587,17 @@ function recalcVariant(p) {
   v.className = 'verdict ' + code + (code === 'edge' || code === 'stop' ? ' badge-square' : '');
   $('#' + p + '-badge').textContent = VERDICT_SYM[code];
   $('#' + p + '-word').textContent = VERDICT_WORD[code];
+  const dot = $('#vdot-' + p);
+  if (dot) { dot.className = 'vdot ' + code; dot.textContent = VERDICT_SYM[code]; }
+  const vsum = $('#vsum-' + p);
+  if (vsum) vsum.textContent = code === 'wait' ? '' : 'від ' + fmtMoney(r.required) + ' ₴';
   $('#' + p + '-sub').textContent = code === 'wait'
     ? (r.freight <= 0 ? 'Введіть ставку замовника' : (isIdle ? 'Введіть, скільки днів простій' : 'Введіть кілометри'))
     : code === 'go'
-      ? (isIdle ? 'Заробіток за день вище мінімуму' : 'Заробіток ' + fmtNum(r.profitPerKm, 2) + ' ₴/км при мінімумі ' + fmtNum(r.threshold, 2))
+      ? 'Можна брати'
       : code === 'edge'
-        ? 'Не вистачає ' + fmtMoney(Math.abs(r.reserve)) + ' ₴ до мінімуму — торгуйтесь'
-        : 'Не вистачає ' + fmtMoney(Math.abs(r.reserve)) + ' ₴ — просіть ' + fmtMoney(r.required) + ' ₴';
+        ? 'Бракує ' + fmtMoney(Math.abs(r.reserve)) + ' ₴ — торгуйтесь'
+        : 'Просіть від ' + fmtMoney(r.required) + ' ₴';
 
   set('note', isIdle
     ? 'Простій: дивимось прибуток за 1 день. Зараз ' + fmtMoney(r.metric) + ' ₴/день при мінімумі ' + fmtMoney(r.threshold) + ' ₴.'
@@ -1351,14 +1615,82 @@ function toggleB(on) {
   $('#btn-add-b').hidden = !!on;
   $('#compare').hidden = !on;
   $('#variants').classList.toggle('two', !!on);
+  $('#vswitch').classList.toggle('has-b', !!on);
+  $('#vlabel-b').textContent = on ? 'Б' : '+ Порівняти';
+  if (!on) showVariant('a');
   if (on) recalcVariant('b');
   renderCompare();
+}
+
+// Додати рейс Б: порожній Б стає копією А (частіше порівнюють той самий рейс з іншою ціною),
+// а заповнений Б, який прибирали, повертається таким, яким був.
+function addB() {
+  const fresh = !val('b-freight') && !val('b-ppt') && !val('b-cur') && !val('b-km-full') && !val('b-km-empty');
+  toggleB(true);
+  if (fresh) {
+    applyVariant('b', readVariant('a'));
+    recalcVariant('b');
+    toast('Рейс Б — копія А: змініть ставку, тип або кілометри');
+  }
+  showVariant('b');
+}
+
+// Телефон: видно один рейс; А і Б перемикаються вкладками панелі або свайпом.
+function showVariant(p) {
+  const prev = state.activeV || 'a';
+  state.activeV = p;
+  ['a', 'b'].forEach(function (k) { $('#variant-' + k).classList.toggle('is-active', k === p); });
+  $('#vswitch').classList.toggle('on-b', p === 'b');
+  $$('#vswitch button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.v === p ? 'true' : 'false'); });
+  if (prev !== p) {
+    const el = $('#variant-' + p);
+    el.classList.remove('slide-l', 'slide-r');
+    void el.offsetWidth;
+    el.classList.add(p === 'b' ? 'slide-l' : 'slide-r');
+  }
+}
+
+// Свайп вліво-вправо по рейсу на телефоні — лише коли є рейс Б. Не з полів вводу і не від країв
+// екрана (там системний жест «назад»); рух має бути помітно горизонтальним і швидким.
+function bindSwipe() {
+  const host = $('#variants');
+  let s = null;
+  host.addEventListener('touchstart', function (e) {
+    const t = e.touches[0];
+    const onField = e.target.closest && e.target.closest('input, select, textarea');
+    s = e.touches.length === 1 && !onField && t.clientX > 24 && t.clientX < innerWidth - 24
+      ? { x: t.clientX, y: t.clientY, at: Date.now() } : null;
+  }, { passive: true });
+  host.addEventListener('touchend', function (e) {
+    if (!s || !state.showB || window.matchMedia('(min-width: 900px)').matches) { s = null; return; }
+    const t = e.changedTouches[0], dx = t.clientX - s.x, dy = t.clientY - s.y, quick = Date.now() - s.at < 600;
+    s = null;
+    if (!quick || Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 2) return;
+    showVariant(dx < 0 ? 'b' : 'a');
+  }, { passive: true });
+}
+
+// Налаштування розгортаються плавно: знімаємо hidden, висоту анімує клас .open.
+function setSettingsOpen(open) {
+  const body = $('#settings-body'), btn = $('#btn-settings-toggle');
+  btn.textContent = open ? 'Згорнути' : 'Змінити';
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  clearTimeout(state.settingsTimer);
+  if (open) {
+    body.hidden = false;
+    void body.offsetHeight; // зафіксувати згорнутий стан — анімація не залежить від кадрів
+    body.classList.add('open');
+  } else {
+    body.classList.remove('open');
+    state.settingsTimer = setTimeout(function () { if (!body.classList.contains('open')) body.hidden = true; }, 360);
+  }
 }
 
 function copyAtoB() {
   const d = readVariant('a');
   applyVariant('b', d);
   recalcVariant('b');
+  showVariant('b');
   toast('Рейс А скопійовано в Б — міняйте те, що відрізняється');
 }
 
@@ -1442,42 +1774,78 @@ function resetVariant(p, ask) {
 /* ============================================================
    ОНОВЛЕННЯ ДОВІДНИКІВ, СТАРТ
    ============================================================ */
-async function refreshConfig() {
-  loader(true, 'Оновлюю довідники…');
+function sameRef(a, b) {
+  const pick = function (c) { return c ? JSON.stringify([c.vehicles, c.tolls, c.season, c.settings, c.defaults, c.month]) : ''; };
+  return pick(a) === pick(b);
+}
+
+function applyConfig(data) {
+  const dirty = state.dirty, mine = state.settings;
+  state.config = data;
+  store.set(KEY.config(state.session.user), data);
+  ['grain', 'tent'].forEach(function (m) { if (!dirty[m]) mine[m] = JSON.parse(JSON.stringify((data.settings || {})[m] || (data.defaults || {})[m] || {})); });
+  renderSettings();
+  ['a', 'b'].forEach(function (p) {
+    const d = readVariant(p);
+    renderVariant(p);
+    applyVariant(p, d);
+  });
+  recalcAll();
+}
+
+// silent === true — тихе оновлення після миттєвого старту: без заставки й тостів;
+// нічого не змінилось — нічого не перемальовуємо; людина друкує — чекаємо, поки вийде з поля.
+async function refreshConfig(silent) {
+  const quiet = silent === true;
+  if (!quiet) loader(true, 'Оновлюю довідники…');
   try {
     const data = await apiCall('config', { token: state.session.token });
-    const dirty = state.dirty, mine = state.settings;
-    state.config = data;
-    store.set(KEY.config(state.session.user), data);
-    ['grain', 'tent'].forEach(function (m) { if (!dirty[m]) mine[m] = JSON.parse(JSON.stringify((data.settings || {})[m] || (data.defaults || {})[m] || {})); });
-    renderSettings();
-    ['a', 'b'].forEach(function (p) {
-      const d = readVariant(p);
-      renderVariant(p);
-      applyVariant(p, d);
-    });
-    recalcAll();
     $('#offline-bar').hidden = true;
-    toast('Довідники оновлено');
+    if (quiet && sameRef(data, state.config)) { store.set(KEY.config(state.session.user), data); return; }
+    const a = document.activeElement;
+    if (quiet && a && a.closest && a.closest('#variants, #settings')) { state.pendingConfig = data; return; }
+    applyConfig(data);
+    if (!quiet) toast('Довідники оновлено');
   } catch (e) {
     if (e.code === 'AUTH') sessionExpired();
-    else { toast(e.message, true); if (e.code === 'NETWORK') $('#offline-bar').hidden = false; }
-  } finally { loader(false); }
+    else if (e.code === 'NETWORK') $('#offline-bar').hidden = false;
+    if (!quiet && e.code !== 'AUTH') toast(e.message, true);
+  } finally {
+    if (!quiet) loader(false);
+  }
 }
 
 async function boot() {
   buildKeypad();
   $$('.mode-switch button').forEach(function (b) { b.addEventListener('click', function () { if (b.dataset.mode !== state.mode) applyMode(b.dataset.mode); }); });
   $('#btn-settings-toggle').addEventListener('click', function () {
-    const body = $('#settings-body');
-    body.hidden = !body.hidden;
-    $('#btn-settings-toggle').textContent = body.hidden ? 'Змінити' : 'Згорнути';
+    setSettingsOpen(!$('#settings-body').classList.contains('open'));
   });
   $('#btn-settings-save').addEventListener('click', saveSettings);
   $('#btn-settings-reset').addEventListener('click', resetSettings);
   $('#btn-refresh').addEventListener('click', refreshConfig);
   $('#btn-logout').addEventListener('click', logout);
-  $('#btn-add-b').addEventListener('click', function () { toggleB(true); });
+  $('#btn-add-b').addEventListener('click', addB);
+  $$('#vswitch button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      const v = b.dataset.v;
+      if (v === 'b' && !state.showB) addB();
+      else if (state.activeV === v) $('#' + v + '-verdict').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      else showVariant(v);
+    });
+  });
+  bindSwipe();
+  // Свіжі довідники прийшли, поки людина друкувала, — застосовуємо, щойно вона вийде з поля.
+  document.addEventListener('focusout', function () {
+    setTimeout(function () {
+      const a = document.activeElement;
+      if (state.pendingConfig && !(a && a.closest && a.closest('#variants, #settings'))) {
+        const d = state.pendingConfig;
+        state.pendingConfig = null;
+        applyConfig(d);
+      }
+    }, 0);
+  });
   $('#btn-relogin').addEventListener('click', function () { $('#screen-expired').hidden = true; logout(); });
   window.addEventListener('beforeunload', function (e) {
     if (state.dirty.grain || state.dirty.tent) { e.preventDefault(); e.returnValue = ''; }
@@ -1486,7 +1854,13 @@ async function boot() {
   if (DEMO && demoScene()) { await runDemoScene(demoScene()); return; }
 
   const session = store.get(KEY.session);
-  if (session && session.token) {
+  const cachedCfg = session && session.token ? store.get(KEY.config(session.user)) : null;
+  if (cachedCfg) {
+    // Миттєвий старт: калькулятор із довідників, збережених на пристрої; свіжі — тихо у фоні.
+    state.session = session;
+    enter(cachedCfg);
+    refreshConfig(true);
+  } else if (session && session.token) {
     state.session = session;
     loader(true, 'Завантажую довідники…');
     try {
