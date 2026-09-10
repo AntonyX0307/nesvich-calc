@@ -76,33 +76,45 @@
   .mark.grain { border-radius: 50%; }
   .mark.tent { border-radius: 2px; }
 
-  /* ---------- вхід ---------- */
-  .login { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: var(--s5) var(--s4); background: #1d1d1f; }
-  .login-card { width: 100%; max-width: 420px; background: var(--card); border-radius: 24px; padding: var(--s5);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, .28); animation: rise .6s var(--spring-soft) both; }
-  .brand { font-weight: 600; font-size: 21px; letter-spacing: -.02em; }
-  .brand span { display: block; font-weight: 500; color: var(--ink-2); font-size: 14px; margin-top: 2px; }
-  .login-hint { margin: var(--s5) 0 var(--s3); color: var(--ink-2); font-weight: 600; }
+  /* ---------- вхід: на весь екран, як код-пароль на iPhone / в Telegram ---------- */
+  .login { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; color: #fff;
+    padding: calc(var(--s5) + env(safe-area-inset-top)) var(--s4) calc(var(--s5) + env(safe-area-inset-bottom));
+    background:
+      radial-gradient(70% 55% at 15% 0%, rgba(10, 132, 255, .30), rgba(10, 132, 255, 0) 70%),
+      radial-gradient(60% 50% at 100% 100%, rgba(191, 90, 242, .24), rgba(191, 90, 242, 0) 70%),
+      #0b0b0f; }
+  .login-card { width: 100%; max-width: 340px; animation: rise .6s var(--spring-soft) both; }
+  .brand { text-align: center; font-size: 15px; font-weight: 600; color: rgba(255, 255, 255, .6); }
+  .login-hint { margin: var(--s5) 0 var(--s4); text-align: center; font-size: 24px; font-weight: 700; letter-spacing: -.02em; color: #fff; }
   .user-list { display: grid; gap: var(--s2); }
-  .user-btn { display: flex; align-items: center; gap: var(--s3); width: 100%; text-align: left; min-height: 60px;
-    padding: var(--s2) var(--s4) var(--s2) var(--s3); border: 1px solid var(--line); border-radius: var(--r-s); background: #fff; font-weight: 600;
-    transition: border-color .2s ease, background-color .2s ease, transform .45s var(--spring); }
-  .user-btn:active { transform: scale(.98); background: var(--paper); }
+  .user-btn { display: flex; align-items: center; gap: var(--s3); width: 100%; min-height: 64px; padding: var(--s2) var(--s4) var(--s2) var(--s3);
+    border: 0; border-radius: 16px; background: rgba(255, 255, 255, .09); color: #fff; font-weight: 600; text-align: left;
+    transition: background-color .2s ease, transform .45s var(--spring); }
+  .user-btn:active { transform: scale(.98); background: rgba(255, 255, 255, .18); }
   .user-btn .avatar { flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
-    background: var(--paper); color: var(--ink); font-weight: 700; }
+    background: rgba(255, 255, 255, .16); font-weight: 700; }
   .user-btn > span:nth-child(2) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .user-btn small { color: var(--ink-3); font-weight: 500; margin-left: auto; }
-  .link { background: none; border: 0; padding: 0; min-height: var(--h); color: var(--ink-2); font-weight: 600;
-    text-decoration: underline; text-underline-offset: 3px; }
-  .pin-dots { display: flex; gap: var(--s4); justify-content: center; margin: var(--s4) 0 var(--s5); }
-  .pin-dots i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--ink);
-    transition: background-color .15s ease, transform .45s var(--spring); }
-  .pin-dots i.on { background: var(--ink); transform: scale(1.15); }
-  .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s2); }
-  .keypad button { height: 60px; border: 1px solid var(--line); border-radius: var(--r-s); background: #fff; font-size: 22px; font-weight: 600;
-    transition: background-color .15s ease, transform .45s var(--spring); }
-  .keypad button:active { background: var(--paper); transform: scale(.95); }
-  .keypad button.mute { border-color: transparent; background: transparent; color: var(--ink-2); font-size: 15px; }
+  .user-btn small { margin-left: auto; color: rgba(255, 255, 255, .55); font-weight: 500; }
+  .link { background: none; border: 0; padding: 0; min-height: var(--h); color: rgba(255, 255, 255, .8); font-weight: 600; }
+  .pin-who { display: grid; justify-items: center; gap: var(--s2); margin-top: var(--s2); }
+  .pin-avatar { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; font-size: 26px; font-weight: 600;
+    background: rgba(255, 255, 255, .16); }
+  .pin-who b { font-size: 17px; font-weight: 600; }
+  #login-pin .login-hint { margin: var(--s4) 0; font-size: 17px; font-weight: 500; color: rgba(255, 255, 255, .8); }
+  .pin-dots { display: flex; gap: 22px; justify-content: center; }
+  .pin-dots i { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, .9);
+    transition: background-color .12s ease, transform .4s var(--spring); }
+  .pin-dots i.on { background: #fff; transform: scale(1.1); }
+  .pin-dots.shake { animation: shake .45s cubic-bezier(.36, .07, .19, .97); }
+  #login-pin.busy .pin-dots i { animation: breathe 1s ease-in-out infinite; }
+  #login-pin.busy .keypad { opacity: .55; pointer-events: none; }
+  #pin-error { min-height: 72px; }
+  .keypad { display: grid; grid-template-columns: repeat(3, 76px); justify-content: center; gap: 16px 26px; }
+  .keypad button { width: 76px; height: 76px; border: 0; border-radius: 50%; display: grid; place-items: center;
+    background: rgba(255, 255, 255, .15); color: #fff; font-size: 32px; font-weight: 400; line-height: 1; transition: background-color .3s ease; }
+  .keypad button:active { background: rgba(255, 255, 255, .42); transition: none; }
+  .keypad button.mute { background: transparent; color: rgba(255, 255, 255, .85); font-size: 15px; font-weight: 600; }
+  .keypad button.mute:active { background: rgba(255, 255, 255, .1); }
   .alert { display: flex; gap: var(--s3); align-items: flex-start; margin-top: var(--s4); padding: var(--s3) var(--s4);
     border-radius: var(--r-s); font-weight: 600; background: var(--fill-2); color: var(--ink); animation: rise .45s var(--spring-soft) both; }
   .alert .sym { flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
@@ -111,7 +123,15 @@
   .alert.stop { background: var(--stop-bg); } .alert.stop .sym { background: var(--stop); }
   .alert.edge { background: var(--edge-bg); } .alert.edge .sym { background: var(--edge-fill); color: var(--edge-glyph); }
   .alert-act { margin-top: var(--s3); }
-  .login-status { margin: var(--s3) 0 0; color: var(--ink-3); font-size: 13px; min-height: 1.4em; }
+  .login .alert { margin-top: var(--s3); background: rgba(255, 255, 255, .09); color: #fff; }
+  .login .alert small { color: rgba(255, 255, 255, .65); }
+  .login .alert.stop { background: rgba(255, 69, 58, .2); }
+  .login .alert.stop .sym { background: #ff453a; }
+  .login .alert.edge { background: rgba(255, 159, 10, .2); }
+  .login .alert .btn { border-color: transparent; background: rgba(255, 255, 255, .16); color: #fff; }
+  .login-status { margin: var(--s3) 0 0; text-align: center; color: rgba(255, 255, 255, .6); font-size: 13px; min-height: 1.4em; }
+  @keyframes shake { 10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(4px); } 30%, 50%, 70% { transform: translateX(-8px); } 40%, 60% { transform: translateX(8px); } }
+  @keyframes breathe { 50% { opacity: .35; } }
 
   /* ---------- шапка ---------- */
   .top { position: sticky; top: 0; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--s2);
@@ -190,6 +210,12 @@
   .fields.quick { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
   .settings-more { margin-top: var(--s4); }
   .settings-more .more-body { padding-top: var(--s2); }
+  .fixed-list { display: grid; }
+  .fixed-row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); padding: var(--s2) 0;
+    border-top: 1px solid var(--line-2); font-size: 14px; }
+  .fixed-row:first-child { border-top: 0; }
+  .fixed-row b { font-weight: 600; white-space: nowrap; text-align: right; }
+  .fixed-row small { font-weight: 500; color: var(--ink-3); }
   .settings-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s5); }
   .settings-group h3 { font-size: 15px; margin-bottom: var(--s3); }
   .settings-group p.note { margin: var(--s3) 0 0; color: var(--ink-3); font-size: 13px; }
@@ -234,7 +260,7 @@
   .btn.small { position: relative; height: 34px; padding: 0 var(--s3); font-size: 13px; border-radius: 10px; }
   .btn.small::after { content: ""; position: absolute; inset: -5px -3px; } /* палець влучає, як у 44 px */
   .btn.wide { width: 100%; }
-  .btn.accent { border-color: transparent; background: var(--accent-soft); color: var(--accent); }
+  .btn.link { border-color: transparent; background: transparent; color: var(--blue); padding: 0 var(--s2); }
 
   /* ---------- перемикач: один компонент для режиму, рейсів А/Б і пігулок у картці ----------
      Біла підкладка їде за вибраною кнопкою з відскоком (JS рахує ширину й зсув, CSS анімує). */
@@ -261,9 +287,9 @@
   @media (hover: hover) {
     .btn:hover { border-color: #b9b9c0; }
     .btn.primary:hover { background: #3a3a3c; border-color: #3a3a3c; }
-    .btn.ghost:hover, .btn.accent:hover { background: rgba(118, 118, 128, .2); }
+    .btn.ghost:hover { background: rgba(118, 118, 128, .2); }
+    .btn.link:hover { background: rgba(0, 113, 227, .08); border-color: transparent; }
     .settings-line:hover { background: rgba(118, 118, 128, .06); }
-    .btn.accent:hover { color: var(--ink); }
     .seg > button:not([aria-pressed="true"]):hover { color: var(--ink); background: rgba(118, 118, 128, .1); }
     .user-btn:hover { border-color: var(--ink-3); }
   }
@@ -280,6 +306,12 @@
   .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s3); }
   .row.car { grid-template-columns: minmax(0, 1fr) 112px; }
   .row[data-quote="currency"] { grid-template-columns: minmax(0, 1fr) auto; }
+  /* Ставка й кілометри: на телефоні одне під одним, на широкій картці — одним рядком. */
+  .pay-km { display: grid; gap: var(--s4); grid-template-columns: minmax(0, 1fr); }
+  @container (min-width: 480px) {
+    .pay-km { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s3); align-items: start; }
+    .pay-km:has(> [data-km][hidden]) { grid-template-columns: minmax(0, 1fr); }
+  }
 
   details.more, details.ledger-wrap { border-radius: var(--r-m); background: var(--fill-2); }
   details > summary { list-style: none; }
@@ -324,45 +356,47 @@
 
   /* ---------- результат ---------- */
   .result { display: grid; gap: var(--s2); }
-  .verdict { display: grid; gap: var(--s3); padding: var(--s4); border-radius: var(--r); border: 1px solid var(--line); background: var(--card);
-    transition: background-color .35s ease, border-color .35s ease, padding .35s var(--ease-out); }
+  /* Вердикт — спокійна біла картка: колір лише у значку, слові й мʼякому відтінку згори; великі числа — чорним. */
+  .verdict { display: grid; gap: var(--s3); padding: var(--s4); border-radius: var(--r); border: 1px solid var(--line-2); background: var(--card);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .04); transition: background-color .35s ease, border-color .35s ease; }
+  .verdict.go { background: linear-gradient(to bottom, rgba(52, 199, 89, .11), rgba(52, 199, 89, 0) 88px), var(--card); }
+  .verdict.edge { background: linear-gradient(to bottom, rgba(255, 159, 10, .13), rgba(255, 159, 10, 0) 88px), var(--card); }
+  .verdict.stop { background: linear-gradient(to bottom, rgba(255, 59, 48, .10), rgba(255, 59, 48, 0) 88px), var(--card); }
   .v-row { display: flex; align-items: center; gap: var(--s3); }
   .v-text { min-width: 0; }
-  .verdict .badge { flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
-    font-size: 18px; font-weight: 800; color: #fff; background: var(--wait); transition: background-color .3s ease, border-radius .3s ease, width .3s ease, height .3s ease; }
-  .verdict .word { display: block; font-size: 24px; line-height: 1.15; font-weight: 700; letter-spacing: -.025em; color: var(--ink); }
-  .verdict .sub { display: block; margin-top: 2px; font-size: 14px; font-weight: 500; color: var(--ink-2); }
+  .verdict .badge { flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 15px; font-weight: 800; color: #fff; background: var(--wait); }
+  .verdict .word { display: block; font-size: 20px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; color: var(--ink); }
+  .verdict .sub { display: block; margin-top: 2px; font-size: 13px; font-weight: 500; color: var(--ink-2); }
   .verdict-profit { margin-left: auto; text-align: right; }
   .verdict-profit small { display: block; font-size: 12px; font-weight: 600; color: var(--ink-2); }
-  .verdict-profit b { font-size: 24px; font-weight: 700; letter-spacing: -.025em; }
-  .verdict.go { background: var(--go-bg); border-color: var(--go-line); }
+  .verdict-profit b { font-size: 22px; font-weight: 700; letter-spacing: -.025em; color: var(--ink); }
   .verdict.go .badge { background: var(--go); }
-  .verdict.go .word, .verdict.go .verdict-profit b { color: var(--go); }
-  .verdict.edge { background: var(--edge-bg); border-color: var(--edge-line); }
-  .verdict.edge .badge { background: var(--edge-fill); color: var(--edge-glyph); border-radius: 11px; }
+  .verdict.go .word { color: var(--go); }
+  .verdict.edge .badge { background: var(--edge-fill); color: var(--edge-glyph); border-radius: 9px; }
   .verdict.edge .word { color: var(--edge); }
-  .verdict.stop { background: var(--stop-bg); border-color: var(--stop-line); }
-  .verdict.stop .badge { background: var(--stop); border-radius: 11px; }
-  .verdict.stop .word, .verdict.stop .verdict-profit b { color: var(--stop); }
-  .verdict.wait { background: transparent; border-style: dashed; padding: var(--s3) var(--s4); }
+  .verdict.stop .badge { background: var(--stop); border-radius: 9px; }
+  .verdict.stop .word { color: var(--stop); }
+  .verdict.wait { background: transparent; border-style: dashed; border-color: var(--line); box-shadow: none; padding: var(--s3) var(--s4); }
   .verdict.wait .badge { flex-basis: 28px; width: 28px; height: 28px; background: transparent; box-shadow: inset 0 0 0 1.5px var(--line); }
-  .verdict.wait .word { font-size: 18px; font-weight: 600; color: var(--ink-2); }
+  .verdict.wait .word { font-size: 17px; font-weight: 600; color: var(--ink-2); }
   .verdict.wait .sub { color: var(--ink-3); }
   .verdict.wait .v-price, .verdict.wait .v-metrics, .verdict.wait .verdict-profit { display: none; }
   .badge.pop { animation: pop .6s var(--spring); }
-  .v-price { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s3); padding: var(--s3) var(--s4);
-    border-radius: var(--r-s); background: rgba(255, 255, 255, .82); }
-  .v-price small { display: block; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+  .v-price { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s3); padding-top: var(--s3); border-top: 1px solid var(--line-2); }
+  .v-price small { display: block; font-size: 12px; font-weight: 600; color: var(--ink-2); }
   .v-price b { font-size: 28px; font-weight: 700; letter-spacing: -.03em; color: var(--ink); }
   .v-price .res { text-align: right; }
-  .v-price .res b { font-size: 20px; color: var(--go-ink); }
+  .v-price .res b { font-size: 18px; color: var(--go-ink); }
   .v-price .res b.neg { color: var(--stop); }
-  .v-metrics { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); font-size: 13px; color: var(--ink-2); }
-  .v-metrics b { color: var(--ink); font-weight: 700; }
+  .v-metrics { display: flex; flex-wrap: wrap; gap: 4px var(--s4); font-size: 13px; color: var(--ink-2); }
+  .v-metrics b { color: var(--ink); font-weight: 600; }
   .v-metrics b.neg { color: var(--stop); }
   @container (min-width: 520px) {
-    .verdict .word, .verdict-profit b { font-size: 28px; }
-    .v-price b { font-size: 34px; }
+    .verdict { padding: var(--s4) var(--s5); }
+    .verdict .word { font-size: 22px; }
+    .verdict-profit b { font-size: 26px; }
+    .v-price b { font-size: 32px; }
   }
   .ledger-row { display: flex; justify-content: space-between; gap: var(--s3); padding: var(--s2) var(--s4); border-top: 1px solid var(--line-2); font-size: 14px; }
   .ledger-row span:first-child { color: var(--ink-2); }
@@ -432,17 +466,24 @@
   .sheet-card h2 { font-size: 20px; }
   .sheet-card p { margin: var(--s2) 0 var(--s5); color: var(--ink-2); }
 
-  /* ---------- фон широкого екрана: від 1200 px, під картками ----------
-     data-bg="scene" — намальована сцена; data-bg="photo" — фото bg.webp (ставить tools/bg-photo.mjs).
-     Картинку браузер тягне лише на широкому екрані й лише в режимі фото. */
-  .bg-scene, .bg-photo { display: none; }
+  /* ---------- тло ----------
+     data-bg="apple" — мʼякі системні кольори Apple (блакитний, фіолетовий, помаранчевий, зелений) на світло-сірому,
+     нерухомо під картками; скло шапки розмиває саме їх. data-bg="photo" — фото bg.webp від 1200 px
+     (ставить tools/bg-photo.mjs); картинку браузер тягне лише в режимі фото й лише на широкому екрані. */
+  body[data-bg="apple"]::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(60% 50% at 6% 0%, rgba(0, 122, 255, .15), rgba(0, 122, 255, 0) 70%),
+      radial-gradient(50% 45% at 96% 6%, rgba(175, 82, 222, .13), rgba(175, 82, 222, 0) 70%),
+      radial-gradient(55% 50% at 100% 100%, rgba(255, 149, 0, .11), rgba(255, 149, 0, 0) 70%),
+      radial-gradient(60% 55% at 0% 100%, rgba(52, 199, 89, .11), rgba(52, 199, 89, 0) 70%),
+      var(--paper); }
+  .bg-photo { display: none; }
 
   /* ---------- широкий екран ---------- */
   @media (min-width: 900px) {
     html { scroll-padding-top: 96px; }
     .top { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); padding: var(--s3) var(--s5); }
     .top-brand { display: block; min-width: 0; font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .top-brand span { font-weight: 500; color: var(--ink-3); margin-left: var(--s2); }
     .top .mode-switch { justify-self: center; }
     .top-right { display: flex; align-items: center; justify-self: end; }
     .vswitch { display: none; }
@@ -458,15 +499,10 @@
   }
   @media (min-width: 1200px) {
     #screen-calc { position: relative; z-index: 0; }
-    body[data-bg="scene"] .bg-scene { display: block; position: fixed; left: 0; right: 0; bottom: 0; height: 64vh; z-index: -1; pointer-events: none; }
-    .bg-scene svg { display: block; width: 100%; height: 100%; }
     body[data-bg="photo"] .bg-photo { display: block; position: fixed; inset: 0; z-index: -1; pointer-events: none;
       background: linear-gradient(to bottom, rgba(245, 245, 247, .94) 0, rgba(245, 245, 247, .5) 120px, rgba(245, 245, 247, .12) 45%, rgba(245, 245, 247, .08) 100%),
         url("bg.webp") center 70% / cover no-repeat; }
   }
-  .bg-scene .tr-grain { display: none; }
-  body[data-mode="grain"] .bg-scene .tr-grain { display: inline; }
-  body[data-mode="grain"] .bg-scene .tr-tent { display: none; }
 
   /* ---------- рух ---------- */
   .appear { animation: appear .45s var(--spring-soft); }
@@ -481,11 +517,11 @@
   }
 </style>
 </head>
-<body data-mode="grain" data-bg="scene">
+<body data-mode="grain" data-bg="apple">
 
 <section id="screen-login" class="login" hidden>
   <div class="login-card">
-    <div class="brand">Nesvich Logistics<span>Калькулятор рейсів</span></div>
+    <div class="brand">Калькулятор рейсів</div>
 
     <div id="login-users">
       <p class="login-hint">Хто рахує?</p>
@@ -494,11 +530,12 @@
     </div>
 
     <div id="login-pin" hidden>
-      <button type="button" class="link" id="pin-back">← інший користувач</button>
-      <p class="login-hint">PIN для <b id="pin-user"></b></p>
+      <button type="button" class="link" id="pin-back">‹ Інший користувач</button>
+      <div class="pin-who"><span class="pin-avatar" id="pin-avatar" aria-hidden="true"></span><b id="pin-user"></b></div>
+      <p class="login-hint">Введіть PIN</p>
       <div class="pin-dots" id="pin-dots"><i></i><i></i><i></i><i></i></div>
+      <div id="pin-error" aria-live="polite"></div>
       <div class="keypad" id="keypad"></div>
-      <div id="pin-error"></div>
     </div>
 
     <p class="login-status" id="login-status"></p>
@@ -507,69 +544,9 @@
 
 <section id="screen-calc" hidden>
 <div class="bg-photo" aria-hidden="true"></div>
-<div class="bg-scene" aria-hidden="true">
-<svg viewBox="0 0 1600 600" preserveAspectRatio="xMidYMax slice" focusable="false">
-  <defs>
-    <linearGradient id="bgSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f5f5f7"/><stop offset=".42" stop-color="#e5edf6"/><stop offset=".8" stop-color="#f7ecd9"/></linearGradient>
-    <radialGradient id="bgSun" cx="1210" cy="372" r="360" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffd48f" stop-opacity=".72"/><stop offset=".45" stop-color="#ffe4bb" stop-opacity=".34"/><stop offset="1" stop-color="#ffe4bb" stop-opacity="0"/></radialGradient>
-    <linearGradient id="bgFar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c6d4e3"/><stop offset="1" stop-color="#e2e9f1"/></linearGradient>
-    <linearGradient id="bgMid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9bccf"/><stop offset="1" stop-color="#cdd8e3"/></linearGradient>
-    <linearGradient id="bgMist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f1ea" stop-opacity="0"/><stop offset="1" stop-color="#f4f1ea" stop-opacity=".85"/></linearGradient>
-    <linearGradient id="bgMeadow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dde6cc"/><stop offset="1" stop-color="#c9d6b1"/></linearGradient>
-    <linearGradient id="bgWheat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0e1ba"/><stop offset="1" stop-color="#ddc488"/></linearGradient>
-    <pattern id="bgRows" width="44" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(-5)"><path d="M0 5.5H44" stroke="#cfb577" stroke-width="1.5" opacity=".55"/></pattern>
-    <pattern id="bgPines" x="0" y="424" width="34" height="46" patternUnits="userSpaceOnUse"><path d="M7 46 13 13 19 46Z M21 46 26 25 31 46Z" fill="#98aec0"/></pattern>
-  </defs>
-  <rect width="1600" height="600" fill="url(#bgSky)"/>
-  <rect width="1600" height="600" fill="url(#bgSun)"/>
-  <path d="M0 318 110 238 196 290 318 176 440 272 560 214 690 296 818 196 950 282 1086 206 1216 292 1340 228 1470 284 1600 222V600H0Z" fill="url(#bgFar)"/>
-  <rect y="236" width="1600" height="170" fill="url(#bgMist)"/>
-  <path d="M0 392 148 326 268 374 400 314 540 382 700 332 860 390 1010 342 1160 398 1320 350 1470 400 1600 362V600H0Z" fill="url(#bgMid)"/>
-  <rect y="344" width="1600" height="110" fill="url(#bgMist)"/>
-  <path d="M0 452C220 426 420 438 620 446S1040 428 1240 438 1500 452 1600 446V600H0Z" fill="url(#bgMeadow)"/>
-  <g fill="url(#bgPines)"><rect x="34" y="424" width="238" height="46"/><rect x="612" y="424" width="170" height="46"/><rect x="1392" y="424" width="208" height="46"/></g>
-  <path d="M0 470C260 448 520 460 760 468S1260 452 1600 472V600H0Z" fill="url(#bgWheat)"/>
-  <path d="M0 470C260 448 520 460 760 468S1260 452 1600 472V600H0Z" fill="url(#bgRows)"/>
-  <rect y="506" width="1600" height="94" fill="#dde3e8"/>
-  <rect y="532" width="1600" height="54" fill="#c7cfd7"/>
-  <path d="M0 559H1600" stroke="#f4f6f8" stroke-width="3" stroke-dasharray="46 34"/>
-  <g transform="translate(1128 401)">
-    <ellipse cx="226" cy="170" rx="236" ry="7" fill="#1d1d1f" opacity=".14"/>
-    <g class="tr-tent">
-      <rect x="0" y="10" width="330" height="118" rx="6" fill="#fbfcfd" stroke="#d3dbe2" stroke-width="1.5"/>
-      <path d="M30 15V123M60 15V123M90 15V123M120 15V123M150 15V123M180 15V123M210 15V123M240 15V123M270 15V123M300 15V123" stroke="#e7ecf0" stroke-width="2"/>
-      <rect x="0" y="118" width="330" height="10" fill="#edf1f4"/>
-      <text x="165" y="80" text-anchor="middle" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="8" fill="#c3cdd6">NESVICH</text>
-    </g>
-    <g class="tr-grain">
-      <path d="M20 26Q165 2 314 26Z" fill="#e6d3a4"/>
-      <rect x="0" y="22" width="334" height="8" rx="2" fill="#dfe5ea"/>
-      <rect x="4" y="28" width="326" height="100" rx="4" fill="#eef1f4" stroke="#cfd8df" stroke-width="1.5"/>
-      <path d="M40 31V125M76 31V125M112 31V125M148 31V125M184 31V125M220 31V125M256 31V125M292 31V125" stroke="#dde3e8" stroke-width="3"/>
-      <text x="167" y="86" text-anchor="middle" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="8" fill="#bfc9d3">NESVICH</text>
-    </g>
-    <rect x="6" y="128" width="324" height="8" fill="#5b646c"/>
-    <rect x="286" y="136" width="6" height="22" fill="#6b747c"/>
-    <rect x="300" y="136" width="152" height="10" fill="#4e575f"/>
-    <path d="M344 36Q372 10 414 20L420 36Z" fill="#eef2f5" stroke="#d3dbe2" stroke-width="1.5"/>
-    <path d="M344 150V52Q344 36 358 36H414Q428 36 434 48L446 88Q450 98 450 110V150Z" fill="#ffffff" stroke="#d3dbe2" stroke-width="1.5"/>
-    <path d="M418 48H432L444 88H424Z" fill="#46545f"/>
-    <rect x="366" y="50" width="44" height="34" rx="4" fill="#46545f"/>
-    <path d="M360 92H414V138H360Z" fill="none" stroke="#e2e8ec" stroke-width="1.5"/>
-    <rect x="440" y="58" width="6" height="18" rx="2" fill="#5b646c"/>
-    <rect x="443" y="100" width="7" height="36" fill="#e4e9ed"/>
-    <rect x="441" y="112" width="9" height="8" rx="2" fill="#f6d596"/>
-    <rect x="348" y="126" width="46" height="18" rx="4" fill="#c9d1d8"/>
-    <rect x="404" y="138" width="48" height="12" rx="3" fill="#5b646c"/>
-    <g fill="#2f363c"><circle cx="44" cy="148" r="21"/><circle cx="92" cy="148" r="21"/><circle cx="140" cy="148" r="21"/><circle cx="320" cy="148" r="21"/><circle cx="420" cy="148" r="21"/></g>
-    <g fill="#cfd6dc"><circle cx="44" cy="148" r="10"/><circle cx="92" cy="148" r="10"/><circle cx="140" cy="148" r="10"/><circle cx="320" cy="148" r="10"/><circle cx="420" cy="148" r="10"/></g>
-    <g fill="#7d8891"><circle cx="44" cy="148" r="4"/><circle cx="92" cy="148" r="4"/><circle cx="140" cy="148" r="4"/><circle cx="320" cy="148" r="4"/><circle cx="420" cy="148" r="4"/></g>
-  </g>
-</svg>
-</div>
   <header class="top">
     <div class="glass" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-    <div class="top-brand">Nesvich Logistics<span>Калькулятор рейсів</span></div>
+    <div class="top-brand">Калькулятор рейсів</div>
     <div class="seg fit mode-switch" role="group" aria-label="Тип авто">
       <span class="seg-thumb"></span>
       <button type="button" data-mode="grain" aria-pressed="true"><i class="mark grain"></i>Зерновоз</button>
@@ -617,6 +594,13 @@
                 <p class="note">Для рейсу з вантажем і догрузу назад дивимось заробіток на 1 км, для простою — за 1 день. «На межі» — коли не вистачає до 10 %.</p>
               </div>
             </div>
+          </div>
+        </details>
+        <details class="more settings-more" id="settings-fixed" hidden>
+          <summary><span class="sum-t">Постійні витрати</span><span class="sum-val" id="fixed-sum"></span></summary>
+          <div class="more-body">
+            <div class="fixed-list" id="fixed-list"></div>
+            <p class="note">Страховки, техогляд, добові й інше, що є в кожному рейсі: калькулятор сам кладе їх у витрати й у ціну «не дешевше». Суми змінюються в таблиці «Калькулятор рейсів», аркуш «Постійні витрати»; місяць — 22 робочі дні, рік — 264.</p>
           </div>
         </details>
         <div class="settings-foot">
@@ -769,6 +753,39 @@ if (typeof module !== 'undefined') module.exports = Calc;
 </script>
 
 <script>
+/* ---------- Постійні витрати на рейс: чиста логіка без DOM ----------
+   Статті з аркуша «Постійні витрати» (страховки, техогляд, добові…) розкладаються на рейс і йдуть у Calc
+   разом з «іншими витратами» — сам Calc не змінюється. Місяць = 22 робочі дні, рік = 22 × 12 = 264. */
+const Fixed = (function () {
+  const WORK_DAYS_MONTH = 22;
+  const num = function (v) {
+    const n = Number(String(v === undefined || v === null ? '' : v).replace(',', '.').replace(/\s/g, ''));
+    return isNaN(n) ? 0 : n;
+  };
+  const plateKey = function (p) { return String(p || '').toUpperCase().replace(/\s+/g, ''); };
+  // Скільки стаття коштує на 1 день рейсу; null — стаття рахується не днями (за км чи за рейс).
+  function perDay(it) {
+    const a = Math.max(num(it.amount), 0);
+    return it.unit === 'day' ? a : it.unit === 'month' ? a / WORK_DAYS_MONTH : it.unit === 'year' ? a / (WORK_DAYS_MONTH * 12) : null;
+  }
+  // items: [{ name, amount, unit: 'trip'|'day'|'km'|'month'|'year', mode: ''|'grain'|'tent', plate: '' }]
+  // trip:  { mode, plate, days, km } → { total, rows: [{ name, sum }] }
+  function forTrip(items, trip) {
+    const rows = [];
+    (Array.isArray(items) ? items : []).forEach(function (it) {
+      if (!it || (it.mode && it.mode !== trip.mode) || (it.plate && plateKey(it.plate) !== plateKey(trip.plate))) return;
+      const a = Math.max(num(it.amount), 0), d = perDay(it);
+      const sum = it.unit === 'trip' ? a : it.unit === 'km' ? a * Math.max(num(trip.km), 0) : d === null ? 0 : d * Math.max(num(trip.days), 0);
+      if (sum > 0) rows.push({ name: String(it.name || ''), sum: sum });
+    });
+    return { total: rows.reduce(function (t, r) { return t + r.sum; }, 0), rows: rows };
+  }
+  return { forTrip: forTrip, perDay: perDay, WORK_DAYS_MONTH: WORK_DAYS_MONTH };
+})();
+if (typeof module !== 'undefined') module.exports = Fixed;
+</script>
+
+<script>
 /* ---------- Бекенд (Apps Script) ---------- */
 async function api(action, payload) {
   if (!API_URL || API_URL.indexOf('ВСТАВТЕ') === 0) {
@@ -805,9 +822,9 @@ const DEMO_USERS = [
   { name: 'Тарас Мельник', role: 'керівник', pin: '4321' }
 ];
 const DEMO_VEHICLES = [
-  { plate: 'AA 1234 BB', model: 'Scania R450', driver: 'Петро Савчук', normGrain: 30, normTent: 27.5 },
-  { plate: 'AA 5678 CC', model: 'MAN TGX 18.480', driver: 'Микола Гринь', normGrain: 32 },
-  { plate: 'BC 2211 AI', model: 'DAF XF 480', driver: 'Василь Дуда', normGrain: 31, normTent: 28 }
+  { plate: 'AA 1234 BB', model: 'Scania R450', driver: 'Савчук Петро', normGrain: 30, normTent: 27.5 },
+  { plate: 'AA 5678 CC', model: 'MAN TGX 18.480', driver: 'Гринь Микола', normGrain: 32 },
+  { plate: 'BC 2211 AI', model: 'DAF XF 480', driver: 'Дуда Василь', normGrain: 31, normTent: 28 }
 ];
 const DEMO_TOLLS = [
   { country: 'Польща', rate: 4, unit: 'km' },
@@ -828,6 +845,12 @@ const DEMO_SETTINGS = {
     uaServiceMinKm: 5, abroadServiceMinKm: 15, uaReturnMinKm: 3, abroadReturnMinKm: 8, idleMinDay: 2000
   }
 };
+// Демо: постійні витрати лише для тенту — сцени зерновоза лишаються з тими самими числами.
+const DEMO_FIXED = [
+  { name: 'Страховка ОСЦПВ (цивілка)', amount: 9000, unit: 'year', mode: 'tent', plate: '' },
+  { name: 'Добові водію', amount: 400, unit: 'day', mode: 'tent', plate: '' },
+  { name: 'ТО і ремонт', amount: 1.5, unit: 'km', mode: 'tent', plate: '' }
+];
 const DEMO_SEASON = { 1: 1.06, 2: 1.05, 3: 1.02, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1.02, 11: 1.04, 12: 1.06 };
 let demoAttempts = {};
 let demoBlocked = {};
@@ -842,6 +865,7 @@ function demoConfig() {
     vehicles: JSON.parse(JSON.stringify(DEMO_VEHICLES)),
     tolls: JSON.parse(JSON.stringify(DEMO_TOLLS)),
     season: DEMO_SEASON,
+    fixed: JSON.parse(JSON.stringify(DEMO_FIXED)),
     month: 9
   };
 }
@@ -1006,6 +1030,7 @@ function openPin(user) {
   state.pinUser = user;
   state.pin = '';
   $('#pin-user').textContent = user;
+  $('#pin-avatar').textContent = String(user || '').charAt(0).toUpperCase();
   $('#pin-error').innerHTML = '';
   $('#login-users').hidden = true;
   $('#login-pin').hidden = false;
@@ -1017,7 +1042,7 @@ function renderPinDots() {
 }
 
 function pinPress(key) {
-  if ($('#login-pin').hidden) return;
+  if ($('#login-pin').hidden || $('#login-pin').classList.contains('busy')) return;
   if (key === 'back') { state.pin = state.pin.slice(0, -1); renderPinDots(); return; }
   if (key === 'clear') { state.pin = ''; renderPinDots(); return; }
   if (!/^\d$/.test(key) || state.pin.length >= 4) return;
@@ -1029,16 +1054,16 @@ function pinPress(key) {
 async function submitPin() {
   const user = state.pinUser, pin = state.pin;
   $('#pin-error').innerHTML = '';
-  loader(true, 'Перевіряю PIN…');
+  $('#login-pin').classList.add('busy'); // крапки пульсують, поки сервер перевіряє, — без затемнення екрана
   try {
     const data = await apiCall('login', { user: user, pin: pin });
     state.configAt = Date.now();
     state.session = { token: data.token, user: data.user, role: data.role };
     store.set(KEY.session, state.session);
-    loader(false);
+    $('#login-pin').classList.remove('busy');
     enter(data);
   } catch (e) {
-    loader(false);
+    $('#login-pin').classList.remove('busy');
     state.pin = '';
     renderPinDots();
     showPinError(e);
@@ -1046,6 +1071,10 @@ async function submitPin() {
 }
 
 function showPinError(e) {
+  // Невірно — крапки коротко трусяться, як на iPhone; на Android ще й легка вібрація.
+  const dots = $('#pin-dots');
+  dots.classList.remove('shake'); void dots.offsetWidth; dots.classList.add('shake');
+  if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) navigator.vibrate(60);
   // Бекенд віддає LOCK для блокування і AUTH із текстом «PIN ще не задано» — зводимо до станів екрана.
   const code = e.code === 'LOCK' ? 'BLOCKED'
     : (e.code === 'AUTH' && /PIN ще не задано/.test(e.message || '')) ? 'NOPIN'
@@ -1186,6 +1215,7 @@ function renderSettings() {
     el.addEventListener('change', onSettingChange);
   });
   renderSeasonNote();
+  renderFixedSettings();
   renderSettingsSum();
   renderDirty();
 }
@@ -1227,6 +1257,25 @@ function renderSeasonNote() {
     ? 'Зараз ' + Calc.MONTHS[m - 1] + ': норма × ' + fmtNum(seasonCoef(), 3) + '. Коефіцієнти по місяцях — на аркуші «Сезон».'
     : 'Сезон вимкнено — норма береться як є.';
 }
+
+// Постійні витрати в налаштуваннях — лише перегляд: суми веде адмін на аркуші «Постійні витрати».
+const UNIT_LABEL = { trip: 'за рейс', day: 'за день', km: 'за км', month: 'за місяць', year: 'за рік' };
+function renderFixedSettings() {
+  const box = $('#settings-fixed'), all = state.config && state.config.fixed;
+  box.hidden = !Array.isArray(all); // бекенд ще без аркуша — блоку немає
+  if (!Array.isArray(all)) return;
+  const mine = all.filter(function (it) { return !it.mode || it.mode === state.mode; });
+  $('#fixed-sum').textContent = mine.length ? mine.length + ' ' + plural(mine.length, 'стаття', 'статті', 'статей') : 'ще не задано';
+  $('#fixed-list').innerHTML = mine.length
+    ? mine.map(function (it) {
+        const d = Fixed.perDay(it);
+        return '<div class="fixed-row"><span>' + esc(it.name) + (it.plate ? ' <small>· лише ' + esc(it.plate) + '</small>' : '') + '</span>' +
+          '<b class="num">' + fmtSmart(Calc.num(it.amount)) + ' ₴ ' + (UNIT_LABEL[it.unit] || '') +
+          (d !== null && it.unit !== 'day' ? ' <small>≈ ' + fmtMoney(d) + ' ₴/день</small>' : '') + '</b></div>';
+      }).join('')
+    : '<p class="note">Ще не задано — впишіть суми на аркуші «Постійні витрати».</p>';
+}
+function plural(n, one, few, many) { const a = n % 10, b = n % 100; return a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 12 || b > 14) ? few : many; }
 
 function renderSettingsSum() {
   const s = state.settings[state.mode] || {};
@@ -1287,7 +1336,7 @@ function resetSettings() {
 function vehicleOptions(selected) {
   const list = (state.config.vehicles || []).filter(function (v) { return v.active !== false; });
   return '<option value="">Без авто — норма з налаштувань</option>' + list.map(function (v) {
-    const label = v.plate + ' · ' + shortModel(v.model) + (v.driver ? ' · ' + shortName(v.driver) : '');
+    const label = v.plate + (v.driver ? ' · ' + String(v.driver).trim().split(/\s+/)[0] : (v.model ? ' · ' + shortModel(v.model) : ''));
     return '<option value="' + esc(v.plate) + '"' + (v.plate === selected ? ' selected' : '') + '>' + esc(label) + '</option>';
   }).join('');
 }
@@ -1354,21 +1403,20 @@ function renderVariant(p) {
   host.innerHTML =
     '<div class="v-head"><h2><span class="v-key">' + key + '</span>Рейс ' + key + '</h2>' +
       '<div class="v-head-actions">' +
-        (p === 'b' ? '<button type="button" class="btn small ghost" data-act="copy-a">← Копія А</button>' : '') +
+        (p === 'a' ? '<button type="button" class="btn small ghost" data-act="copy-a" title="Скопіювати рейс А в рейс Б">Копія в Б →</button>' : '') +
         '<button type="button" class="btn small ghost" data-act="reset">Очистити</button>' +
       '</div></div>' +
 
     '<div class="field"><label>Куди їдемо</label>' +
       segHTML(p + '-region', 'ukraine', [['ukraine', 'Україна'], ['abroad', 'Закордон']]) + '</div>' +
 
-    '<div class="group"><div class="field"><label>Тип рейсу</label>' +
+    '<div class="field"><label>Тип рейсу</label>' +
       segHTML(p + '-scenario', 'service', [['service', 'З вантажем'], ['return', 'Догруз назад'], ['idle', 'Простій']]) + '</div>' +
-      '<span class="note" id="' + p + '-scenario-hint"></span></div>' +
 
     '<div class="field"><label>Як задана ставка</label>' +
       segHTML(p + '-quote', 'manual', [['manual', '₴ за рейс'], ['ton_usd', '$ за тонну'], ['currency', 'У валюті']]) + '</div>' +
 
-    '<div class="group">' +
+    '<div class="pay-km"><div class="group">' +
       '<div class="field" data-quote="manual"><label for="' + p + '-freight">Скільки платять <small>₴ за рейс</small></label>' +
         '<input type="text" inputmode="decimal" id="' + p + '-freight" placeholder="0"></div>' +
       '<div class="row" data-quote="ton_usd">' +
@@ -1388,7 +1436,7 @@ function renderVariant(p) {
         '<div class="field"><label for="' + p + '-km-empty">Км порожнім</label><input type="text" inputmode="decimal" id="' + p + '-km-empty" placeholder="0"></div>' +
       '</div>' +
       '<span class="note" id="' + p + '-km-total"></span>' +
-    '</div>' +
+    '</div></div>' +
 
     // Авто й дні — одразу на виду (від них залежать паливо і «за день»); норма видна рядком нижче.
     '<div class="group">' +
@@ -1403,7 +1451,7 @@ function renderVariant(p) {
     '<div class="tolls-block">' +
       '<div class="tolls-head">' +
         '<span class="lbl">Платні дороги <small class="num" id="' + p + '-tolls-total"></small></span>' +
-        '<label class="btn small accent add-toll">+ Додати країну<select data-act="add-toll" aria-label="Додати країну з платними дорогами">' + tollOptions('Оберіть країну') + '</select></label>' +
+        '<label class="btn small link add-toll">+ Додати країну<select data-act="add-toll" aria-label="Додати країну з платними дорогами">' + tollOptions('Оберіть країну') + '</select></label>' +
       '</div>' +
       '<div class="tolls" id="' + p + '-tolls"></div>' +
     '</div>' +
@@ -1440,6 +1488,7 @@ function renderVariant(p) {
         '<div class="ledger-row"><span id="' + p + '-r-driver-label">Водію</span><span class="num" id="' + p + '-r-driver">0 ₴</span></div>' +
         '<div class="ledger-row"><span>Амортизація (знос авто)</span><span class="num" id="' + p + '-r-amort">0 ₴</span></div>' +
         '<div class="ledger-row"><span>Платні дороги</span><span class="num" id="' + p + '-r-tolls">0 ₴</span></div>' +
+        '<div class="ledger-row" data-fixed-row hidden><span>Постійні витрати <small id="' + p + '-r-fixed-note"></small></span><span class="num" id="' + p + '-r-fixed">0 ₴</span></div>' +
         '<div class="ledger-row"><span>Інші витрати</span><span class="num" id="' + p + '-r-other">0 ₴</span></div>' +
         '<div class="ledger-row total"><span>Усі витрати</span><span class="num" id="' + p + '-r-total">0 ₴</span></div>' +
         '<p class="ledger-note" id="' + p + '-note"></p>' +
@@ -1517,15 +1566,6 @@ function syncVariantVisibility(p) {
   $$('[data-km]', host).forEach(function (f) { f.hidden = idle; });
 
   const s = state.settings[state.mode] || {};
-  // Підказка — про той мінімум, за яким справді рахуємо: по Україні чи за кордоном.
-  const ua = $('#' + p + '-region').value !== 'abroad';
-  const where = ua ? ' ₴/км по Україні' : ' ₴/км за кордоном';
-  const back = Calc.num(ua ? s.uaReturnMinKm : s.abroadReturnMinKm);
-  $('#' + p + '-scenario-hint').textContent = idle
-    ? 'Стоїмо і чекаємо: дивимось заробіток за день — мінімум ' + fmtMoney(Calc.num(s.idleMinDay)) + ' ₴.'
-    : ($('#' + p + '-scenario').value === 'return'
-      ? (back > 0 ? 'Вантаж у бік дому — мінімум нижчий: ' + fmtSmart(back) + where + '.' : 'Вантаж у бік дому — досить не піти в мінус.')
-      : 'Основний рейс — мінімум ' + fmtSmart(Calc.num(ua ? s.uaServiceMinKm : s.abroadServiceMinKm)) + where + '.');
 
   // Курси — прямо в пігулках валют; перераховану суму пише recalcVariant.
   $$('.seg-extra', host).forEach(function (e) {
@@ -1543,7 +1583,7 @@ function renderNormHint(p) {
   const src = v
     ? (norm.dataset.auto === '1' ? 'з довідника' : 'вручну, у довіднику ' + fmtNum(vehicleNorm(v, state.mode), 1))
     : (norm.dataset.auto === '' && norm.value !== String(s.fuelCons) ? 'вручну' : 'з налаштувань');
-  $('#' + p + '-norm-hint').innerHTML = 'Норма <b class="num">' + esc(fmtNum(Calc.num(norm.value), 1)) + ' л/100 км</b> · ' + esc(src);
+  $('#' + p + '-norm-hint').innerHTML = 'Норма <b class="num">' + esc(fmtNum(Calc.num(norm.value), 1)) + ' л/100 км</b> · ' + (v && v.model ? esc(shortModel(v.model)) + ' · ' : '') + esc(src);
 }
 
 /* ---- платні дороги ---- */
@@ -1625,7 +1665,12 @@ function recalcVariant(p) {
   if ($('#variant-' + p).innerHTML === '') return;
   const inp = readVariant(p);
   const s = state.settings[state.mode] || {};
-  const r = Calc.compute(inp, s, { mode: state.mode, seasonCoef: seasonCoef() });
+  // Постійні витрати з аркуша йдуть у Calc разом з «іншими» — він рахує їх як будь-яку витрату (і в «не дешевше»).
+  const fx = Fixed.forTrip(state.config.fixed, { mode: state.mode, plate: inp.vehicle,
+    days: Math.max(Calc.num(inp.days, 1), 0),
+    km: inp.scenario === 'idle' ? 0 : Math.max(Calc.num(inp.kmFull), 0) + Math.max(Calc.num(inp.kmEmpty), 0) });
+  const r = Calc.compute(Object.assign({}, inp, { other: Math.max(Calc.num(inp.other), 0) + fx.total }), s, { mode: state.mode, seasonCoef: seasonCoef() });
+  r.fixed = fx;
   state.results[p] = r;
 
   $$('#' + p + '-tolls .toll-row').forEach(function (row) {
@@ -1637,9 +1682,13 @@ function recalcVariant(p) {
   const isIdle = inp.scenario === 'idle';
   const waiting = r.decision.code === 'wait';
 
-  set('km-total', r.totalKm > 0 ? 'Разом ' + fmtNum(r.totalKm, 0) + ' км' : '');
+  // Разом кілометрів і яка частка — порожняком: одразу видно, скільки рейсу їдемо без вантажу.
+  $('#' + p + '-km-total').innerHTML = r.totalKm > 0
+    ? 'Разом <b class="num">' + fmtNum(r.totalKm, 0) + ' км</b>' + (r.kmEmpty > 0 ? ' · порожнім ' + Math.round(r.kmEmpty / r.totalKm * 100) + ' %' : '')
+    : '';
   set('tolls-total', r.tolls > 0 ? '· ' + fmtMoney(r.tolls) + ' ₴' : '');
-  set('more-sum', r.other > 0 ? 'інші ' + fmtMoney(r.other) + ' ₴' : '');
+  const ownOther = r.other - r.fixed.total; // постійні витрати йдуть окремим рядком, тут — лише вписане руками
+  set('more-sum', ownOther > 0 ? 'інші ' + fmtMoney(ownOther) + ' ₴' : '');
   renderNormHint(p);
   // Ставка у валюті чи за тонну — одразу видно, скільки це гривень і з чого.
   const fh = $('#' + p + '-freight-hint');
@@ -1656,7 +1705,10 @@ function recalcVariant(p) {
   set('r-driver', fmtMoney(r.driver) + ' ₴');
   set('r-amort', fmtMoney(r.amort) + ' ₴');
   set('r-tolls', fmtMoney(r.tolls) + ' ₴');
-  set('r-other', fmtMoney(r.other) + ' ₴');
+  set('r-other', fmtMoney(r.other - r.fixed.total) + ' ₴');
+  set('r-fixed', fmtMoney(r.fixed.total) + ' ₴');
+  set('r-fixed-note', r.fixed.rows.length ? '· ' + r.fixed.rows.map(function (x) { return x.name; }).join(', ') : '');
+  $('[data-fixed-row]', $('#variant-' + p)).hidden = !(state.config.fixed && state.config.fixed.length);
   set('r-total', fmtMoney(r.total) + ' ₴');
   set('r-required', waiting ? '—' : fmtMoney(r.required) + ' ₴');
   set('r-profit', waiting ? '—' : fmtMoney(r.profit) + ' ₴');
@@ -1970,7 +2022,7 @@ function resetVariant(p, ask) {
    ОНОВЛЕННЯ ДОВІДНИКІВ, СТАРТ
    ============================================================ */
 function sameRef(a, b) {
-  const pick = function (c) { return c ? JSON.stringify([c.vehicles, c.tolls, c.season, c.settings, c.defaults, c.month]) : ''; };
+  const pick = function (c) { return c ? JSON.stringify([c.vehicles, c.tolls, c.season, c.settings, c.defaults, c.month, c.fixed]) : ''; };
   return pick(a) === pick(b);
 }
 
@@ -2017,6 +2069,7 @@ async function boot() {
   watchSeg($('.mode-switch'));
   watchSeg($('#vtabs'));
   smoothDetails($('#settings-more'));
+  smoothDetails($('#settings-fixed'));
   // Шрифт дозавантажився — ширина кнопок змінилась, підкладки перемикачів доганяють.
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { $$('.seg').forEach(moveThumb); });
   $('#btn-settings-toggle').addEventListener('click', function () {
