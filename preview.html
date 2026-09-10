@@ -337,12 +337,12 @@
 
   /* ---------- полірка 10.09: перемикач із пружинкою, налаштування в рядок, рейси А/Б свайпом, компактний результат ---------- */
   .mode-switch { position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; gap: 0; isolation: isolate; }
-  .mode-switch::before, .vswitch::before { content: ""; position: absolute; z-index: -1; top: 3px; bottom: 3px; left: 3px;
+  .mode-switch::before, .vtabs::before { content: ""; position: absolute; z-index: -1; top: 3px; bottom: 3px; left: 3px;
     width: calc(50% - 3px); border-radius: 999px; background: linear-gradient(#ffffff, #fafafc);
     box-shadow: 0 1px 3px rgba(0,0,0,.16), 0 0 0 .5px rgba(0,0,0,.04);
     transition: transform .5s cubic-bezier(.34, 1.56, .64, 1);
     transition: transform .6s linear(0, .402 7.4%, .711 15.3%, .929 23.7%, 1.008 28.2%, 1.067 33%, 1.099 38.2%, 1.105 43.1%, 1.084 50%, 1.018 65.5%, .994 74.2%, 1.001 100%); }
-  body[data-mode="tent"] .mode-switch::before, .vswitch.on-b::before { transform: translateX(100%); }
+  body[data-mode="tent"] .mode-switch::before, .vswitch.on-b .vtabs::before { transform: translateX(100%); }
   .mode-switch button { justify-content: center; }
   .mode-switch button.is-active { background: transparent; box-shadow: none; }
 
@@ -354,23 +354,36 @@
   .settings-body.open { grid-template-rows: 1fr; opacity: 1; margin-top: 14px; padding-top: 14px; border-top-color: var(--line-2); }
   .settings-inner { overflow: hidden; min-height: 0; }
 
+  /* Рейси А/Б на телефоні — скляна нижня панель із двома вкладками (схема Codex + пружинка).
+     Поки рейсу Б немає, друга вкладка — «+ Порівняти»: створює Б копією А. */
   .vswitch { display: none; }
-  .vdot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--wait); }
+  .vdot { display: inline-block; flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--wait); }
   .vdot.go { background: var(--go); } .vdot.edge { background: var(--edge); } .vdot.stop { background: var(--stop); }
   @media (max-width: 899px) {
     .mode-switch button { padding: 0 10px; }
     .settings-line .title { display: none; }
-    .vswitch:not([hidden]) { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 3px; border-radius: 999px;
-      background: linear-gradient(#ececf0, #e3e3e8); border: 1px solid rgba(0,0,0,.06); isolation: isolate; }
-    .vswitch button { min-height: 40px; border: 0; background: transparent; border-radius: 999px; font-weight: 600;
-      color: var(--ink-2); display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-    .vswitch button[aria-pressed="true"] { color: var(--ink); }
+    #btn-add-b { display: none; }
+    .variants { overflow-x: clip; }
+    .vswitch { display: block; position: sticky; bottom: 0; z-index: 8; margin: 0 -14px -40px;
+      padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
+      background: rgba(250,250,252,.72); -webkit-backdrop-filter: saturate(180%) blur(22px); backdrop-filter: saturate(180%) blur(22px);
+      border-top: .5px solid rgba(0,0,0,.1); }
+    .vtabs { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 3px; border-radius: 999px;
+      background: rgba(118,118,128,.14); isolation: isolate; }
+    .vtabs button { min-width: 0; min-height: 42px; padding: 0 8px; border: 0; background: transparent; border-radius: 999px;
+      font-size: 14px; font-weight: 600; color: var(--ink-2); display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .vtabs button[aria-pressed="true"] { color: var(--ink); }
+    .vtabs .vsum { font-weight: 700; white-space: nowrap; }
+    .vswitch:not(.has-b) #vdot-b, .vswitch:not(.has-b) #vsum-b { display: none; }
+    .vswitch:not(.has-b) [data-v="b"] { color: var(--accent); }
+    .result { bottom: calc(66px + env(safe-area-inset-bottom)); }
     .variants.two .variant:not(.is-active) { display: none; }
-    .variant.slide-l { animation: slide-l .32s cubic-bezier(.2, .8, .2, 1); }
-    .variant.slide-r { animation: slide-r .32s cubic-bezier(.2, .8, .2, 1); }
+    .variant.slide-l { animation: slide-l .28s cubic-bezier(.2, .8, .2, 1); }
+    .variant.slide-r { animation: slide-r .28s cubic-bezier(.2, .8, .2, 1); }
   }
-  @keyframes slide-l { from { transform: translateX(28px); opacity: .4; } to { transform: none; opacity: 1; } }
-  @keyframes slide-r { from { transform: translateX(-28px); opacity: .4; } to { transform: none; opacity: 1; } }
+  @keyframes slide-l { from { transform: translateX(22px); opacity: .5; } to { transform: none; opacity: 1; } }
+  @keyframes slide-r { from { transform: translateX(-22px); opacity: .5; } to { transform: none; opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .vtabs::before { transition: none; } }
 
   .verdict { display: grid; gap: 10px; align-items: stretch; padding: 12px 14px; }
   .verdict .v-row { display: flex; align-items: center; gap: 12px; }
@@ -443,6 +456,19 @@
   @media (min-width: 1200px) {
     .toll-row { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr) minmax(76px, auto) 44px; }
   }
+
+  /* ---------- полірка 3: статус рейсу вгорі в шапці, картка результату без прилипання ---------- */
+  @media (max-width: 899px) {
+    .top { flex-wrap: wrap; row-gap: 8px; }
+    .vswitch { position: static; flex: 1 0 100%; order: 3; margin: 0; padding: 0; background: none;
+      -webkit-backdrop-filter: none; backdrop-filter: none; border: 0; }
+    .vtabs button { min-height: 38px; }
+    .result { position: static; }
+  }
+  .vdot { width: 18px; height: 18px; flex-basis: 18px; display: inline-grid; place-items: center;
+    color: #fff; font-size: 11px; font-weight: 800; font-style: normal; }
+  .seg-extra { display: none; max-width: none; opacity: 1; transition: none; }
+  .seg button[aria-pressed="true"] .seg-extra { display: inline; }
 </style>
 </head>
 <body data-mode="grain">
@@ -532,6 +558,12 @@
       <button type="button" class="icon-btn" id="btn-refresh" title="Оновити довідники" aria-label="Оновити довідники">↻</button>
       <button type="button" class="icon-btn" id="btn-logout" title="Вийти" aria-label="Вийти">⏻</button>
     </div>
+    <nav class="vswitch" id="vswitch" aria-label="Рейси">
+      <div class="vtabs" role="tablist">
+        <button type="button" role="tab" data-v="a" aria-pressed="true"><i class="vdot" id="vdot-a"></i><span>А</span><b class="vsum" id="vsum-a"></b></button>
+        <button type="button" role="tab" data-v="b" aria-pressed="false"><i class="vdot" id="vdot-b"></i><span id="vlabel-b">+ Порівняти</span><b class="vsum" id="vsum-b"></b></button>
+      </div>
+    </nav>
   </header>
 
   <div class="bar offline" id="offline-bar" hidden>
@@ -568,10 +600,6 @@
       </div></div>
     </section>
 
-    <div class="vswitch" id="vswitch" role="tablist" aria-label="Рейс" hidden>
-      <button type="button" role="tab" data-v="a" aria-pressed="true"><i class="vdot" id="vdot-a"></i>Рейс А</button>
-      <button type="button" role="tab" data-v="b" aria-pressed="false"><i class="vdot" id="vdot-b"></i>Рейс Б</button>
-    </div>
     <div class="variants" id="variants">
       <section class="card variant is-active" id="variant-a"></section>
       <section class="card variant" id="variant-b" hidden></section>
@@ -1428,8 +1456,9 @@ function syncVariantVisibility(p) {
 
   // Курси — прямо в пігулках валют; перераховану суму пише recalcVariant.
   $$('.seg-extra', host).forEach(function (e) {
-    e.textContent = ' · ' + fmtNum(Calc.num(e.dataset.extra === 'USD' ? s.usdRate : s.eurRate), 2);
+    e.textContent = '\u00a0·\u00a0' + fmtNum(Calc.num(e.dataset.extra === 'USD' ? s.usdRate : s.eurRate), 2);
   });
+  $$('[data-seg]', host).forEach(moveThumb);
 
   const v = vehicleByPlate($('#' + p + '-vehicle').value);
   const norm = $('#' + p + '-norm');
@@ -1556,7 +1585,9 @@ function recalcVariant(p) {
   $('#' + p + '-badge').textContent = VERDICT_SYM[code];
   $('#' + p + '-word').textContent = VERDICT_WORD[code];
   const dot = $('#vdot-' + p);
-  if (dot) dot.className = 'vdot ' + code;
+  if (dot) { dot.className = 'vdot ' + code; dot.textContent = VERDICT_SYM[code]; }
+  const vsum = $('#vsum-' + p);
+  if (vsum) vsum.textContent = code === 'wait' ? '' : 'від ' + fmtMoney(r.required) + ' ₴';
   $('#' + p + '-sub').textContent = code === 'wait'
     ? (r.freight <= 0 ? 'Введіть ставку замовника' : (isIdle ? 'Введіть, скільки днів простій' : 'Введіть кілометри'))
     : code === 'go'
@@ -1581,13 +1612,27 @@ function toggleB(on) {
   $('#btn-add-b').hidden = !!on;
   $('#compare').hidden = !on;
   $('#variants').classList.toggle('two', !!on);
-  $('#vswitch').hidden = !on;
+  $('#vswitch').classList.toggle('has-b', !!on);
+  $('#vlabel-b').textContent = on ? 'Б' : '+ Порівняти';
   if (!on) showVariant('a');
   if (on) recalcVariant('b');
   renderCompare();
 }
 
-// Телефон: видно один рейс; А і Б перемикаються пігулками або свайпом.
+// Додати рейс Б: порожній Б стає копією А (частіше порівнюють той самий рейс з іншою ціною),
+// а заповнений Б, який прибирали, повертається таким, яким був.
+function addB() {
+  const fresh = !val('b-freight') && !val('b-ppt') && !val('b-cur') && !val('b-km-full') && !val('b-km-empty');
+  toggleB(true);
+  if (fresh) {
+    applyVariant('b', readVariant('a'));
+    recalcVariant('b');
+    toast('Рейс Б — копія А: змініть ставку, тип або кілометри');
+  }
+  showVariant('b');
+}
+
+// Телефон: видно один рейс; А і Б перемикаються вкладками панелі або свайпом.
 function showVariant(p) {
   const prev = state.activeV || 'a';
   state.activeV = p;
@@ -1602,19 +1647,22 @@ function showVariant(p) {
   }
 }
 
-// Свайп вліво-вправо по рейсу на телефоні — лише коли є рейс Б.
+// Свайп вліво-вправо по рейсу на телефоні — лише коли є рейс Б. Не з полів вводу і не від країв
+// екрана (там системний жест «назад»); рух має бути помітно горизонтальним і швидким.
 function bindSwipe() {
   const host = $('#variants');
-  let x0 = null, y0 = 0;
+  let s = null;
   host.addEventListener('touchstart', function (e) {
-    if (e.touches.length !== 1) { x0 = null; return; }
-    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+    const t = e.touches[0];
+    const onField = e.target.closest && e.target.closest('input, select, textarea');
+    s = e.touches.length === 1 && !onField && t.clientX > 24 && t.clientX < innerWidth - 24
+      ? { x: t.clientX, y: t.clientY, at: Date.now() } : null;
   }, { passive: true });
   host.addEventListener('touchend', function (e) {
-    if (x0 === null || !state.showB || window.matchMedia('(min-width: 900px)').matches) { x0 = null; return; }
-    const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
-    x0 = null;
-    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (!s || !state.showB || window.matchMedia('(min-width: 900px)').matches) { s = null; return; }
+    const t = e.changedTouches[0], dx = t.clientX - s.x, dy = t.clientY - s.y, quick = Date.now() - s.at < 600;
+    s = null;
+    if (!quick || Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 2) return;
     showVariant(dx < 0 ? 'b' : 'a');
   }, { passive: true });
 }
@@ -1627,7 +1675,8 @@ function setSettingsOpen(open) {
   clearTimeout(state.settingsTimer);
   if (open) {
     body.hidden = false;
-    requestAnimationFrame(function () { requestAnimationFrame(function () { body.classList.add('open'); }); });
+    void body.offsetHeight; // зафіксувати згорнутий стан — анімація не залежить від кадрів
+    body.classList.add('open');
   } else {
     body.classList.remove('open');
     state.settingsTimer = setTimeout(function () { if (!body.classList.contains('open')) body.hidden = true; }, 360);
@@ -1773,8 +1822,15 @@ async function boot() {
   $('#btn-settings-reset').addEventListener('click', resetSettings);
   $('#btn-refresh').addEventListener('click', refreshConfig);
   $('#btn-logout').addEventListener('click', logout);
-  $('#btn-add-b').addEventListener('click', function () { toggleB(true); showVariant('b'); });
-  $$('#vswitch button').forEach(function (b) { b.addEventListener('click', function () { showVariant(b.dataset.v); }); });
+  $('#btn-add-b').addEventListener('click', addB);
+  $$('#vswitch button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      const v = b.dataset.v;
+      if (v === 'b' && !state.showB) addB();
+      else if (state.activeV === v) $('#' + v + '-verdict').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      else showVariant(v);
+    });
+  });
   bindSwipe();
   // Свіжі довідники прийшли, поки людина друкувала, — застосовуємо, щойно вона вийде з поля.
   document.addEventListener('focusout', function () {
