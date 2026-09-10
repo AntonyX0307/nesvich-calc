@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Калькулятор рейсів — Nesvich Logistics</title>
 <meta name="theme-color" content="#f5f5f7">
 <style>
@@ -55,7 +55,10 @@
 
   /* ---------- основа ---------- */
   * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; scroll-padding-top: 132px; }
+  /* Сторінка як застосунок: без «гуми» на краях (iOS Safari 16+, Chrome) і без зуму щипком чи подвійним тапом.
+     Під сторінкою — те саме світло-сіре тло, тож навіть на старих iPhone з-під краю не видно чужого кольору. */
+  html { -webkit-text-size-adjust: 100%; scroll-padding-top: 132px; background: var(--paper); overscroll-behavior: none; touch-action: pan-x pan-y; }
+  body { overscroll-behavior: none; }
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, "Segoe UI", system-ui, sans-serif;
@@ -78,7 +81,7 @@
 
   /* ---------- вхід: код-пароль як на iPhone, на світлому тлі з кольорами Apple ----------
      Клавіші — матове скло над кольоровим тлом; натиснута — темнішає миттєво, відпущена — світлішає плавно. */
-  .login { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; color: var(--ink);
+  .login { position: fixed; inset: 0; z-index: 30; overflow-y: auto; overscroll-behavior: contain; display: grid; color: var(--ink);
     padding: calc(var(--s5) + env(safe-area-inset-top)) var(--s4) calc(var(--s5) + env(safe-area-inset-bottom));
     background:
       radial-gradient(75% 55% at 0% 0%, rgba(0, 122, 255, .26), rgba(0, 122, 255, 0) 70%),
@@ -86,7 +89,7 @@
       radial-gradient(75% 55% at 15% 100%, rgba(255, 149, 0, .20), rgba(255, 149, 0, 0) 70%),
       radial-gradient(60% 50% at 100% 100%, rgba(255, 45, 85, .16), rgba(255, 45, 85, 0) 70%),
       var(--paper); }
-  .login-card { width: 100%; max-width: 360px; animation: rise .6s var(--spring-soft) both; }
+  .login-card { width: 100%; max-width: 360px; margin: auto; animation: rise .6s var(--spring-soft) both; }
   .brand { text-align: center; font-size: 15px; font-weight: 600; color: var(--ink-2); }
   .login-hint { margin: var(--s5) 0 var(--s4); text-align: center; font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
   .user-list { display: grid; gap: var(--s2); }
@@ -2160,6 +2163,11 @@ async function boot() {
   }
 }
 document.addEventListener('DOMContentLoaded', boot);
+
+// Щипковий зум на iPhone: Safari не зважає на user-scalable=no, тож жест гасимо самі.
+['gesturestart', 'gesturechange', 'gestureend'].forEach(function (t) {
+  document.addEventListener(t, function (e) { e.preventDefault(); }, { passive: false });
+});
 
 // Сторінка й картинки — з кешу пристрою (sw.js): відкривається миттєво, свіжа версія підтягується у фоні.
 // Нова версія стала на місце, поки сторінка відкрита, — пропонуємо оновити одним дотиком.
