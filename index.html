@@ -4,30 +4,30 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Калькулятор рейсів — Nesvich Logistics</title>
-<meta name="theme-color" content="#16233a">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#ffffff">
 <style>
   :root {
-    --ink: #16233a;
-    --ink-2: #5a6578;
-    --ink-3: #8a93a3;
-    --paper: #eef1f6;
+    --ink: #1d1d1f;
+    --ink-2: #6e6e73;
+    --ink-3: #6e6e73;
+    --paper: #f5f5f7;
     --card: #ffffff;
-    --line: #d6dce7;
-    --line-2: #e9edf3;
-    --go: #1c7c4d;   --go-bg: #e2f2e9;
-    --edge: #a3670a; --edge-bg: #fbefd6;
-    --stop: #b3261e; --stop-bg: #fce6e3;
-    --wait: #5a6578; --wait-bg: #e9ecf1;
-    --grain: #b8860b; --grain-soft: #f6ecd0;
-    --tent: #2f5ea8;  --tent-soft: #dde7f5;
+    --line: #d2d2d7;
+    --line-2: #e8e8ed;
+
+    --go: #0f7a46;   --go-bg: #eaf4ee;
+    --edge: #8f6100;  --edge-bg: #f7f1e2;
+    --stop: #b3261e; --stop-bg: #f9ebe9;
+    --wait: #6e6e73; --wait-bg: #f0f0f2;
+
+    --grain: #6b5844; --grain-soft: #f2efea;
+    --tent: #3c5a73;  --tent-soft: #ecf0f4;
     --accent: var(--grain);
     --accent-soft: var(--grain-soft);
-    --r: 12px;
-    --r-s: 8px;
-    --focus: 0 0 0 3px rgba(47, 94, 168, .28);
+
+    --r: 18px;
+    --r-s: 12px;
+    --focus: 0 0 0 4px rgba(29,29,31,.18);
   }
   body[data-mode="tent"] { --accent: var(--tent); --accent-soft: var(--tent-soft); }
 
@@ -35,247 +35,281 @@
   html { -webkit-text-size-adjust: 100%; }
   body {
     margin: 0;
-    font-family: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    line-height: 1.4;
-    color: var(--ink);
-    background: var(--paper);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, "Segoe UI", system-ui, sans-serif;
+    font-size: 15px; font-weight: 400; line-height: 1.45;
+    letter-spacing: -.005em;
+    color: var(--ink); background: var(--paper);
     font-variant-numeric: tabular-nums;
   }
   [hidden] { display: none !important; }
   button, input, select { font: inherit; color: inherit; }
   button { cursor: pointer; }
-  h1, h2, h3 { margin: 0; font-weight: 700; }
+  h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -.02em; }
+  a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  a:hover { color: var(--ink); }
   :focus-visible { outline: none; box-shadow: var(--focus); }
+  .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* ---------- shapes: mode marks ---------- */
+  .mark { width: 12px; height: 12px; flex: 0 0 12px; background: currentColor; display: inline-block; }
+  .mark.grain { border-radius: 50%; }
+  .mark.tent { border-radius: 2px; }
 
   /* ---------- login ---------- */
   .login {
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: grid;
-    place-items: center;
-    padding: 24px;
-    background: var(--ink);
-    background-image: radial-gradient(1200px 600px at 20% -10%, rgba(255,255,255,.07), transparent 60%);
+    min-height: 100vh; min-height: 100dvh;
+    display: grid; place-items: center; padding: 20px;
+    background: #1d1d1f;
   }
-  .login-card {
-    width: 100%;
-    max-width: 400px;
-    background: var(--card);
-    border-radius: 16px;
-    padding: 28px 26px 22px;
-  }
-  .brand { font-weight: 800; font-size: 20px; letter-spacing: -.01em; }
+  .login-card { width: 100%; max-width: 420px; background: var(--card); border-radius: 22px; padding: 26px 24px 22px; box-shadow: 0 20px 60px rgba(0,0,0,.28); }
+  .brand { font-weight: 600; font-size: 21px; letter-spacing: -.02em; }
   .brand span { display: block; font-weight: 500; color: var(--ink-2); font-size: 14px; margin-top: 2px; }
-  .login-hint { margin: 22px 0 10px; color: var(--ink-2); }
+  .login-hint { margin: 20px 0 10px; color: var(--ink-2); font-weight: 600; }
   .user-list { display: grid; gap: 8px; }
   .user-btn {
-    display: flex; align-items: center; gap: 12px;
-    width: 100%; text-align: left;
-    padding: 12px 14px;
-    border: 1px solid var(--line); border-radius: var(--r-s);
-    background: #fff;
-    font-weight: 600;
+    display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+    min-height: 60px; padding: 10px 14px;
+    border: 1px solid var(--line); border-radius: 12px; background: #fff; font-weight: 700;
   }
   .user-btn:hover { border-color: var(--ink); }
-  .user-btn .avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    display: grid; place-items: center;
-    background: var(--ink); color: #fff; font-weight: 800;
-  }
-  .user-btn small { color: var(--ink-3); font-weight: 500; margin-left: auto; }
-  .link { background: none; border: 0; padding: 0; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; }
-  .pin-dots { display: flex; gap: 14px; justify-content: center; margin: 18px 0 20px; }
-  .pin-dots i {
-    width: 14px; height: 14px; border-radius: 50%;
-    border: 2px solid var(--ink); background: transparent;
-    transition: background .12s;
-  }
+  .user-btn .avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--paper); color: var(--ink); font-weight: 800; }
+  .user-btn > span:nth-child(2) { white-space: nowrap; }
+  .user-btn small { color: var(--ink-3); font-weight: 600; margin-left: auto; }
+  .link { background: none; border: 0; padding: 8px 0; color: var(--ink-2); font-weight: 600;
+    text-decoration: underline; text-underline-offset: 3px; min-height: 44px; }
+  .pin-dots { display: flex; gap: 16px; justify-content: center; margin: 18px 0 20px; }
+  .pin-dots i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--ink); background: transparent; }
   .pin-dots i.on { background: var(--ink); }
-  .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .keypad button {
-    height: 52px; border: 1px solid var(--line); border-radius: var(--r-s);
-    background: #fff; font-size: 20px; font-weight: 600;
-  }
+  .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .keypad button { min-height: 60px; border: 1px solid var(--line); border-radius: 12px; background: #fff;
+    font-size: 22px; font-weight: 700; }
   .keypad button:active { background: var(--paper); }
-  .keypad button.mute { border-color: transparent; background: transparent; color: var(--ink-2); font-size: 15px; }
-  .login-error { min-height: 1.4em; margin: 12px 0 0; color: var(--stop); font-weight: 600; }
+  .keypad button.mute { border-color: transparent; background: transparent; color: var(--ink-2); font-size: 15px; font-weight: 600; }
+
+  .alert { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding: 12px 14px;
+    border-radius: 12px; font-weight: 600; background: var(--wait-bg); color: var(--ink); }
+  .alert .sym { flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--ink); color: #fff; font-size: 13px; font-weight: 800; }
+  .alert small { display: block; font-weight: 500; color: var(--ink-2); margin-top: 2px; }
+  .alert.stop { background: var(--stop-bg); } .alert.stop .sym { background: var(--stop); }
+  .alert.edge { background: var(--edge-bg); } .alert.edge .sym { background: var(--edge); }
+  .alert-act { margin-top: 10px; }
   .login-status { margin: 12px 0 0; color: var(--ink-3); font-size: 13px; min-height: 1.4em; }
 
   /* ---------- top bar ---------- */
-  .top {
-    position: sticky; top: 0; z-index: 20;
-    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
-    padding: 10px 20px;
-    background: var(--card);
-    border-bottom: 1px solid var(--line);
+  .top { position: sticky; top: 0; z-index: 20;
+    display: flex; align-items: center; gap: 12px; padding: 8px 14px;
+    background: rgba(255,255,255,.86); backdrop-filter: saturate(180%) blur(16px);
+    color: var(--ink); border-bottom: 1px solid var(--line); }
+  .mode-switch { display: inline-flex; min-width: 0; gap: 2px; padding: 3px; border-radius: 999px;
+    background: linear-gradient(#ececf0, #e3e3e8); border: 1px solid rgba(0,0,0,.06);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.07), 0 1px 0 rgba(255,255,255,.7); }
+  .mode-switch button { display: inline-flex; align-items: center; gap: 8px; border: 0; background: transparent;
+    border-radius: 999px; min-height: 40px; padding: 0 15px; font-weight: 500; color: var(--ink-2);
+    transition: background .18s ease, color .18s ease, box-shadow .18s ease; }
+  .mode-switch button:active { transform: scale(.97); }
+  .mode-switch button .mark { color: var(--ink-3); }
+  .mode-switch button.is-active { color: var(--ink); font-weight: 600;
+    background: linear-gradient(#ffffff, #fafafc);
+    box-shadow: 0 1px 3px rgba(0,0,0,.16), 0 0 0 .5px rgba(0,0,0,.04); }
+  .mode-switch button.is-active .mark { color: var(--accent); }
+  .top-right { margin-left: auto; min-width: 0; display: flex; align-items: center; gap: 8px; }
+  @media (max-width: 899px) {
+    .top { gap: 8px; padding: 8px 10px; }
+    .top-user { display: none; }
+    .mode-switch button { padding: 0 12px; }
   }
-  .top::after {
-    content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 3px;
-    background: var(--accent);
-  }
-  .top-brand { font-weight: 800; letter-spacing: -.01em; white-space: nowrap; }
-  .top-brand span { color: var(--ink-3); font-weight: 500; }
-  .mode-switch {
-    display: inline-flex; padding: 3px; border-radius: 999px;
-    background: var(--paper); border: 1px solid var(--line);
-  }
-  .mode-switch button {
-    border: 0; background: transparent; border-radius: 999px;
-    padding: 8px 18px; font-weight: 700; color: var(--ink-2);
-  }
-  .mode-switch button.is-active { background: var(--accent); color: #fff; }
-  .top-user { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
-  .top-user .name { font-weight: 700; }
-  .icon-btn {
-    width: 34px; height: 34px; border-radius: 50%;
-    border: 1px solid var(--line); background: #fff; color: var(--ink-2);
-    display: grid; place-items: center; font-size: 16px;
-  }
-  .icon-btn:hover { color: var(--ink); border-color: var(--ink); }
+  .top-user { font-weight: 600; white-space: nowrap; color: var(--ink-2); }
+  .icon-btn { min-width: 44px; min-height: 44px; border-radius: 50%; border: 1px solid var(--line);
+    background: #fff; color: var(--ink-2); display: grid; place-items: center; font-size: 17px; }
+  .icon-btn:hover { color: var(--ink); border-color: var(--ink-3); }
+
+  .bar { padding: 10px 14px; font-weight: 700; display: flex; gap: 10px; align-items: center; }
+  .bar.offline { background: var(--edge-bg); color: var(--edge); }
+  .bar .sym { flex: 0 0 20px; width: 20px; height: 20px; border-radius: 50%; background: var(--edge); color: #fff;
+    display: grid; place-items: center; font-size: 13px; font-weight: 800; }
+  .bar span.small { font-weight: 500; color: var(--ink-2); }
 
   /* ---------- layout ---------- */
-  .wrap { max-width: 1240px; margin: 0 auto; padding: 22px 20px 60px; display: grid; gap: 18px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 14px 14px 40px; display: grid; gap: 12px; }
+  .card { background: var(--card); border: 1px solid var(--line-2); border-radius: var(--r); box-shadow: 0 1px 2px rgba(0,0,0,.04); }
 
-  /* ---------- settings band ---------- */
-  .settings { padding: 16px 20px; }
-  .settings-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-  .settings-head h2 { font-size: 15px; font-weight: 700; }
-  .settings-head h2 em { font-style: normal; color: var(--accent); }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .chip {
-    padding: 4px 10px; border-radius: 999px;
-    background: var(--paper); color: var(--ink-2); font-size: 13px; font-weight: 600;
-  }
-  .chip b { color: var(--ink); font-weight: 700; }
-  .settings-actions { display: flex; gap: 8px; align-items: center; }
-  .settings-body { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line-2); }
-  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  .settings-group h3 { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+  /* ---------- settings strip ---------- */
+  .settings { padding: 12px 14px; background: transparent; border: 1px solid var(--line); box-shadow: none; }
+  .settings-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .settings-line .sum { color: var(--ink-2); font-size: 13px; font-weight: 400; }
+  .settings-line .sum b { color: var(--ink); font-weight: 500; white-space: nowrap; }
+  .settings-line .title { font-size: 12px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em; }
+  .settings-line .spacer { margin-left: auto; }
+  .settings-body { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-2); }
+  .settings-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+  .settings-group h3 { font-size: 14px; margin-bottom: 10px; }
   .settings-group p.note { margin: 10px 0 0; color: var(--ink-3); font-size: 13px; }
-  .fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
-  .settings-foot { display: flex; align-items: center; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
-  .dirty { color: var(--edge); font-size: 13px; font-weight: 600; }
+  .fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+  .settings-foot { display: flex; align-items: center; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  .dirty { color: var(--edge); font-size: 13px; font-weight: 700; }
 
   /* ---------- fields ---------- */
-  .field label { display: block; font-size: 13px; color: var(--ink-2); margin-bottom: 4px; font-weight: 600; }
+  .field label { display: block; font-size: 13px; color: var(--ink-2); margin-bottom: 4px; font-weight: 700; }
   .field label small { color: var(--ink-3); font-weight: 500; }
   .field input, .field select, .input {
-    width: 100%; height: 40px;
-    padding: 0 10px;
-    border: 1px solid var(--line); border-radius: var(--r-s);
-    background: #fff;
+    width: 100%; min-height: 48px; padding: 0 12px; font-size: 17px; font-weight: 600;
+    border: 1px solid var(--line); border-radius: var(--r-s); background: #fff;
   }
-  .field input:disabled, .input:disabled { background: var(--paper); color: var(--ink-3); }
-  .field select { padding-right: 28px; appearance: none; -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%235a6578' stroke-width='1.8'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 10px center; }
-  .field .hint { display: block; margin-top: 4px; font-size: 12px; color: var(--ink-3); }
-  .toggle { display: flex; align-items: center; gap: 10px; height: 40px; }
-  .toggle input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
+  .field input::placeholder { color: #a1a1a6; font-weight: 400; }
+  .field select { padding-right: 30px; appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236e6e73' stroke-width='1.8'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 11px center; }
+  .field .hint { display: block; margin-top: 4px; font-size: 12px; color: var(--ink-3); font-weight: 600; }
+  .toggle { display: flex; align-items: center; gap: 10px; min-height: 48px; font-weight: 600; }
+  .toggle input { width: 22px; height: 22px; margin: 0; accent-color: var(--accent); }
+
+  .seg { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: var(--r-s); background: var(--paper); }
+  .seg button { flex: 1 1 0; min-height: 40px; padding: 0 8px; border: 0; border-radius: 8px; background: transparent;
+    font-size: 14px; font-weight: 700; color: var(--ink-2); }
+  .seg button[aria-pressed="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.14); }
+  .seg.compact button { font-size: 13px; }
 
   /* ---------- buttons ---------- */
-  .btn {
-    height: 38px; padding: 0 16px;
-    border-radius: var(--r-s); border: 1px solid var(--line);
-    background: #fff; font-weight: 700;
-    display: inline-flex; align-items: center; gap: 8px;
-  }
+  .btn { white-space: nowrap; min-height: 48px; padding: 0 18px; border-radius: var(--r-s); border: 1px solid var(--line);
+    background: #fff; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
   .btn:hover { border-color: var(--ink); }
   .btn.primary { background: var(--ink); border-color: var(--ink); color: #fff; }
-  .btn.primary:hover { background: #22304d; }
-  .btn.primary:disabled { opacity: .6; cursor: default; }
+  .btn.primary:disabled { opacity: .55; cursor: default; }
   .btn.ghost { background: transparent; }
-  .btn.small { height: 32px; padding: 0 12px; font-size: 13px; }
+  .btn.small { min-height: 40px; padding: 0 12px; font-size: 13px; }
+  .btn.wide { width: 100%; }
+  .btn.dashed { border-style: dashed; background: transparent; color: var(--ink-2); }
 
-  /* ---------- variants ---------- */
-  .variants { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  .variant { padding: 18px 20px 20px; border-top: 4px solid var(--accent); }
-  .variant-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-  .variant-head h2 { font-size: 20px; font-weight: 800; letter-spacing: -.01em; }
-  .variant-head .sub { color: var(--ink-3); font-size: 13px; }
-  .block { margin-top: 16px; }
-  .block h3 { font-size: 13px; font-weight: 700; color: var(--ink-2); margin-bottom: 8px; }
-  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .row + .row { margin-top: 10px; }
-  .row.two { grid-template-columns: 1fr 1fr; }
-  .row.veh { grid-template-columns: 2fr 1fr; }
+  /* ---------- variant ---------- */
+  .variants { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  .variant { padding: 14px; }
+  .v-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .v-head h2 { font-size: 17px; display: flex; align-items: center; gap: 8px; }
+  .v-key { width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+    display: grid; place-items: center; font-size: 14px; font-weight: 600; }
+  .v-head-actions { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
 
-  .tolls { border: 1px solid var(--line-2); border-radius: var(--r-s); padding: 10px; background: #fafbfd; }
-  .toll-row { display: grid; grid-template-columns: 1.6fr 1fr 1fr auto auto; gap: 8px; align-items: end; }
-  .toll-row + .toll-row { margin-top: 8px; }
-  .toll-sum { height: 40px; min-width: 76px; display: grid; place-items: center; padding: 0 8px;
-    background: var(--go-bg); color: var(--go); border-radius: var(--r-s); font-weight: 700; font-size: 13px; }
-  .toll-del { width: 40px; height: 40px; border-radius: var(--r-s); border: 1px solid var(--line); background: #fff; color: var(--ink-2); }
-  .toll-add { margin-top: 10px; }
+  .fieldset { display: grid; gap: 10px; margin-top: 12px; }
+  .leg { font-size: 12px; font-weight: 800; color: var(--ink-3); text-transform: uppercase; letter-spacing: .05em; margin-top: 4px; }
+  .route { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: end; }
+  .route-dash { padding-bottom: 14px; color: var(--ink-3); font-weight: 700; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row.three { grid-template-columns: repeat(3, 1fr); }
+  .km-total { font-size: 13px; font-weight: 700; color: var(--ink-2); }
 
-  .ledger { margin-top: 18px; border-top: 1px solid var(--line-2); }
-  .ledger-row { display: grid; grid-template-columns: 1fr auto 1fr auto; gap: 0 16px; padding: 7px 0; border-bottom: 1px solid var(--line-2); font-size: 14px; }
-  .ledger-row span:nth-child(odd) { color: var(--ink-2); }
-  .ledger-row span:nth-child(even) { font-weight: 700; text-align: right; white-space: nowrap; }
-  .ledger-row.total span { font-weight: 800; color: var(--ink); }
+  details.more, details.ledger-wrap { border: 1px solid var(--line-2); border-radius: var(--r-s); background: #f5f5f7; }
+  details.more > summary, details.ledger-wrap > summary {
+    list-style: none; cursor: pointer; min-height: 48px; display: flex; align-items: center; gap: 8px;
+    padding: 0 14px; font-weight: 700; color: var(--ink-2); }
+  details > summary::-webkit-details-marker { display: none; }
+  details.more > summary::after, details.ledger-wrap > summary::after { content: "▾"; margin-left: auto; }
+  details[open].more > summary::after, details[open].ledger-wrap > summary::after { content: "▴"; }
+  .more-body { padding: 4px 14px 14px; display: grid; gap: 10px; }
 
-  .verdict {
-    margin-top: 16px; padding: 16px 18px;
-    border-radius: var(--r); border-left: 6px solid var(--wait);
-    background: var(--wait-bg);
-    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-  }
-  .verdict .word { font-size: 24px; font-weight: 800; letter-spacing: -.01em; color: var(--wait); }
-  .verdict .profit { text-align: right; }
-  .verdict .profit small { display: block; color: var(--ink-2); font-size: 13px; }
-  .verdict .profit b { font-size: 26px; font-weight: 800; letter-spacing: -.01em; }
-  .verdict.go { border-color: var(--go); background: var(--go-bg); }     .verdict.go .word, .verdict.go .profit b { color: var(--go); }
-  .verdict.edge { border-color: var(--edge); background: var(--edge-bg); } .verdict.edge .word { color: var(--edge); }
-  .verdict.stop { border-color: var(--stop); background: var(--stop-bg); } .verdict.stop .word, .verdict.stop .profit b { color: var(--stop); }
+  .tolls { display: grid; gap: 8px; }
+  .toll-row { display: grid; grid-template-columns: 1fr 1fr auto 44px; gap: 8px; align-items: end;
+    padding: 10px; border: 1px solid var(--line-2); border-radius: var(--r-s); background: #fff; }
+  .toll-row .field.country { grid-column: 1 / -1; }
+  .toll-row .field.qty, .toll-row .field.rate { min-width: 0; }
+  .toll-sum { display: block; font-weight: 600; font-size: 15px; min-height: 48px; line-height: 48px; }
+  .toll-del { min-width: 44px; min-height: 44px; border-radius: 50%; border: 1px solid var(--line);
+    background: #fff; color: var(--ink-2); font-size: 17px; }
+  .toll-del:hover { color: var(--stop); border-color: var(--stop); }
+  .tolls-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .tolls-total { margin-left: auto; font-weight: 600; color: var(--ink-2); font-size: 13px; }
 
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
-  .stat { padding: 10px 12px; border: 1px solid var(--line-2); border-radius: var(--r-s); }
-  .stat small { display: block; color: var(--ink-3); font-size: 12px; font-weight: 600; }
-  .stat b { display: block; font-size: 16px; margin-top: 2px; white-space: nowrap; }
+  /* ---------- result ---------- */
+  .result { margin-top: 14px; display: grid; gap: 8px; position: sticky; bottom: 0; z-index: 5;
+    background: var(--card); padding-top: 8px; }
+  .verdict { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: var(--r);
+    border: 1px solid var(--wait); background: var(--wait-bg); }
+  .verdict .badge { flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--wait); color: #fff; font-size: 20px; font-weight: 800; }
+  .verdict .word { display: block; font-size: 24px; font-weight: 600; letter-spacing: -.02em; color: var(--wait); }
+  .verdict .sub { display: block; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+  .verdict-profit { margin-left: auto; text-align: right; }
+  .verdict-profit small { display: block; font-size: 12px; font-weight: 700; color: var(--ink-2); }
+  .verdict-profit b { font-size: 24px; font-weight: 600; letter-spacing: -.02em; }
+  .verdict.go { border-color: var(--go); background: var(--go-bg); }
+  .verdict.go .badge { background: var(--go); } .verdict.go .word, .verdict.go .verdict-profit b { color: var(--go); }
+  .verdict.edge { border-color: var(--edge); background: var(--edge-bg); }
+  .verdict.edge .badge { background: var(--edge); } .verdict.edge .word { color: var(--edge); }
+  .verdict.stop { border-color: var(--stop); background: var(--stop-bg); }
+  .verdict.stop .badge { background: var(--stop); } .verdict.stop .word, .verdict.stop .verdict-profit b { color: var(--stop); }
+  .verdict.badge-square .badge { border-radius: 8px; }
+
+  .offer { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;
+    padding: 14px 16px; border-radius: var(--r); background: #1d1d1f; color: #fff; }
+  .offer small { display: block; font-size: 12px; font-weight: 500; color: #a1a1a6; }
+  .offer b { font-size: 28px; font-weight: 600; letter-spacing: -.02em; }
+  .offer .res { text-align: right; }
+  .offer .res b { font-size: 18px; }
+  .offer .res b.neg { color: #ffb3ab; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .stat { padding: 8px 10px; border: 1px solid var(--line-2); border-radius: var(--r-s); }
+  .stat small { display: block; color: var(--ink-3); font-size: 11px; font-weight: 700; }
+  .stat b { display: block; font-size: 15px; margin-top: 2px; white-space: nowrap; }
   .stat b.neg { color: var(--stop); }
-  .stat b.pos { color: var(--go); }
-  .note { margin: 10px 0 0; color: var(--ink-3); font-size: 13px; }
 
-  .compare { padding: 16px 20px; font-size: 15px; }
-  .compare b { font-weight: 800; }
+  .ledger-row { display: flex; justify-content: space-between; gap: 12px; padding: 8px 14px;
+    border-top: 1px solid var(--line-2); font-size: 14px; }
+  .ledger-row span:first-child { color: var(--ink-2); }
+  .ledger-row span:last-child { font-weight: 700; white-space: nowrap; }
+  .ledger-row.total span { font-weight: 800; color: var(--ink); }
+  .ledger-note { padding: 10px 14px; color: var(--ink-3); font-size: 12px; }
 
-  /* ---------- toast / loader ---------- */
-  .toast {
-    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
-    background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 999px;
-    font-weight: 600; z-index: 50; max-width: calc(100% - 32px);
-  }
+  /* ---------- compare ---------- */
+  .compare { padding: 14px; }
+  .compare h2 { font-size: 17px; }
+  .compare .lead { margin: 10px 0 0; font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
+  .compare .lead small { display: block; font-size: 13px; font-weight: 600; color: var(--ink-2); letter-spacing: 0; }
+  .cmp-table { margin-top: 12px; }
+  .cmp-row { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; padding: 8px 0;
+    border-top: 1px solid var(--line-2); font-size: 14px; }
+  .cmp-row span:first-child { color: var(--ink-2); }
+  .cmp-row span + span { text-align: right; font-weight: 700; }
+  .cmp-row.head span { color: var(--ink-3); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; border: 0; }
+  .cmp-row .win { color: var(--go); }
+  .cmp-acts { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+  /* ---------- overlays ---------- */
+  .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
+    background: var(--ink); color: #fff; padding: 12px 18px; border-radius: 999px; font-weight: 700; z-index: 60;
+    max-width: calc(100% - 28px); }
   .toast.err { background: var(--stop); }
-  .loader {
-    position: fixed; inset: 0; z-index: 40; display: grid; place-items: center;
-    background: rgba(238,241,246,.85); color: var(--ink-2); font-weight: 600;
-  }
+  .loader { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center;
+    background: rgba(242,241,236,.9); color: var(--ink-2); font-weight: 700; }
   .loader div { display: flex; align-items: center; gap: 12px; }
-  .spinner { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--ink); animation: spin .8s linear infinite; }
+  .spinner { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--ink);
+    animation: spin .8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } .pin-dots i { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
 
-  /* ---------- responsive ---------- */
-  @media (max-width: 980px) {
-    .variants { grid-template-columns: 1fr; }
-    .settings-grid { grid-template-columns: 1fr; }
-    .stats { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 640px) {
-    .top { grid-template-columns: 1fr auto; padding: 8px 12px; }
-    .top-brand { display: none; }
-    .mode-switch { justify-self: start; }
-    .wrap { padding: 14px 12px 50px; gap: 12px; }
-    .settings, .variant, .compare { padding: 14px; }
-    .row, .row.veh { grid-template-columns: 1fr 1fr; }
-    .toll-row { grid-template-columns: 1fr 1fr; }
-    .toll-row .field:first-child { grid-column: 1 / -1; }
-    .ledger-row { grid-template-columns: 1fr auto; }
-    .verdict .word { font-size: 20px; }
-    .verdict .profit b { font-size: 22px; }
+  .sheet { position: fixed; inset: 0; z-index: 55; display: grid; place-items: center; padding: 20px;
+    background: rgba(27,27,24,.55); }
+  .sheet-card { width: 100%; max-width: 420px; background: #fff; border-radius: 18px; padding: 22px; }
+  .sheet-card h2 { font-size: 20px; }
+  .sheet-card p { margin: 8px 0 18px; color: var(--ink-2); }
+
+  /* ---------- ≥ 900px ---------- */
+  @media (min-width: 900px) {
+    .top { padding: 10px 20px; }
+    .wrap { padding: 18px 20px 60px; gap: 16px; }
+    .settings { padding: 12px 18px; }
+    .settings-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+    .variant, .compare { padding: 18px 20px; }
+    .variants.two { grid-template-columns: 1fr 1fr; }
+    .row.three { grid-template-columns: repeat(3, 1fr); }
+    .toll-row { grid-template-columns: 1.4fr 1fr 1fr; }
+    .toll-row .field.country { grid-column: auto; }
+    .result { position: static; }
+    .verdict .word { font-size: 28px; }
+    .offer b { font-size: 32px; }
+    .stats { grid-template-columns: repeat(3, 1fr); }
+    .stat b { font-size: 16px; }
   }
 </style>
 </head>
@@ -288,6 +322,7 @@
     <div id="login-users">
       <p class="login-hint">Хто рахує?</p>
       <div id="user-list" class="user-list"></div>
+      <div id="users-error"></div>
     </div>
 
     <div id="login-pin" hidden>
@@ -295,7 +330,7 @@
       <p class="login-hint">PIN для <b id="pin-user"></b></p>
       <div class="pin-dots" id="pin-dots"><i></i><i></i><i></i><i></i></div>
       <div class="keypad" id="keypad"></div>
-      <p class="login-error" id="pin-error"></p>
+      <div id="pin-error"></div>
     </div>
 
     <p class="login-status" id="login-status"></p>
@@ -304,29 +339,30 @@
 
 <section id="screen-calc" hidden>
   <header class="top">
-    <div class="top-brand">Nesvich <span>· Калькулятор рейсів</span></div>
     <div class="mode-switch" role="tablist" aria-label="Тип авто">
-      <button type="button" role="tab" data-mode="grain" class="is-active">Зерновоз</button>
-      <button type="button" role="tab" data-mode="tent">Тент</button>
+      <button type="button" role="tab" data-mode="grain" class="is-active"><i class="mark grain"></i>Зерновоз</button>
+      <button type="button" role="tab" data-mode="tent"><i class="mark tent"></i>Тент</button>
     </div>
-    <div class="top-user">
-      <span class="name" id="user-name"></span>
-      <button type="button" class="icon-btn" id="btn-refresh" title="Оновити довідники з таблиці" aria-label="Оновити довідники">↻</button>
-      <button type="button" class="btn small" id="btn-logout">Вийти</button>
+    <div class="top-right">
+      <span class="top-user" id="user-name"></span>
+      <button type="button" class="icon-btn" id="btn-refresh" title="Оновити довідники" aria-label="Оновити довідники">↻</button>
+      <button type="button" class="icon-btn" id="btn-logout" title="Вийти" aria-label="Вийти">⏻</button>
     </div>
   </header>
 
+  <div class="bar offline" id="offline-bar" hidden>
+    <span class="sym">!</span>
+    <span>Немає звʼязку<span class="small"> — рахую з останніх збережених довідників, зміни налаштувань не збережуться</span></span>
+  </div>
+
   <main class="wrap">
-    <section class="card settings">
-      <div class="settings-head">
-        <div>
-          <h2>Мої налаштування · <em id="settings-mode-label">зерновоз</em></h2>
-          <div class="chips" id="settings-chips"></div>
-        </div>
-        <div class="settings-actions">
-          <span class="dirty" id="settings-dirty" hidden>не збережено</span>
-          <button type="button" class="btn ghost" id="btn-settings-toggle">Змінити</button>
-        </div>
+    <section class="card settings" id="settings">
+      <div class="settings-line">
+        <span class="title">Мої налаштування</span>
+        <span class="sum" id="settings-sum"></span>
+        <span class="spacer"></span>
+        <span class="dirty" id="settings-dirty" hidden>не збережено</span>
+        <button type="button" class="btn small ghost" id="btn-settings-toggle">Змінити</button>
       </div>
       <div class="settings-body" id="settings-body" hidden>
         <div class="settings-grid">
@@ -336,9 +372,9 @@
             <p class="note" id="season-note"></p>
           </div>
           <div class="settings-group">
-            <h3>Пороги рішення</h3>
+            <h3>Мінімальний заробіток, нижче якого не їдемо</h3>
             <div class="fields" id="fields-thresholds"></div>
-            <p class="note">Для «послуги» і «повернення» рішення рахується по прибутку на 1 км, для «простою» — по прибутку за 1 день. «На межі» — коли не вистачає до 10 %.</p>
+            <p class="note">Для рейсу з вантажем і догрузу назад дивимось заробіток на 1 км, для простою — за 1 день. «На межі» — коли не вистачає до 10 %.</p>
           </div>
         </div>
         <div class="settings-foot">
@@ -348,17 +384,27 @@
       </div>
     </section>
 
-    <div class="variants">
+    <div class="variants" id="variants">
       <section class="card variant" id="variant-a"></section>
-      <section class="card variant" id="variant-b"></section>
+      <section class="card variant" id="variant-b" hidden></section>
     </div>
 
-    <section class="card compare" id="compare"></section>
+    <button type="button" class="btn dashed wide" id="btn-add-b">+ Порівняти з іншим рейсом</button>
+    <section class="card compare" id="compare" hidden></section>
   </main>
 </section>
 
+<div class="sheet" id="screen-expired" hidden>
+  <div class="sheet-card">
+    <h2>Сесія закінчилась</h2>
+    <p>Вхід на цьому пристрої більше не дійсний: минуло 30 днів або змінився PIN. Дані рейсу збережені — після входу вони будуть на місці.</p>
+    <button type="button" class="btn primary wide" id="btn-relogin">Увійти знову</button>
+  </div>
+</div>
+
 <div id="toast" class="toast" hidden></div>
 <div id="loader" class="loader" hidden><div><span class="spinner"></span><span id="loader-text">Завантажую…</span></div></div>
+
 <script>
 /* ============================================================
    НАЛАШТУВАННЯ ФАЙЛУ — єдине місце, яке треба змінити.
@@ -499,13 +545,109 @@ async function api(action, payload) {
   return data;
 }
 </script>
+
+<script>
+/* ============================================================
+   ДЕМО-РЕЖИМ — підключений поруч з api(), сам api() не змінений.
+   DEMO = false → додаток працює з Apps Script як раніше.
+   ============================================================ */
+const DEMO = false;
+
+const DEMO_USERS = [
+  { name: 'Ігор Ковальчук', role: 'логіст', pin: '1234' },
+  { name: 'Оксана Бондар', role: 'логіст', pin: '' },
+  { name: 'Тарас Мельник', role: 'керівник', pin: '4321' }
+];
+const DEMO_VEHICLES = [
+  { plate: 'AA 1234 BB', model: 'Scania R450', driver: 'Петро Савчук', normGrain: 30, normTent: 27.5 },
+  { plate: 'AA 5678 CC', model: 'MAN TGX 18.480', driver: 'Микола Гринь', normGrain: 32 },
+  { plate: 'BC 2211 AI', model: 'DAF XF 480', driver: 'Василь Дуда', normGrain: 31, normTent: 28 }
+];
+const DEMO_TOLLS = [
+  { country: 'Польща', rate: 4, unit: 'km' },
+  { country: 'Німеччина', rate: 16, unit: 'km' },
+  { country: 'Угорщина', rate: 9, unit: 'km' },
+  { country: 'Румунія', rate: 5, unit: 'km' },
+  { country: 'Словаччина', rate: 250, unit: 'day' }
+];
+const DEMO_SETTINGS = {
+  grain: {
+    fuelPrice: 90, fuelCons: 30, driverRate: 6, amortRate: 5,
+    usdRate: 41.5, eurRate: 50, defaultLoadTons: 25, seasonOn: 0,
+    uaServiceMinKm: 5, abroadServiceMinKm: 15, uaReturnMinKm: 3, abroadReturnMinKm: 8, idleMinDay: 2000
+  },
+  tent: {
+    fuelPrice: 90, fuelCons: 27.5, driverPct: 10, driverPctBase: 'gross', amortRate: 5,
+    usdRate: 41.5, eurRate: 50, defaultLoadTons: 22, seasonOn: 0,
+    uaServiceMinKm: 5, abroadServiceMinKm: 15, uaReturnMinKm: 3, abroadReturnMinKm: 8, idleMinDay: 2000
+  }
+};
+const DEMO_SEASON = { 1: 1.06, 2: 1.05, 3: 1.02, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1.02, 11: 1.04, 12: 1.06 };
+let demoAttempts = {};
+let demoBlocked = {};
+let demoSaved = JSON.parse(JSON.stringify(DEMO_SETTINGS));
+let demoOffline = false;
+
+function demoConfig() {
+  return {
+    ok: true,
+    settings: JSON.parse(JSON.stringify(demoSaved)),
+    defaults: JSON.parse(JSON.stringify(DEMO_SETTINGS)),
+    vehicles: JSON.parse(JSON.stringify(DEMO_VEHICLES)),
+    tolls: JSON.parse(JSON.stringify(DEMO_TOLLS)),
+    season: DEMO_SEASON,
+    month: 9
+  };
+}
+function demoFail(msg, code) { const e = new Error(msg); e.code = code; return e; }
+
+async function demoApi(action, payload) {
+  await new Promise(function (r) { setTimeout(r, 140); });
+  const p = payload || {};
+  if (demoOffline) throw demoFail('Немає зв\u2019язку з сервером', 'NETWORK');
+
+  if (action === 'users') {
+    return { ok: true, users: DEMO_USERS.map(function (u) { return { name: u.name, role: u.role }; }) };
+  }
+  if (action === 'login') {
+    const u = DEMO_USERS.find(function (x) { return x.name === p.user; });
+    if (!u) throw demoFail('Такого користувача немає у списку', 'NOUSER');
+    if (demoBlocked[p.user]) throw demoFail('Забагато спроб. Вхід заблоковано на 10 хв — спробуйте пізніше або попросіть керівника скинути PIN.', 'BLOCKED');
+    if (!u.pin) throw demoFail('PIN ще не задано. Попросіть керівника задати PIN — і зайдіть знову.', 'NOPIN');
+    if (String(p.pin) !== u.pin) {
+      demoAttempts[p.user] = (demoAttempts[p.user] || 0) + 1;
+      const left = 3 - demoAttempts[p.user];
+      if (left <= 0) { demoBlocked[p.user] = true; throw demoFail('Забагато спроб. Вхід заблоковано на 10 хв — спробуйте пізніше або попросіть керівника скинути PIN.', 'BLOCKED'); }
+      throw demoFail('Невірний PIN. Лишилось ' + left + (left === 1 ? ' спроба' : ' спроби'), 'PIN');
+    }
+    demoAttempts[p.user] = 0;
+    return Object.assign({ token: 'demo-token', user: u.name, role: u.role }, demoConfig());
+  }
+  if (action === 'config') {
+    if (p.token !== 'demo-token') throw demoFail('Сесія закінчилась', 'AUTH');
+    return demoConfig();
+  }
+  if (action === 'save') {
+    if (p.token !== 'demo-token') throw demoFail('Сесія закінчилась', 'AUTH');
+    demoSaved[p.mode] = JSON.parse(JSON.stringify(p.settings));
+    return { ok: true };
+  }
+  throw demoFail('Демо: невідома дія ' + action, 'ERR');
+}
+
+/* Єдина точка виклику для інтерфейсу */
+async function apiCall(action, payload) {
+  return DEMO ? demoApi(action, payload) : api(action, payload);
+}
+</script>
+
 <script>
 /* ---------- Утиліти ---------- */
 const $ = function (sel, root) { return (root || document).querySelector(sel); };
 const $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
 const esc = function (s) { return String(s === undefined || s === null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
-const fmtMoney = function (v) { return Math.round(Number(v) || 0).toLocaleString('uk-UA'); };
-const fmtNum = function (v, d) { return (Number(v) || 0).toLocaleString('uk-UA', { minimumFractionDigits: d, maximumFractionDigits: d }); };
+const fmtMoney = function (v) { return Math.round(Number(v) || 0).toLocaleString('uk-UA').replace(/\u00a0/g, ' '); };
+const fmtNum = function (v, d) { return (Number(v) || 0).toLocaleString('uk-UA', { minimumFractionDigits: d, maximumFractionDigits: d }).replace(/\u00a0/g, ' '); };
 const store = {
   get: function (k, fb) { try { const r = localStorage.getItem(k); return r === null ? fb : JSON.parse(r); } catch (e) { return fb; } },
   set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
@@ -518,7 +660,9 @@ const KEY = {
   mode: function (u) { return 'nl.mode:' + u; }
 };
 const MODE_LABEL = { grain: 'зерновоз', tent: 'тент' };
-const TENT_DELTA = 2.5; // тент бере на стільки л/100 менше за зерновоз, якщо у довіднику не вказано окремо
+const TENT_DELTA = 2.5;
+const VERDICT_SYM = { wait: '…', go: '✓', edge: '!', stop: '✕' };
+const VERDICT_WORD = { wait: 'Чекаю дані', go: 'Їдемо', edge: 'На межі', stop: 'Не вигідно' };
 
 let toastTimer = null;
 function toast(msg, isErr) {
@@ -533,17 +677,19 @@ function loader(on, text) {
   $('#loader-text').textContent = text || 'Завантажую…';
   $('#loader').hidden = !on;
 }
+function alertHTML(kind, sym, title, sub, actLabel, actId) {
+  return '<div class="alert ' + kind + '"><span class="sym">' + sym + '</span><div><span>' + esc(title) + '</span>' +
+    (sub ? '<small>' + esc(sub) + '</small>' : '') +
+    (actLabel ? '<div class="alert-act"><button type="button" class="btn small" id="' + actId + '">' + esc(actLabel) + '</button></div>' : '') +
+    '</div></div>';
+}
 
 /* ---------- Стан ---------- */
 const state = {
-  session: null,     // { token, user, role }
-  config: null,      // з бекенду
-  mode: 'grain',
-  settings: {},      // робоча копія налаштувань { grain:{}, tent:{} }
-  dirty: { grain: false, tent: false },
-  restoring: false,
-  results: { a: null, b: null },
-  pin: ''
+  session: null, config: null, mode: 'grain',
+  settings: {}, dirty: { grain: false, tent: false },
+  restoring: false, frozen: false,
+  results: { a: null, b: null }, showB: false, pin: ''
 };
 
 /* ============================================================
@@ -551,9 +697,12 @@ const state = {
    ============================================================ */
 function showLogin() {
   $('#screen-calc').hidden = true;
+  $('#screen-expired').hidden = true;
   $('#screen-login').hidden = false;
   $('#login-users').hidden = false;
   $('#login-pin').hidden = true;
+  $('#users-error').innerHTML = '';
+  $('#pin-error').innerHTML = '';
   $('#login-status').textContent = '';
   loadUsers();
 }
@@ -563,12 +712,16 @@ async function loadUsers() {
   list.innerHTML = '';
   $('#login-status').textContent = 'Завантажую список…';
   try {
-    const data = await api('users');
+    const data = await apiCall('users');
     $('#login-status').textContent = '';
     renderUsers(data.users || []);
   } catch (e) {
-    $('#login-status').textContent = e.message;
+    $('#login-status').textContent = '';
     const remembered = store.get(KEY.session);
+    $('#users-error').innerHTML = alertHTML('stop', '!', 'Немає звʼязку',
+      'Не можу завантажити список. Перевірте інтернет і спробуйте ще раз.', 'Спробувати ще раз', 'btn-retry-users');
+    const btn = $('#btn-retry-users');
+    if (btn) btn.addEventListener('click', loadUsers);
     if (remembered && remembered.user) renderUsers([{ name: remembered.user, role: remembered.role }]);
   }
 }
@@ -591,7 +744,7 @@ function openPin(user) {
   state.pinUser = user;
   state.pin = '';
   $('#pin-user').textContent = user;
-  $('#pin-error').textContent = '';
+  $('#pin-error').innerHTML = '';
   $('#login-users').hidden = true;
   $('#login-pin').hidden = false;
   renderPinDots();
@@ -613,10 +766,10 @@ function pinPress(key) {
 
 async function submitPin() {
   const user = state.pinUser, pin = state.pin;
-  $('#pin-error').textContent = '';
+  $('#pin-error').innerHTML = '';
   loader(true, 'Перевіряю PIN…');
   try {
-    const data = await api('login', { user: user, pin: pin });
+    const data = await apiCall('login', { user: user, pin: pin });
     state.session = { token: data.token, user: data.user, role: data.role };
     store.set(KEY.session, state.session);
     loader(false);
@@ -625,8 +778,31 @@ async function submitPin() {
     loader(false);
     state.pin = '';
     renderPinDots();
-    $('#pin-error').textContent = e.message;
+    showPinError(e);
   }
+}
+
+function showPinError(e) {
+  // Бекенд віддає LOCK для блокування і AUTH із текстом «PIN ще не задано» — зводимо до станів екрана.
+  const code = e.code === 'LOCK' ? 'BLOCKED'
+    : (e.code === 'AUTH' && /PIN ще не задано/.test(e.message || '')) ? 'NOPIN'
+    : (e.code || 'ERR');
+  if (code === 'BLOCKED') {
+    $('#pin-error').innerHTML = alertHTML('stop', '✕', 'Вхід заблоковано на 10 хвилин',
+      'Забагато невірних спроб. Зачекайте 10 хвилин і наберіть PIN знову.', 'Вибрати іншого користувача', 'btn-err-back');
+  } else if (code === 'NOPIN') {
+    $('#pin-error').innerHTML = alertHTML('edge', '!', 'PIN ще не задано',
+      'Керівник має задати вам PIN у таблиці. Після цього зайдіть знову.', 'Вибрати іншого користувача', 'btn-err-back');
+  } else if (code === 'NETWORK') {
+    $('#pin-error').innerHTML = alertHTML('stop', '!', 'Немає звʼязку',
+      'PIN не перевірити без інтернету. Спробуйте ще раз.', 'Спробувати ще раз', 'btn-err-retry');
+  } else {
+    $('#pin-error').innerHTML = alertHTML('stop', '✕', e.message || 'Невірний PIN', 'Наберіть PIN ще раз.');
+  }
+  const back = $('#btn-err-back');
+  if (back) back.addEventListener('click', function () { $('#pin-back').click(); });
+  const retry = $('#btn-err-retry');
+  if (retry) retry.addEventListener('click', function () { $('#pin-error').innerHTML = ''; });
 }
 
 function buildKeypad() {
@@ -646,6 +822,7 @@ function buildKeypad() {
   $('#pin-back').addEventListener('click', function () {
     $('#login-pin').hidden = true;
     $('#login-users').hidden = false;
+    $('#pin-error').innerHTML = '';
   });
 }
 
@@ -654,6 +831,9 @@ function logout() {
   state.session = null;
   state.config = null;
   showLogin();
+}
+function sessionExpired() {
+  $('#screen-expired').hidden = false;
 }
 
 /* ============================================================
@@ -671,48 +851,49 @@ function enter(config, fromCache) {
 
   $('#screen-login').hidden = true;
   $('#screen-calc').hidden = false;
-  $('#user-name').textContent = state.session.user;
+  $('#user-name').textContent = shortName(state.session.user);
+  $('#offline-bar').hidden = !fromCache;
 
   applyMode(state.mode, true);
-  if (fromCache) toast('Немає зв\u2019язку — працюю з останніх збережених довідників');
 }
 
 function applyMode(mode, first) {
   if (!first) saveDraft();
   state.mode = mode;
-  store.set(KEY.mode(state.session.user), mode);
+  if (state.session) store.set(KEY.mode(state.session.user), mode);
   document.body.dataset.mode = mode;
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff');
   $$('.mode-switch button').forEach(function (b) { b.classList.toggle('is-active', b.dataset.mode === mode); });
-  $('#settings-mode-label').textContent = MODE_LABEL[mode];
   renderSettings();
   renderVariant('a');
   renderVariant('b');
   restoreDraft();
+  if (!state.showB && window.matchMedia('(min-width: 900px)').matches) toggleB(true);
   recalcAll();
 }
 
 /* ============================================================
-   НАЛАШТУВАННЯ
+   НАЛАШТУВАННЯ (ключі полів — ті самі, що чекає бекенд)
    ============================================================ */
 const COST_FIELDS = [
-  { k: 'fuelPrice', l: 'Ціна палива', u: 'грн/л' },
+  { k: 'fuelPrice', l: 'Ціна палива', u: '₴/л' },
   { k: 'fuelCons', l: 'Норма, якщо авто не вибрано', u: 'л/100 км' },
-  { k: 'driverRate', l: 'ЗП водія', u: 'грн/км', modes: ['grain'] },
-  { k: 'driverPct', l: 'Водію від фрахту', u: '%', modes: ['tent'] },
-  { k: 'driverPctBase', l: 'Відсоток рахуємо від', type: 'select', modes: ['tent'],
-    opts: [['gross', 'повного фрахту'], ['minusTolls', 'фрахту мінус платні дороги'], ['net', 'фрахту мінус усі витрати']] },
-  { k: 'amortRate', l: 'Амортизація', u: 'грн/км' },
-  { k: 'usdRate', l: 'Курс USD', u: 'грн' },
-  { k: 'eurRate', l: 'Курс EUR', u: 'грн' },
+  { k: 'driverRate', l: 'Водію', u: '₴/км', modes: ['grain'] },
+  { k: 'driverPct', l: 'Водію', u: '% від фрахту', modes: ['tent'] },
+  { k: 'driverPctBase', l: 'Від чого рахувати відсоток водія', type: 'select', modes: ['tent'],
+    opts: [['gross', 'від усього фрахту'], ['minusTolls', 'від фрахту мінус платні дороги'], ['net', 'від фрахту мінус усі витрати']] },
+  { k: 'amortRate', l: 'Амортизація', u: '₴/км — знос авто', modes: ['grain', 'tent'] },
+  { k: 'usdRate', l: 'Курс USD', u: '₴' },
+  { k: 'eurRate', l: 'Курс EUR', u: '₴' },
   { k: 'defaultLoadTons', l: 'Тонаж за замовчуванням', u: 'т' },
   { k: 'seasonOn', l: 'Сезонний коефіцієнт до норми', type: 'toggle' }
 ];
 const THRESHOLD_FIELDS = [
-  { k: 'uaServiceMinKm', l: 'Україна, послуга', u: 'грн/км' },
-  { k: 'abroadServiceMinKm', l: 'Закордон, послуга', u: 'грн/км' },
-  { k: 'uaReturnMinKm', l: 'Україна, повернення', u: 'грн/км' },
-  { k: 'abroadReturnMinKm', l: 'Закордон, повернення', u: 'грн/км' },
-  { k: 'idleMinDay', l: 'Простій, мінімум за день', u: 'грн' }
+  { k: 'uaServiceMinKm', l: 'Україна · рейс з вантажем', u: '₴/км' },
+  { k: 'abroadServiceMinKm', l: 'Закордон · рейс з вантажем', u: '₴/км' },
+  { k: 'uaReturnMinKm', l: 'Україна · догруз назад', u: '₴/км' },
+  { k: 'abroadReturnMinKm', l: 'Закордон · догруз назад', u: '₴/км' },
+  { k: 'idleMinDay', l: 'Простій · мінімум за день', u: '₴' }
 ];
 
 function fieldHTML(f, s) {
@@ -739,7 +920,7 @@ function renderSettings() {
     el.addEventListener('change', onSettingChange);
   });
   renderSeasonNote();
-  renderChips();
+  renderSettingsSum();
   renderDirty();
 }
 
@@ -762,7 +943,7 @@ function onSettingChange(e) {
     });
   }
   renderSeasonNote();
-  renderChips();
+  renderSettingsSum();
   renderDirty();
   recalcAll();
 }
@@ -781,26 +962,22 @@ function renderSeasonNote() {
     : 'Сезон вимкнено — норма береться як є.';
 }
 
-function renderChips() {
+function renderSettingsSum() {
   const s = state.settings[state.mode] || {};
-  const chips = [
-    ['Паливо', fmtNum(Calc.num(s.fuelPrice), 2) + ' ₴/л'],
+  const parts = [
+    fmtNum(Calc.num(s.fuelPrice), 0) + ' ₴/л',
+    fmtNum(Calc.num(s.fuelCons), 1) + ' л/100',
     state.mode === 'tent'
-      ? ['Водію', fmtNum(Calc.num(s.driverPct), 1) + ' % ' + ({ gross: 'від фрахту', minusTolls: 'від фрахту − дороги', net: 'від чистого' }[s.driverPctBase] || 'від фрахту')]
-      : ['ЗП', fmtNum(Calc.num(s.driverRate), 2) + ' ₴/км'],
-    ['Аморт.', fmtNum(Calc.num(s.amortRate), 2) + ' ₴/км'],
-    ['USD', fmtNum(Calc.num(s.usdRate), 2)],
-    ['EUR', fmtNum(Calc.num(s.eurRate), 2)],
-    ['Тонаж', fmtNum(Calc.num(s.defaultLoadTons), 1) + ' т'],
-    ['Пороги', fmtNum(Calc.num(s.uaServiceMinKm), 0) + ' / ' + fmtNum(Calc.num(s.abroadServiceMinKm), 0) + ' ₴/км'],
-    ['Сезон', Calc.num(s.seasonOn) ? '× ' + fmtNum(seasonCoef(), 3) : 'вимк.']
+      ? 'водію ' + fmtNum(Calc.num(s.driverPct), 0) + ' %'
+      : 'водію ' + fmtNum(Calc.num(s.driverRate), 0) + ' ₴/км',
+    'знос ' + fmtNum(Calc.num(s.amortRate), 0) + ' ₴/км',
+    'EUR ' + fmtNum(Calc.num(s.eurRate), 0),
+    'мін. ' + fmtNum(Calc.num(s.uaServiceMinKm), 0) + '/' + fmtNum(Calc.num(s.abroadServiceMinKm), 0) + ' ₴/км'
   ];
-  $('#settings-chips').innerHTML = chips.map(function (c) { return '<span class="chip">' + esc(c[0]) + ' <b>' + esc(c[1]) + '</b></span>'; }).join('');
+  $('#settings-sum').innerHTML = parts.map(function (t) { return '<b>' + esc(t) + '</b>'; }).join(' · ');
 }
 
-function renderDirty() {
-  $('#settings-dirty').hidden = !state.dirty[state.mode];
-}
+function renderDirty() { $('#settings-dirty').hidden = !state.dirty[state.mode]; }
 
 async function saveSettings() {
   const btn = $('#btn-settings-save');
@@ -812,7 +989,7 @@ async function saveSettings() {
   });
   btn.disabled = true; btn.textContent = 'Зберігаю…';
   try {
-    await api('save', { token: state.session.token, mode: mode, settings: clean });
+    await apiCall('save', { token: state.session.token, mode: mode, settings: clean });
     state.settings[mode] = clean;
     state.config.settings = state.config.settings || {};
     state.config.settings[mode] = JSON.parse(JSON.stringify(clean));
@@ -821,7 +998,7 @@ async function saveSettings() {
     renderSettings();
     toast('Збережено');
   } catch (e) {
-    if (e.code === 'AUTH') { toast('Сесія закінчилась — увійдіть знову', true); logout(); }
+    if (e.code === 'AUTH') sessionExpired();
     else toast(e.message, true);
   } finally {
     btn.disabled = false; btn.textContent = 'Зберегти';
@@ -839,11 +1016,11 @@ function resetSettings() {
 }
 
 /* ============================================================
-   ВАРІАНТИ А / Б
+   РЕЙСИ А / Б
    ============================================================ */
 function vehicleOptions(selected) {
   const list = (state.config.vehicles || []).filter(function (v) { return v.active !== false; });
-  return '<option value="">— без авто —</option>' + list.map(function (v) {
+  return '<option value="">— без авто, норма з налаштувань —</option>' + list.map(function (v) {
     const label = v.plate + ' · ' + shortModel(v.model) + (v.driver ? ' · ' + shortName(v.driver) : '');
     return '<option value="' + esc(v.plate) + '"' + (v.plate === selected ? ' selected' : '') + '>' + esc(label) + '</option>';
   }).join('');
@@ -868,76 +1045,136 @@ function vehicleNorm(v, mode) {
   return isNaN(g) ? '' : g;
 }
 
+function segHTML(id, value, opts) {
+  return '<div class="seg' + (opts.length > 2 ? ' compact' : '') + '" role="group" data-seg="' + id + '">' +
+    opts.map(function (o) {
+      return '<button type="button" data-val="' + esc(o[0]) + '" aria-pressed="' + (o[0] === value ? 'true' : 'false') + '">' + esc(o[1]) + '</button>';
+    }).join('') +
+    '</div><input type="hidden" id="' + id + '" value="' + esc(value) + '">';
+}
+
 function renderVariant(p) {
-  const title = p === 'a' ? 'Варіант А' : 'Варіант Б';
   const s = state.settings[state.mode] || {};
   const host = $('#variant-' + p);
+  const key = p === 'a' ? 'А' : 'Б';
   host.innerHTML =
-    '<div class="variant-head"><h2>' + title + '</h2><button type="button" class="btn small ghost" data-act="reset">Очистити</button></div>' +
+    '<div class="v-head"><h2><span class="v-key">' + key + '</span>Рейс ' + key + '</h2>' +
+      '<div class="v-head-actions">' +
+        (p === 'b' ? '<button type="button" class="btn small ghost" data-act="copy-a">← Копіювати А</button>' : '') +
+        '<button type="button" class="btn small ghost" data-act="reset">Очистити</button>' +
+        (p === 'b' ? '<button type="button" class="btn small ghost" data-act="close-b">Прибрати</button>' : '') +
+      '</div></div>' +
 
-    '<div class="block"><h3>Рейс</h3>' +
-      '<div class="row">' +
-        '<div class="field"><label>Регіон</label><select id="' + p + '-region"><option value="ukraine">Україна</option><option value="abroad">Закордон</option></select></div>' +
-        '<div class="field"><label>Сценарій</label><select id="' + p + '-scenario"><option value="service">Надаємо послугу</option><option value="return">Повертаємось назад</option><option value="idle">Простій / очікування</option></select></div>' +
-        '<div class="field"><label>Фрахт задаємо</label><select id="' + p + '-quote"><option value="manual">Сумою в гривні</option><option value="ton_usd">Ціною за тонну, USD</option><option value="currency">Сумою у валюті</option></select></div>' +
+    '<div class="fieldset">' +
+      '<div class="field"><label>Куди їдемо</label>' +
+        segHTML(p + '-region', 'ukraine', [['ukraine', 'Україна'], ['abroad', 'Закордон']]) + '</div>' +
+
+      '<div class="field"><label>Тип рейсу</label>' +
+        segHTML(p + '-scenario', 'service', [['service', 'З вантажем'], ['return', 'Догруз назад'], ['idle', 'Простій']]) +
+        '<span class="hint" id="' + p + '-scenario-hint"></span></div>' +
+
+      '<div class="field"><label>Як задана ставка</label>' +
+        segHTML(p + '-quote', 'manual', [['manual', '₴ за рейс'], ['ton_usd', '$ за тонну'], ['currency', 'Сумою у валюті']]) + '</div>' +
+
+      '<div class="field" data-quote="manual"><label for="' + p + '-freight">Скільки платять <small>₴ за рейс</small></label>' +
+        '<input type="text" inputmode="decimal" id="' + p + '-freight" placeholder="0"></div>' +
+      '<div class="row" data-quote="ton_usd">' +
+        '<div class="field"><label for="' + p + '-ppt">Ціна за 1 тонну <small>USD</small></label><input type="text" inputmode="decimal" id="' + p + '-ppt" placeholder="0"></div>' +
+        '<div class="field"><label for="' + p + '-tons">Тонн у кузові</label><input type="text" inputmode="decimal" id="' + p + '-tons" value="' + esc(s.defaultLoadTons || '') + '"></div>' +
       '</div>' +
-      '<div class="row veh">' +
-        '<div class="field"><label>Авто</label><select id="' + p + '-vehicle">' + vehicleOptions('') + '</select></div>' +
-        '<div class="field"><label>Норма <small>л/100 км</small></label><input type="text" inputmode="decimal" id="' + p + '-norm" value="' + esc(s.fuelCons || '') + '"><span class="hint" id="' + p + '-norm-hint">з налаштувань</span></div>' +
+      '<div class="row" data-quote="currency">' +
+        '<div class="field"><label for="' + p + '-cur">Сума у валюті</label><input type="text" inputmode="decimal" id="' + p + '-cur" placeholder="0"></div>' +
+        '<div class="field"><label>Валюта</label>' + segHTML(p + '-currency', 'EUR', [['EUR', 'EUR'], ['USD', 'USD']]) + '</div>' +
       '</div>' +
-    '</div>' +
+      '<span class="hint" id="' + p + '-freight-hint"></span>' +
 
-    '<div class="block"><h3>Гроші і пробіг</h3>' +
-      '<div class="row">' +
-        '<div class="field" data-quote="manual"><label>Фрахт <small>грн</small></label><input type="text" inputmode="decimal" id="' + p + '-freight" placeholder="0"></div>' +
-        '<div class="field" data-quote="ton_usd"><label>Ціна за 1 т <small>USD</small></label><input type="text" inputmode="decimal" id="' + p + '-ppt" placeholder="0"></div>' +
-        '<div class="field" data-quote="ton_usd"><label>Тонаж <small>т</small></label><input type="text" inputmode="decimal" id="' + p + '-tons" value="' + esc(s.defaultLoadTons || '') + '"></div>' +
-        '<div class="field" data-quote="currency"><label>Сума у валюті</label><input type="text" inputmode="decimal" id="' + p + '-cur" placeholder="0"></div>' +
-        '<div class="field" data-quote="currency"><label>Валюта</label><select id="' + p + '-currency"><option value="EUR">EUR</option><option value="USD">USD</option></select></div>' +
-        '<div class="field" data-km><label>Км з вантажем</label><input type="text" inputmode="decimal" id="' + p + '-km-full" placeholder="0"></div>' +
-        '<div class="field" data-km><label>Км порожній</label><input type="text" inputmode="decimal" id="' + p + '-km-empty" placeholder="0"></div>' +
-        '<div class="field"><label>Тривалість <small>днів</small></label><input type="text" inputmode="decimal" id="' + p + '-days" value="1"></div>' +
-        '<div class="field"><label>Інші витрати <small>грн: стоянки, переправи, добові</small></label><input type="text" inputmode="decimal" id="' + p + '-other" placeholder="0"></div>' +
+      '<div class="row" data-km>' +
+        '<div class="field"><label for="' + p + '-km-full">Км з вантажем</label><input type="text" inputmode="decimal" id="' + p + '-km-full" placeholder="0"></div>' +
+        '<div class="field"><label for="' + p + '-km-empty">Км порожнім</label><input type="text" inputmode="decimal" id="' + p + '-km-empty" placeholder="0"></div>' +
       '</div>' +
+      '<div class="km-total" id="' + p + '-km-total" data-km></div>' +
+
+      '<div class="field" id="' + p + '-tolls-wrap"><label>Платні дороги <small>ставка підставиться з довідника</small></label>' +
+        '<div class="tolls" id="' + p + '-tolls"></div>' +
+        '<div class="tolls-foot" style="margin-top:8px">' +
+          '<button type="button" class="btn small dashed" data-act="add-toll">+ Додати країну</button>' +
+          '<span class="tolls-total num" id="' + p + '-tolls-total"></span>' +
+        '</div>' +
+      '</div>' +
+
+      '<details class="more" id="' + p + '-more"><summary>Ще: дні, авто, норма, інші витрати</summary>' +
+        '<div class="more-body">' +
+          '<div class="row">' +
+            '<div class="field"><label for="' + p + '-days">Скільки днів</label><input type="text" inputmode="decimal" id="' + p + '-days" value="1"></div>' +
+            '<div class="field"><label for="' + p + '-other">Інші витрати <small>₴</small></label><input type="text" inputmode="decimal" id="' + p + '-other" placeholder="0"></div>' +
+          '</div>' +
+          '<div class="field"><label for="' + p + '-vehicle">Авто <small>підставляє норму палива</small></label><select id="' + p + '-vehicle">' + vehicleOptions('') + '</select></div>' +
+          '<div class="field"><label for="' + p + '-norm">Норма палива <small>л/100 км</small></label><input type="text" inputmode="decimal" id="' + p + '-norm" value="' + esc(s.fuelCons || '') + '"><span class="hint" id="' + p + '-norm-hint">з налаштувань</span></div>' +
+        '</div>' +
+      '</details>' +
     '</div>' +
 
-    '<div class="block"><h3>Платні дороги по країнах</h3>' +
-      '<div class="tolls"><div id="' + p + '-tolls"></div>' +
-      '<button type="button" class="btn small toll-add" data-act="add-toll">+ Додати країну</button></div>' +
-    '</div>' +
+    '<div class="result">' +
+      '<div class="verdict wait" id="' + p + '-verdict">' +
+        '<span class="badge" id="' + p + '-badge">…</span>' +
+        '<div><b class="word" id="' + p + '-word">Чекаю дані</b><span class="sub" id="' + p + '-sub">Введіть ставку і кілометри</span></div>' +
+        '<div class="verdict-profit"><small>Чистими</small><b class="num" id="' + p + '-r-profit">—</b></div>' +
+      '</div>' +
+      '<div class="offer">' +
+        '<div><small>Наша ціна: не дешевше</small><b class="num" id="' + p + '-r-required">—</b></div>' +
+        '<div class="res"><small id="' + p + '-res-label">Запас</small><b class="num" id="' + p + '-r-reserve">—</b></div>' +
+      '</div>' +
+      '<div class="stats">' +
+        '<div class="stat"><small>Заробіток на 1 км</small><b class="num" id="' + p + '-r-perkm">—</b></div>' +
+        '<div class="stat"><small>Прибуток за день</small><b class="num" id="' + p + '-r-day">—</b></div>' +
+        '<div class="stat"><small id="' + p + '-thr-label">Мінімум на 1 км</small><b class="num" id="' + p + '-r-threshold">—</b></div>' +
+      '</div>' +
+      '<details class="ledger-wrap" id="' + p + '-ledger"><summary>Звідки ці числа</summary>' +
+        '<div class="ledger-row"><span>Ставка замовника</span><span class="num" id="' + p + '-r-freight">0 ₴</span></div>' +
+        '<div class="ledger-row"><span>Пробіг разом</span><span class="num" id="' + p + '-r-km">0 км</span></div>' +
+        '<div class="ledger-row"><span>Паливо <small id="' + p + '-r-fuel-note"></small></span><span class="num" id="' + p + '-r-fuel">0 ₴</span></div>' +
+        '<div class="ledger-row"><span id="' + p + '-r-driver-label">Водію</span><span class="num" id="' + p + '-r-driver">0 ₴</span></div>' +
+        '<div class="ledger-row"><span>Амортизація (знос авто)</span><span class="num" id="' + p + '-r-amort">0 ₴</span></div>' +
+        '<div class="ledger-row"><span>Платні дороги</span><span class="num" id="' + p + '-r-tolls">0 ₴</span></div>' +
+        '<div class="ledger-row"><span>Інші витрати</span><span class="num" id="' + p + '-r-other">0 ₴</span></div>' +
+        '<div class="ledger-row total"><span>Усі витрати</span><span class="num" id="' + p + '-r-total">0 ₴</span></div>' +
+        '<p class="ledger-note" id="' + p + '-note"></p>' +
+      '</details>' +
+    '</div>';
 
-    '<div class="ledger">' +
-      '<div class="ledger-row"><span>Фрахт</span><span id="' + p + '-r-freight">0 ₴</span><span>Пробіг</span><span id="' + p + '-r-km">0 км</span></div>' +
-      '<div class="ledger-row"><span>Паливо <small id="' + p + '-r-fuel-note"></small></span><span id="' + p + '-r-fuel">0 ₴</span><span id="' + p + '-r-driver-label">ЗП водія</span><span id="' + p + '-r-driver">0 ₴</span></div>' +
-      '<div class="ledger-row"><span>Амортизація</span><span id="' + p + '-r-amort">0 ₴</span><span>Платні дороги</span><span id="' + p + '-r-tolls">0 ₴</span></div>' +
-      '<div class="ledger-row"><span>Інші витрати</span><span id="' + p + '-r-other">0 ₴</span><span>Усі витрати</span><span id="' + p + '-r-total">0 ₴</span></div>' +
-      '<div class="ledger-row total"><span>Мінімальний фрахт, щоб їхати</span><span id="' + p + '-r-required">0 ₴</span><span></span><span></span></div>' +
-    '</div>' +
-
-    '<div class="verdict wait" id="' + p + '-verdict"><div class="word" id="' + p + '-verdict-word">Введіть фрахт</div>' +
-      '<div class="profit"><small>Чистий прибуток</small><b id="' + p + '-r-profit">0 ₴</b></div></div>' +
-
-    '<div class="stats">' +
-      '<div class="stat"><small>Прибуток за день</small><b id="' + p + '-r-day">0 ₴</b></div>' +
-      '<div class="stat"><small>Прибуток на 1 км</small><b id="' + p + '-r-perkm">0,00 ₴</b></div>' +
-      '<div class="stat"><small>Потрібний поріг</small><b id="' + p + '-r-threshold">—</b></div>' +
-      '<div class="stat"><small>Запас / недобір</small><b id="' + p + '-r-reserve">0 ₴</b></div>' +
-    '</div>' +
-    '<p class="note" id="' + p + '-note"></p>';
-
-  // події
   $$('input, select', host).forEach(function (el) {
+    if (el.type === 'hidden') return;
     const handler = function () { onVariantInput(p, el); };
     el.addEventListener('input', handler);
     el.addEventListener('change', handler);
   });
+  $$('[data-seg]', host).forEach(function (seg) {
+    seg.addEventListener('click', function (e) {
+      const b = e.target.closest('button[data-val]');
+      if (!b) return;
+      setSeg(seg.dataset.seg, b.dataset.val);
+      onVariantInput(p, $('#' + seg.dataset.seg));
+    });
+  });
   $('[data-act="reset"]', host).addEventListener('click', function () { resetVariant(p, true); });
   $('[data-act="add-toll"]', host).addEventListener('click', function () { addTollRow(p); recalcVariant(p); });
+  const copyA = $('[data-act="copy-a"]', host);
+  if (copyA) copyA.addEventListener('click', copyAtoB);
+  const closeB = $('[data-act="close-b"]', host);
+  if (closeB) closeB.addEventListener('click', function () { toggleB(false); });
   addTollRow(p);
   syncVariantVisibility(p);
 }
 
+function setSeg(id, value) {
+  const el = $('#' + id);
+  if (el) el.value = value;
+  const seg = document.querySelector('[data-seg="' + id + '"]');
+  if (seg) $$('button', seg).forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.val === value ? 'true' : 'false'); });
+}
+
 function onVariantInput(p, el) {
+  if (!el) return;
   if (el.id === p + '-vehicle') {
     const v = vehicleByPlate(el.value);
     const norm = $('#' + p + '-norm');
@@ -958,10 +1195,25 @@ function syncVariantVisibility(p) {
   const idle = $('#' + p + '-scenario').value === 'idle';
   $$('[data-quote]', host).forEach(function (f) { f.hidden = f.dataset.quote !== quote; });
   $$('[data-km]', host).forEach(function (f) { f.hidden = idle; });
+  // У простої вердикт залежить від кількості днів, а поле днів сховане в «Ще» — відкриваємо.
+  if (idle) { const more = $('#' + p + '-more'); if (more) more.open = true; }
+
+  const s = state.settings[state.mode] || {};
+  $('#' + p + '-scenario-hint').textContent = idle
+    ? 'Стоїмо і чекаємо: рішення по заробітку за день.'
+    : ($('#' + p + '-scenario').value === 'return'
+      ? 'Вантаж у бік дому — мінімум нижчий (' + fmtNum(Calc.num(s.uaReturnMinKm), 0) + ' ₴/км по Україні).'
+      : 'Основний рейс — мінімум ' + fmtNum(Calc.num(s.uaServiceMinKm), 0) + ' ₴/км по Україні.');
+
+  const hint = $('#' + p + '-freight-hint');
+  if (quote === 'ton_usd') hint.textContent = 'Тонни × ціна × курс USD ' + fmtNum(Calc.num(s.usdRate), 2);
+  else if (quote === 'currency') hint.textContent = 'Курс EUR ' + fmtNum(Calc.num(s.eurRate), 2) + ' · USD ' + fmtNum(Calc.num(s.usdRate), 2);
+  else hint.textContent = '';
+
   const v = vehicleByPlate($('#' + p + '-vehicle').value);
   const norm = $('#' + p + '-norm');
   $('#' + p + '-norm-hint').textContent = v
-    ? (norm.dataset.auto === '1' ? 'з довідника: ' + v.plate : 'вручну (довідник: ' + fmtNum(vehicleNorm(v, state.mode), 1) + ')')
+    ? (norm.dataset.auto === '1' ? 'з довідника: ' + v.plate : 'вручну (у довіднику ' + fmtNum(vehicleNorm(v, state.mode), 1) + ')')
     : (norm.dataset.auto === '' && norm.value !== String(state.settings[state.mode].fuelCons) ? 'вручну' : 'з налаштувань');
 }
 
@@ -983,11 +1235,11 @@ function addTollRow(p, data) {
     return '<option value="' + esc(t.country) + '"' + (t.country === d.country ? ' selected' : '') + '>' + esc(t.country) + '</option>';
   }).join('');
   row.innerHTML =
-    '<div class="field"><label>Країна</label><select class="t-country">' + opts + '</select></div>' +
-    '<div class="field"><label class="t-qty-label">Км</label><input type="text" inputmode="decimal" class="t-qty" value="' + esc(d.qty || '') + '" placeholder="Кілометри"></div>' +
-    '<div class="field"><label class="t-rate-label">₴/км</label><input type="text" inputmode="decimal" class="t-rate" value="' + esc(d.rate || '') + '" placeholder="Ставка"></div>' +
-    '<div class="toll-sum">0 ₴</div>' +
-    '<button type="button" class="toll-del" aria-label="Прибрати">×</button>';
+    '<div class="field country"><label>Країна</label><select class="t-country">' + opts + '</select></div>' +
+    '<div class="field qty"><label class="t-qty-label">Км</label><input type="text" inputmode="decimal" class="t-qty" value="' + esc(d.qty || '') + '" placeholder="0"></div>' +
+    '<div class="field rate"><label class="t-rate-label">₴/км</label><input type="text" inputmode="decimal" class="t-rate" value="' + esc(d.rate || '') + '" placeholder="0"></div>' +
+    '<div class="field" style="text-align:right"><label>Разом</label><span class="toll-sum num">0 ₴</span></div>' +
+    '<button type="button" class="toll-del" aria-label="Прибрати країну">×</button>';
   host.appendChild(row);
   const sel = $('.t-country', row);
   if (d.country && !d.rate) $('.t-rate', row).value = tollRate(d.country);
@@ -1009,7 +1261,6 @@ function applyTollUnit(row, unit) {
   const day = unit === 'day';
   $('.t-qty-label', row).textContent = day ? 'Дні' : 'Км';
   $('.t-rate-label', row).textContent = day ? '₴/день' : '₴/км';
-  $('.t-qty', row).placeholder = day ? 'К-сть днів' : 'Кілометри';
 }
 function readTolls(p) {
   return $$('#' + p + '-tolls .toll-row').map(function (row) {
@@ -1031,93 +1282,151 @@ function readVariant(p) {
 }
 
 function recalcVariant(p) {
+  if ($('#variant-' + p).innerHTML === '') return;
   const inp = readVariant(p);
   const s = state.settings[state.mode] || {};
   const r = Calc.compute(inp, s, { mode: state.mode, seasonCoef: seasonCoef() });
   state.results[p] = r;
 
-  // суми по рядках доріг
   $$('#' + p + '-tolls .toll-row').forEach(function (row) {
     const sum = Math.max(Calc.num($('.t-qty', row).value), 0) * Math.max(Calc.num($('.t-rate', row).value), 0);
     $('.toll-sum', row).textContent = fmtMoney(sum) + ' ₴';
   });
 
-  const set = function (id, text) { $('#' + p + '-' + id).textContent = text; };
+  const set = function (id, text) { const el = $('#' + p + '-' + id); if (el) el.textContent = text; };
+  const isIdle = inp.scenario === 'idle';
+  const waiting = r.decision.code === 'wait';
+
+  set('km-total', r.totalKm > 0 ? 'Разом ' + fmtNum(r.totalKm, 0) + ' км' : '');
+  set('tolls-total', r.tolls > 0 ? 'Дороги разом ' + fmtMoney(r.tolls) + ' ₴' : '');
   set('r-freight', fmtMoney(r.freight) + ' ₴');
   set('r-km', fmtNum(r.totalKm, 0) + ' км');
   set('r-fuel', fmtMoney(r.fuel) + ' ₴');
   set('r-fuel-note', r.totalKm > 0 ? '· ' + fmtNum(r.norm, 1) + ' л/100' + (r.seasonOn && r.coef !== 1 ? ' із сезоном' : '') : '');
-  set('r-driver-label', state.mode === 'tent' ? 'Водію (' + fmtNum(r.driverPct * 100, 1) + ' %)' : 'ЗП водія');
+  set('r-driver-label', state.mode === 'tent' ? 'Водію (' + fmtNum(r.driverPct * 100, 0) + ' % від фрахту)' : 'Водію');
   set('r-driver', fmtMoney(r.driver) + ' ₴');
   set('r-amort', fmtMoney(r.amort) + ' ₴');
   set('r-tolls', fmtMoney(r.tolls) + ' ₴');
   set('r-other', fmtMoney(r.other) + ' ₴');
   set('r-total', fmtMoney(r.total) + ' ₴');
-  set('r-required', fmtMoney(r.required) + ' ₴');
-  set('r-profit', fmtMoney(r.profit) + ' ₴');
-  set('r-day', fmtMoney(r.profitPerDay) + ' ₴');
-  set('r-perkm', fmtNum(r.profitPerKm, 2) + ' ₴');
-  set('r-threshold', r.thresholdUnit === 'day' ? fmtMoney(r.threshold) + ' ₴/день' : fmtNum(r.threshold, 2) + ' ₴/км');
-  set('r-reserve', fmtMoney(r.reserve) + ' ₴');
-  $('#' + p + '-r-reserve').className = r.reserve >= 0 ? 'pos' : 'neg';
-  $('#' + p + '-r-day').className = r.profitPerDay >= 0 ? '' : 'neg';
-  $('#' + p + '-r-perkm').className = r.profitPerKm >= 0 ? '' : 'neg';
+  set('r-required', waiting ? '—' : fmtMoney(r.required) + ' ₴');
+  set('r-profit', waiting ? '—' : fmtMoney(r.profit) + ' ₴');
+  set('r-day', waiting ? '—' : fmtMoney(r.profitPerDay) + ' ₴');
+  set('r-perkm', waiting ? '—' : fmtNum(r.profitPerKm, 2) + ' ₴');
+  set('thr-label', isIdle ? 'Мінімум за день' : 'Мінімум на 1 км');
+  set('r-threshold', r.thresholdUnit === 'day' ? fmtMoney(r.threshold) + ' ₴' : fmtNum(r.threshold, 2) + ' ₴');
+  set('res-label', r.reserve >= 0 ? 'Запас' : 'Недобір');
+  set('r-reserve', waiting ? '—' : fmtMoney(Math.abs(r.reserve)) + ' ₴');
+  const resEl = $('#' + p + '-r-reserve');
+  resEl.className = 'num' + (r.reserve < 0 ? ' neg' : '');
+  $('#' + p + '-r-perkm').className = 'num' + (r.profitPerKm < 0 ? ' neg' : '');
+  $('#' + p + '-r-day').className = 'num' + (r.profitPerDay < 0 ? ' neg' : '');
 
+  const code = r.decision.code;
   const v = $('#' + p + '-verdict');
-  v.className = 'verdict ' + r.decision.code;
-  $('#' + p + '-verdict-word').textContent = r.decision.label;
+  v.className = 'verdict ' + code + (code === 'edge' || code === 'stop' ? ' badge-square' : '');
+  $('#' + p + '-badge').textContent = VERDICT_SYM[code];
+  $('#' + p + '-word').textContent = VERDICT_WORD[code];
+  $('#' + p + '-sub').textContent = code === 'wait'
+    ? (r.freight <= 0 ? 'Введіть ставку замовника' : (isIdle ? 'Введіть, скільки днів простій' : 'Введіть кілометри'))
+    : code === 'go'
+      ? (isIdle ? 'Заробіток за день вище мінімуму' : 'Заробіток ' + fmtNum(r.profitPerKm, 2) + ' ₴/км при мінімумі ' + fmtNum(r.threshold, 2))
+      : code === 'edge'
+        ? 'Не вистачає ' + fmtMoney(Math.abs(r.reserve)) + ' ₴ до мінімуму — торгуйтесь'
+        : 'Не вистачає ' + fmtMoney(Math.abs(r.reserve)) + ' ₴ — просіть ' + fmtMoney(r.required) + ' ₴';
 
-  const isIdle = inp.scenario === 'idle';
-  $('#' + p + '-note').textContent = isIdle
-    ? 'Для простою дивимось прибуток за 1 день. Зараз: ' + fmtMoney(r.metric) + ' ₴/день'
-    : 'Дивимось прибуток на 1 км. Зараз: ' + fmtNum(r.metric, 2) + ' ₴/км при порозі ' + fmtNum(r.threshold, 2);
+  set('note', isIdle
+    ? 'Простій: дивимось прибуток за 1 день. Зараз ' + fmtMoney(r.metric) + ' ₴/день при мінімумі ' + fmtMoney(r.threshold) + ' ₴.'
+    : 'Дивимось заробіток на 1 км: ' + fmtNum(r.metric, 2) + ' ₴/км при мінімумі ' + fmtNum(r.threshold, 2) + ' ₴/км. «Не дешевше» = витрати + мінімум × ' + fmtNum(r.totalKm, 0) + ' км.');
 
   renderCompare();
   saveDraft();
 }
 
-function recalcAll() { recalcVariant('a'); recalcVariant('b'); }
+function recalcAll() { recalcVariant('a'); if (state.showB) recalcVariant('b'); }
+
+function toggleB(on) {
+  state.showB = !!on;
+  $('#variant-b').hidden = !on;
+  $('#btn-add-b').hidden = !!on;
+  $('#compare').hidden = !on;
+  $('#variants').classList.toggle('two', !!on);
+  if (on) recalcVariant('b');
+  renderCompare();
+}
+
+function copyAtoB() {
+  const d = readVariant('a');
+  applyVariant('b', d);
+  recalcVariant('b');
+  toast('Рейс А скопійовано в Б — міняйте те, що відрізняється');
+}
 
 function renderCompare() {
-  const a = state.results.a, b = state.results.b, el = $('#compare');
+  const el = $('#compare');
+  if (!state.showB) { el.hidden = true; return; }
+  el.hidden = false;
+  const a = state.results.a, b = state.results.b;
   if (!a || !b || a.decision.code === 'wait' || b.decision.code === 'wait') {
-    el.innerHTML = 'Заповніть обидва варіанти — покажу, який кращий.';
+    el.innerHTML = '<h2>Який рейс кращий</h2><p class="lead"><small>Заповніть обидва рейси — покажу різницю.</small></p>' +
+      '<div class="cmp-acts"><button type="button" class="btn small" id="cmp-copy">Скопіювати А в Б</button></div>';
+    $('#cmp-copy').addEventListener('click', copyAtoB);
     return;
   }
-  if (Math.round(a.profit) === Math.round(b.profit)) {
-    el.innerHTML = 'Обидва варіанти дають однаковий прибуток: <b>' + fmtMoney(a.profit) + ' ₴</b>.';
-    return;
-  }
-  const best = a.profit > b.profit ? a : b, key = a.profit > b.profit ? 'А' : 'Б';
-  el.innerHTML = 'Кращий варіант: <b>' + key + '</b>. Різниця по прибутку <b>' + fmtMoney(Math.abs(a.profit - b.profit)) + ' ₴</b>, ' +
-    'запас до порогу у кращого — <b>' + fmtMoney(best.reserve) + ' ₴</b>' +
-    (best.decision.code !== 'go' ? ', але він ' + (best.decision.code === 'edge' ? 'на межі' : 'не проходить поріг') : '') + '.';
+  const diff = a.profit - b.profit;
+  const better = diff === 0 ? null : (diff > 0 ? 'А' : 'Б');
+  const row = function (label, av, bv, winA) {
+    return '<div class="cmp-row"><span>' + label + '</span>' +
+      '<span class="num' + (winA === true ? ' win' : '') + '">' + av + '</span>' +
+      '<span class="num' + (winA === false ? ' win' : '') + '">' + bv + '</span></div>';
+  };
+  el.innerHTML = '<h2>Який рейс кращий</h2>' +
+    '<p class="lead">' + (better ? 'Рейс ' + better + ' кращий на ' + fmtMoney(Math.abs(diff)) + ' ₴' : 'Однаково: ' + fmtMoney(a.profit) + ' ₴') +
+      '<small>' + (better ? 'Рейс ' + better + ': ' : '') + (better === 'Б' ? b : a).decision.label +
+      ', ' + ((better === 'Б' ? b : a).reserve >= 0 ? 'запас ' : 'недобір ') + fmtMoney(Math.abs((better === 'Б' ? b : a).reserve)) + ' ₴ до мінімуму</small></p>' +
+    '<div class="cmp-table">' +
+      '<div class="cmp-row head"><span></span><span>Рейс А</span><span>Рейс Б</span></div>' +
+      row('Вердикт', a.decision.label, b.decision.label, a.decision.code === b.decision.code ? null : (a.profit > b.profit)) +
+      row('Чистими', fmtMoney(a.profit) + ' ₴', fmtMoney(b.profit) + ' ₴', a.profit === b.profit ? null : a.profit > b.profit) +
+      row('На 1 км', fmtNum(a.profitPerKm, 2) + ' ₴', fmtNum(b.profitPerKm, 2) + ' ₴', a.profitPerKm === b.profitPerKm ? null : a.profitPerKm > b.profitPerKm) +
+      row('За день', fmtMoney(a.profitPerDay) + ' ₴', fmtMoney(b.profitPerDay) + ' ₴', a.profitPerDay === b.profitPerDay ? null : a.profitPerDay > b.profitPerDay) +
+      row('Не дешевше', fmtMoney(a.required) + ' ₴', fmtMoney(b.required) + ' ₴', null) +
+      row('Пробіг', fmtNum(a.totalKm, 0) + ' км', fmtNum(b.totalKm, 0) + ' км', null) +
+    '</div>' +
+    '<div class="cmp-acts"><button type="button" class="btn small" id="cmp-copy">Скопіювати А в Б</button></div>';
+  $('#cmp-copy').addEventListener('click', copyAtoB);
 }
 
 /* ---- чернетки ---- */
 function saveDraft() {
-  if (state.restoring || !state.session) return;
-  store.set(KEY.draft(state.session.user, state.mode), { a: readVariant('a'), b: readVariant('b') });
+  if (state.restoring || state.frozen || !state.session) return;
+  store.set(KEY.draft(state.session.user, state.mode), { a: readVariant('a'), b: state.showB ? readVariant('b') : null });
 }
 function restoreDraft() {
+  if (state.frozen || !state.session) return;
   const d = store.get(KEY.draft(state.session.user, state.mode));
   state.restoring = true;
   try {
-    ['a', 'b'].forEach(function (p) { if (d && d[p]) applyVariant(p, d[p]); });
+    if (d && d.a) applyVariant('a', d.a);
+    if (d && d.b) { toggleB(true); applyVariant('b', d.b); }
   } finally { state.restoring = false; }
 }
 function applyVariant(p, d) {
   const setv = function (id, v) { const el = $('#' + id); if (el && v !== undefined && v !== null) el.value = v; };
-  setv(p + '-region', d.region); setv(p + '-scenario', d.scenario); setv(p + '-quote', d.quoteMode);
+  if (d.region) setSeg(p + '-region', d.region);
+  if (d.scenario) setSeg(p + '-scenario', d.scenario);
+  if (d.quoteMode) setSeg(p + '-quote', d.quoteMode);
+  if (d.currency) setSeg(p + '-currency', d.currency);
   setv(p + '-vehicle', d.vehicle);
   const normEl = $('#' + p + '-norm');
   const veh = vehicleByPlate(d.vehicle);
   if (d.normAuto && veh) { normEl.value = vehicleNorm(veh, state.mode); normEl.dataset.auto = '1'; }
   else if (d.norm !== undefined && d.norm !== '') { normEl.value = d.norm; normEl.dataset.auto = ''; }
   setv(p + '-freight', d.freight); setv(p + '-ppt', d.pricePerTon);
-  if (d.tons) { setv(p + '-tons', d.tons); }
-  setv(p + '-cur', d.curAmount); setv(p + '-currency', d.currency);
-  setv(p + '-km-full', d.kmFull); setv(p + '-km-empty', d.kmEmpty); setv(p + '-days', d.days); setv(p + '-other', d.other);
+  if (d.tons) setv(p + '-tons', d.tons);
+  setv(p + '-cur', d.curAmount);
+  setv(p + '-km-full', d.kmFull); setv(p + '-km-empty', d.kmEmpty);
+  setv(p + '-days', d.days); setv(p + '-other', d.other);
   if (Array.isArray(d.tolls) && d.tolls.length) {
     $('#' + p + '-tolls').innerHTML = '';
     d.tolls.forEach(function (t) { addTollRow(p, t); });
@@ -1125,18 +1434,18 @@ function applyVariant(p, d) {
   syncVariantVisibility(p);
 }
 function resetVariant(p, ask) {
-  if (ask && !confirm('Очистити варіант ' + (p === 'a' ? 'А' : 'Б') + '?')) return;
+  if (ask && !confirm('Очистити рейс ' + (p === 'a' ? 'А' : 'Б') + '?')) return;
   renderVariant(p);
   recalcVariant(p);
 }
 
 /* ============================================================
-   ОНОВЛЕННЯ ДОВІДНИКІВ, ВИХІД, СТАРТ
+   ОНОВЛЕННЯ ДОВІДНИКІВ, СТАРТ
    ============================================================ */
 async function refreshConfig() {
   loader(true, 'Оновлюю довідники…');
   try {
-    const data = await api('config', { token: state.session.token });
+    const data = await apiCall('config', { token: state.session.token });
     const dirty = state.dirty, mine = state.settings;
     state.config = data;
     store.set(KEY.config(state.session.user), data);
@@ -1148,10 +1457,11 @@ async function refreshConfig() {
       applyVariant(p, d);
     });
     recalcAll();
+    $('#offline-bar').hidden = true;
     toast('Довідники оновлено');
   } catch (e) {
-    if (e.code === 'AUTH') { toast('Сесія закінчилась — увійдіть знову', true); logout(); }
-    else toast(e.message, true);
+    if (e.code === 'AUTH') sessionExpired();
+    else { toast(e.message, true); if (e.code === 'NETWORK') $('#offline-bar').hidden = false; }
   } finally { loader(false); }
 }
 
@@ -1167,22 +1477,26 @@ async function boot() {
   $('#btn-settings-reset').addEventListener('click', resetSettings);
   $('#btn-refresh').addEventListener('click', refreshConfig);
   $('#btn-logout').addEventListener('click', logout);
+  $('#btn-add-b').addEventListener('click', function () { toggleB(true); });
+  $('#btn-relogin').addEventListener('click', function () { $('#screen-expired').hidden = true; logout(); });
   window.addEventListener('beforeunload', function (e) {
     if (state.dirty.grain || state.dirty.tent) { e.preventDefault(); e.returnValue = ''; }
   });
+
+  if (DEMO && demoScene()) { await runDemoScene(demoScene()); return; }
 
   const session = store.get(KEY.session);
   if (session && session.token) {
     state.session = session;
     loader(true, 'Завантажую довідники…');
     try {
-      const data = await api('config', { token: session.token });
+      const data = await apiCall('config', { token: session.token });
       loader(false);
       enter(data);
     } catch (e) {
       loader(false);
       const cached = store.get(KEY.config(session.user));
-      if (e.code === 'AUTH') { store.del(KEY.session); state.session = null; showLogin(); }
+      if (e.code === 'AUTH') { store.del(KEY.session); state.session = null; showLogin(); sessionExpired(); }
       else if (cached) enter(cached, true);
       else { showLogin(); toast(e.message, true); }
     }
@@ -1191,6 +1505,78 @@ async function boot() {
   }
 }
 document.addEventListener('DOMContentLoaded', boot);
+</script>
+
+<script>
+/* ============================================================
+   ДЕМО-СЦЕНИ для макетів: index.html#demo=<назва>
+   Потрібні лише щоб показати кожен екран без сервера.
+   ============================================================ */
+function demoScene() {
+  const h = String(location.hash || '').replace(/^#/, '');
+  const p = new URLSearchParams(h);
+  return p.get('demo') || '';
+}
+
+const SCENE_A_GO = { from: 'Одеса', to: 'Львів', cargo: 'Пшениця, 25 т', region: 'ukraine', scenario: 'service',
+  quoteMode: 'manual', freight: '47000', kmFull: '600', kmEmpty: '400', days: '2', other: '1000',
+  vehicle: 'AA 1234 BB', normAuto: true, tolls: [] };
+const SCENE_B_EDGE = { from: 'Львів', to: 'Вінниця', cargo: 'Шрот, 24 т', region: 'ukraine', scenario: 'return',
+  quoteMode: 'manual', freight: '20400', kmFull: '450', kmEmpty: '50', days: '1', other: '',
+  vehicle: 'AA 1234 BB', normAuto: true, tolls: [] };
+const SCENE_TENT = { from: 'Житомир', to: 'Гамбург', cargo: 'Пелети, 22 т', region: 'abroad', scenario: 'service',
+  quoteMode: 'currency', curAmount: '2000', currency: 'EUR', kmFull: '1200', kmEmpty: '300', days: '4', other: '2000',
+  vehicle: 'AA 1234 BB', normAuto: true,
+  tolls: [{ country: 'Польща', qty: '700', rate: '4' }, { country: 'Німеччина', qty: '500', rate: '16' }] };
+
+async function enterDemo(mode) {
+  state.frozen = true;
+  state.session = { token: 'demo-token', user: 'Ігор Ковальчук', role: 'логіст' };
+  const cfg = demoConfig();
+  state.config = cfg;
+  state.settings = JSON.parse(JSON.stringify(cfg.settings));
+  state.dirty = { grain: false, tent: false };
+  $('#screen-login').hidden = true;
+  $('#screen-calc').hidden = false;
+  $('#user-name').textContent = shortName(state.session.user);
+  applyMode(mode || 'grain', true);
+}
+
+function fill(p, data, openMore) {
+  applyVariant(p, data);
+  if (openMore) $('#' + p + '-more').open = true;
+  recalcVariant(p);
+}
+
+async function runDemoScene(scene) {
+  if (scene.indexOf('login') === 0) {
+    showLogin();
+    await new Promise(function (r) { setTimeout(r, 260); });
+    if (scene === 'login-pin') openPin('Ігор Ковальчук');
+    if (scene === 'login-wrong') { openPin('Ігор Ковальчук'); state.pin = ''; renderPinDots(); showPinError({ code: 'PIN', message: 'Невірний PIN. Лишилось 2 спроби' }); }
+    if (scene === 'login-blocked') { openPin('Ігор Ковальчук'); showPinError({ code: 'BLOCKED' }); }
+    if (scene === 'login-nopin') { openPin('Оксана Бондар'); showPinError({ code: 'NOPIN' }); }
+    if (scene === 'login-offline') {
+      $('#user-list').innerHTML = '';
+      $('#users-error').innerHTML = alertHTML('stop', '!', 'Немає звʼязку',
+        'Не можу завантажити список. Перевірте інтернет і спробуйте ще раз.', 'Спробувати ще раз', 'btn-retry-users');
+    }
+    return;
+  }
+
+  await enterDemo(scene === 'calc-tent' ? 'tent' : 'grain');
+
+  if (scene === 'calc-empty') return;
+  if (scene === 'calc-wait') { fill('a', Object.assign({}, SCENE_A_GO, { freight: '' })); return; }
+  if (scene === 'calc-go') { fill('a', SCENE_A_GO, true); return; }
+  if (scene === 'calc-edge') { fill('a', SCENE_B_EDGE, true); return; }
+  if (scene === 'calc-stop') { fill('a', Object.assign({}, SCENE_A_GO, { freight: '34000' }), true); return; }
+  if (scene === 'calc-compare') { fill('a', SCENE_A_GO); toggleB(true); fill('b', SCENE_B_EDGE); return; }
+  if (scene === 'calc-settings') { fill('a', SCENE_A_GO); $('#btn-settings-toggle').click(); return; }
+  if (scene === 'calc-tent') { fill('a', SCENE_TENT, true); return; }
+  if (scene === 'calc-offline') { fill('a', SCENE_A_GO); $('#offline-bar').hidden = false; return; }
+  if (scene === 'calc-expired') { fill('a', SCENE_A_GO); sessionExpired(); return; }
+}
 </script>
 </body>
 </html>
