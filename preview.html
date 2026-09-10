@@ -1586,8 +1586,8 @@ function removeTollRow(p, row) {
   const done = function () { row.remove(); recalcVariant(p); };
   if (reduceMotion() || !row.animate) { done(); return; }
   row.style.overflow = 'hidden';
-  row.animate([{ height: row.offsetHeight + 'px', opacity: 1 }, { height: '0px', opacity: 0, paddingTop: '0px', paddingBottom: '0px' }],
-    { duration: 240, easing: 'cubic-bezier(.4, 0, .2, 1)', fill: 'forwards' }).onfinish = done;
+  afterAnim(row.animate([{ height: row.offsetHeight + 'px', opacity: 1 }, { height: '0px', opacity: 0, paddingTop: '0px', paddingBottom: '0px' }],
+    { duration: 240, easing: 'cubic-bezier(.4, 0, .2, 1)', fill: 'forwards' }), 400, done);
 }
 function applyTollUnit(row, unit) {
   const day = unit === 'day';
@@ -1745,12 +1745,12 @@ function showVariant(p) {
   const runs = cards.map(function (c) {
     return c.animate([{ transform: from }, { transform: to }], { duration: 560, easing: ease('--spring-soft'), fill: 'forwards' });
   });
-  runs[0].onfinish = function () {
+  afterAnim(runs[0], 900, function () {
     host.classList.remove('sliding');
     settle();
     runs.forEach(function (a) { a.cancel(); });
     state.sliding = false;
-  };
+  });
 }
 
 // Свайп вліво-вправо по рейсу на телефоні — лише коли є рейс Б. Не з полів і перемикачів і не від країв
@@ -1806,12 +1806,21 @@ function openDetails(d, open) {
   d.dataset.anim = '1';
   d.style.overflow = 'hidden';
   const run = d.animate({ height: [from + 'px', to + 'px'] }, { duration: open ? 420 : 300, easing: 'cubic-bezier(.2, .8, .2, 1)', fill: 'forwards' });
-  run.onfinish = function () {
+  afterAnim(run, open ? 700 : 550, function () {
     if (!open) d.open = false;
     run.cancel();
     d.style.overflow = '';
     delete d.dataset.anim;
-  };
+  });
+}
+
+// Кінець анімації — із запасом за часом: у фоновій вкладці чи при енергозбереженні кадри можуть стояти,
+// а стан інтерфейсу мусить дійти до кінця все одно. fn виконується рівно раз.
+function afterAnim(anim, ms, fn) {
+  let done = false;
+  const once = function () { if (!done) { done = true; fn(); } };
+  anim.finished.then(once, once);
+  setTimeout(once, ms);
 }
 
 function copyAtoB() {
